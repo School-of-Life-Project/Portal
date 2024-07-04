@@ -10,9 +10,12 @@
 	"tauri": {
 		"allowlist": {
 			"all": false,
-			"shell": {
+			"fs": {
 				"all": false,
-				"open": true
+				"readFile": true,
+				"scope": [
+					"$APPDATA/*"
+				]
 			}
 		},
 		"windows": [

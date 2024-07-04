@@ -13,14 +13,30 @@ tauri-build = { version = "1", features = [
 
 [dependencies]
 tauri = { version = "1", features = [
-	"shell-open",
+	"fs-read-file",
 ] }
 serde = { version = "1", features = [
 	"derive",
 ] }
 serde_json = "1"
+uuid = { version = "1.9.1", features = [
+	"v4",
+	"serde",
+] }
+toml = "0.8.14"
+ring = "0.17.8"
+tokio = { version = "1.38.0", features = [
+	"fs",
+] }
+open = "5.2.0"
 
 [features]
 custom-protocol = [
 	"tauri/custom-protocol",
 ]
+
+[profile.release]
+panic         = "abort"
+codegen-units = 1
+lto           = true
+strip         = true
