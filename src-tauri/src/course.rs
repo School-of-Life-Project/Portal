@@ -50,21 +50,6 @@ async fn get_path_iterator(path: &Path) -> io::Result<ReadDir> {
 }
 
 #[tauri::command]
-pub async fn open_data_dir(app_handle: tauri::AppHandle) -> Result<(), String> {
-    let mut path = app_handle
-        .path_resolver()
-        .app_data_dir()
-        .ok_or("Unable to find application data directory")?;
-
-    ensure_folder_exists(&path)
-        .await
-        .map_err(|err| format!("Unable to open application data directory: {}", err))?;
-
-    open::that_detached(&path)
-        .map_err(|err| format!("Unable to launch system file opener: {}", err))
-}
-
-#[tauri::command]
 pub async fn get_courses(
     window: tauri::Window,
     app_handle: tauri::AppHandle,

@@ -732,6 +732,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "fs4"
+version = "0.8.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f7e180ac76c23b45e767bd7ae9579bc0bb458618c4bc71835926e098e61d15f8"
+dependencies = [
+ "rustix",
+ "tokio",
+ "windows-sys 0.52.0",
+]
+
+[[package]]
 name = "futf"
 version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2245,6 +2256,8 @@ dependencies = [
 name = "school-of-life-portal"
 version = "0.0.0"
 dependencies = [
+ "derive_more",
+ "fs4",
  "open",
  "ring",
  "serde",
