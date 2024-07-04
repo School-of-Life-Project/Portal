@@ -1,42 +1,48 @@
 {
-  "build": {
-    "devPath": "../src",
-    "distDir": "../src",
-    "withGlobalTauri": true
-  },
-  "package": {
-    "productName": "school-of-life-portal",
-    "version": "0.0.0"
-  },
-  "tauri": {
-    "allowlist": {
-      "all": false,
-      "shell": {
-        "all": false,
-        "open": true
-      }
-    },
-    "windows": [
-      {
-        "title": "school-of-life-portal",
-        "width": 800,
-        "height": 600
-      }
-    ],
-    "security": {
-      "csp": null
-    },
-    "bundle": {
-      "active": true,
-      "targets": "all",
-      "identifier": "com.tauri.dev",
-      "icon": [
-        "icons/32x32.png",
-        "icons/128x128.png",
-        "icons/128x128@2x.png",
-        "icons/icon.icns",
-        "icons/icon.ico"
-      ]
-    }
-  }
+	"build": {
+		"devPath": "http://127.0.0.1:3000/src",
+		"distDir": "../src",
+		"withGlobalTauri": true
+	},
+	"package": {
+		"productName": "school-of-life-portal"
+	},
+	"tauri": {
+		"allowlist": {
+			"all": false,
+			"shell": {
+				"all": false,
+				"open": true
+			}
+		},
+		"windows": [
+			{
+				"title": "Portal",
+				"minWidth": 600,
+				"minHeight": 400,
+				"fileDropEnabled": false,
+				"fullscreen": true
+			}
+		],
+		"security": {
+			"csp": null
+		},
+		"bundle": {
+			"active": true,
+			"targets": "all",
+			"identifier": "com.schoolOfLifeProject.Portal",
+			"publisher": "School of Life Project",
+			"copyright": "Licensed under BSL-1.0",
+			"category": "Education",
+			"shortDescription": "A textbook-based eLearning application.",
+			"longDescription": "Portal is an eLearning application built for independent learners, designed to allow the use of existing learning materials such as textbooks.",
+			"icon": [
+				"icons/32x32.png",
+				"icons/128x128.png",
+				"icons/128x128@2x.png",
+				"icons/icon.icns",
+				"icons/icon.ico"
+			]
+		}
+	}
 }
