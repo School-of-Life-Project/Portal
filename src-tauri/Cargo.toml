@@ -1,0 +1,26 @@
+[package]
+name = "school-of-life-portal"
+version = "0.0.0"
+description = "A textbook-based eLearning application."
+authors = [
+	"School of Life Project",
+]
+edition = "2021"
+
+[build-dependencies]
+tauri-build = { version = "1", features = [
+] }
+
+[dependencies]
+tauri = { version = "1", features = [
+	"shell-open",
+] }
+serde = { version = "1", features = [
+	"derive",
+] }
+serde_json = "1"
+
+[features]
+custom-protocol = [
+	"tauri/custom-protocol",
+]
