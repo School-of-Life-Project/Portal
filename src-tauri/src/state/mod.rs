@@ -105,6 +105,9 @@ impl Course {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+pub struct CourseProgress {}
+
+#[derive(Serialize, Deserialize, Debug)]
 struct Textbook {
     label: String,
     file: PathBuf,
@@ -116,6 +119,9 @@ struct Chapter {
     id: Option<String>,
     sections: Vec<Vec<String>>,
 }
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Settings {}
 
 #[tauri::command]
 pub async fn open_data_dir(state: tauri::State<'_, StateWrapper>) -> Result<(), ErrorWrapper> {
@@ -132,6 +138,18 @@ pub async fn open_data_dir(state: tauri::State<'_, StateWrapper>) -> Result<(), 
 }
 
 #[tauri::command]
+pub async fn get_course_map_list(
+    state: tauri::State<'_, StateWrapper>,
+) -> Result<Vec<Uuid>, ErrorWrapper> {
+    let state = state.state().await?;
+
+    state
+        .get_course_map_list()
+        .await
+        .map_err(|e| ErrorWrapper::new("Unable to get CourseMap list".to_string(), &e))
+}
+
+#[tauri::command]
 pub async fn get_course_map(
     state: tauri::State<'_, StateWrapper>,
     id: Uuid,
@@ -145,15 +163,15 @@ pub async fn get_course_map(
 }
 
 #[tauri::command]
-pub async fn get_course_map_list(
+pub async fn get_course_list(
     state: tauri::State<'_, StateWrapper>,
 ) -> Result<Vec<Uuid>, ErrorWrapper> {
     let state = state.state().await?;
 
     state
-        .get_course_map_list()
+        .get_course_list()
         .await
-        .map_err(|e| ErrorWrapper::new("Unable to get CourseMap list".to_string(), &e))
+        .map_err(|e| ErrorWrapper::new("Unable to get Course list".to_string(), &e))
 }
 
 #[tauri::command]
@@ -203,35 +221,48 @@ pub async fn get_course_progress(
 }
 
 #[tauri::command]
-pub async fn get_course_list(
+pub async fn set_course_progress(
+    state: tauri::State<'_, StateWrapper>,
+    id: Uuid,
+    data: CourseProgress,
+) -> Result<Option<()>, ErrorWrapper> {
+    let state = state.state().await?;
+
+    todo!()
+}
+
+#[tauri::command]
+pub async fn get_active_courses(
     state: tauri::State<'_, StateWrapper>,
 ) -> Result<Vec<Uuid>, ErrorWrapper> {
     let state = state.state().await?;
 
-    state
-        .get_course_list()
-        .await
-        .map_err(|e| ErrorWrapper::new("Unable to get Course list".to_string(), &e))
+    todo!()
 }
 
-/*#[tauri::command]
-pub async fn get_courses(
-    window: tauri::Window,
-    app_handle: tauri::AppHandle,
+#[tauri::command]
+pub async fn set_active_courses(
     state: tauri::State<'_, StateWrapper>,
-) -> Result<Vec<Course>, String> {
+    data: Vec<Uuid>,
+) -> Result<(), ErrorWrapper> {
+    let state = state.state().await?;
 
-    todo!();
-}*/
+    todo!()
+}
 
-/*#[tauri::command]
-pub async fn open_data_dir(app_handle: tauri::AppHandle) -> Result<(), String> {
-    let path = get_data_dir(app_handle).ok_or("Unable to find application data directory")?;
+#[tauri::command]
+pub async fn get_settings(state: tauri::State<'_, StateWrapper>) -> Result<Settings, ErrorWrapper> {
+    let state = state.state().await?;
 
-    ensure_folder_exists(&path)
-        .await
-        .map_err(|err| format!("Unable to open application data directory: {}", err))?;
+    todo!()
+}
 
-    open::that_detached(&path)
-        .map_err(|err| format!("Unable to launch system file opener: {}", err))
-}*/
+#[tauri::command]
+pub async fn set_settings(
+    state: tauri::State<'_, StateWrapper>,
+    data: Settings,
+) -> Result<(), ErrorWrapper> {
+    let state = state.state().await?;
+
+    todo!()
+}
