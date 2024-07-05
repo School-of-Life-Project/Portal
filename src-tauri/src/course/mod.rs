@@ -1,11 +1,12 @@
 use std::{
     error::Error,
     ffi::OsString,
-    path::{Path, PathBuf},
+    path::{Component, Path, PathBuf},
     sync::Arc,
 };
 
 use serde::{Deserialize, Serialize, Serializer};
+use thiserror::Error;
 use tokio::{
     fs::{self, ReadDir},
     io,
@@ -15,9 +16,7 @@ use uuid::Uuid;
 
 pub mod wrapper;
 
-use crate::data::{
-    self, ConfigError, ConfigFile, DataManager, OpenError, ResourceManager, WritableConfigFile,
-};
+use crate::data::{self, ConfigFile, DataError, DataManager, ResourceManager, WritableConfigFile};
 
 use self::wrapper::{ErrorWrapper, StateWrapper};
 
@@ -31,7 +30,7 @@ struct State {
 }
 
 impl State {
-    async fn new() -> Result<Self, OpenError> {
+    async fn new() -> Result<Self, DataError> {
         let data_dir = data::get_data_dir(crate::IDENTIFIER).await?;
 
         let extension = Some(OsString::from("toml"));
@@ -50,6 +49,36 @@ impl State {
             settings: Mutex::new(WritableConfigFile::new(&settings_path).await?),
         })
     }
+    async fn get_course_map_list(&self) -> Result<Vec<Uuid>, DataError> {
+        self.course_maps.scan().await
+    }
+    async fn get_course_map(&self, id: Uuid) -> Result<Option<CourseMap>, DataError> {
+        match self.course_maps.get(id).await {
+            Some(path) => {
+                let mut file = ConfigFile::new(&path).await?;
+                file.read().await
+            }
+            None => Ok(None),
+        }
+    }
+    async fn get_course_list(&self) -> Result<Vec<Uuid>, DataError> {
+        self.courses.scan().await
+    }
+    async fn get_course(&self, id: Uuid) -> Result<Option<Course>, DataError> {
+        match self.courses.get(id).await {
+            Some(root) => {
+                let mut index = ConfigFile::new(&root.join("course.toml")).await?;
+                let mut course: Course = index.read().await?;
+
+                for book in course.books.iter_mut() {
+                    book.file = data::into_relative_path(&root, &book.file);
+                }
+
+                Ok(Some(course))
+            }
+            None => Ok(None),
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -59,11 +88,24 @@ pub struct CourseMap {}
 pub struct Course {
     title: String,
     description: Option<String>,
-    books: Vec<(String, Textbook)>,
+    books: Vec<Textbook>,
+}
+
+impl Course {
+    fn get_files(&self) -> Vec<&PathBuf> {
+        let mut files = Vec::new();
+
+        for book in &self.books {
+            files.push(&book.file);
+        }
+
+        files
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 struct Textbook {
+    label: String,
     file: PathBuf,
     chapters: Vec<Chapter>,
 }
@@ -95,17 +137,10 @@ pub async fn get_course_map(
 ) -> Result<Option<CourseMap>, ErrorWrapper> {
     let state = state.state().await?;
 
-    match state.course_maps.get(id).await {
-        Some(path) => {
-            let mut file = ConfigFile::new(&path)
-                .await
-                .map_err(|e| ErrorWrapper::new(format!("Unable to open CourseMap {}", id), &e))?;
-            file.read()
-                .await
-                .map_err(|e| ErrorWrapper::new(format!("Unable to read CourseMap {}", id), &e))
-        }
-        None => Ok(None),
-    }
+    state
+        .get_course_map(id)
+        .await
+        .map_err(|e| ErrorWrapper::new(format!("Unable to get CourseMap {}", id), &e))
 }
 
 #[tauri::command]
@@ -115,8 +150,7 @@ pub async fn get_course_map_list(
     let state = state.state().await?;
 
     state
-        .course_maps
-        .scan()
+        .get_course_map_list()
         .await
         .map_err(|e| ErrorWrapper::new("Unable to get CourseMap list".to_string(), &e))
 }
@@ -129,14 +163,14 @@ pub async fn get_course(
 ) -> Result<Option<Course>, ErrorWrapper> {
     let state = state.state().await?;
 
-    match state.courses.get(id).await {
-        Some(path) => {
-            todo!()
+    let course = state
+        .get_course(id)
+        .await
+        .map_err(|e| ErrorWrapper::new(format!("Unable to get Course {}", id), &e))?;
 
-            // TODO: Use app_handle.asset_protocol_scope() + FsScope.allow_file() to selectively allow access to course files
-        }
-        None => Ok(None),
-    }
+    // TODO: Use app_handle.asset_protocol_scope() + FsScope.allow_file() to selectively allow access to course files
+
+    todo!()
 }
 
 #[tauri::command]
@@ -146,12 +180,7 @@ pub async fn get_course_progress(
 ) -> Result<Option<Course>, ErrorWrapper> {
     let state = state.state().await?;
 
-    match state.progress.get(id).await {
-        Some(path) => {
-            todo!()
-        }
-        None => Ok(None),
-    }
+    todo!()
 }
 
 #[tauri::command]
@@ -161,8 +190,7 @@ pub async fn get_course_list(
     let state = state.state().await?;
 
     state
-        .courses
-        .scan()
+        .get_course_list()
         .await
         .map_err(|e| ErrorWrapper::new("Unable to get Course list".to_string(), &e))
 }

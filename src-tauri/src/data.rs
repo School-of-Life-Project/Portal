@@ -1,7 +1,7 @@
 use std::{
     env,
     ffi::OsString,
-    path::{Path, PathBuf},
+    path::{Component, Path, PathBuf},
 };
 
 use advisory_lock::{AdvisoryFileLock, FileLockError, FileLockMode};
@@ -15,7 +15,34 @@ use tokio::{
 use toml::{Deserializer, Serializer};
 use uuid::{fmt::Simple, Uuid};
 
-pub async fn get_data_dir(dirname: &str) -> Result<PathBuf, io::Error> {
+pub fn into_relative_path(root: &Path, path: &Path) -> PathBuf {
+    let mut new = PathBuf::from(root);
+
+    let mut items: usize = 0;
+    let mut popped = 0;
+
+    for component in path.components() {
+        match component {
+            Component::Prefix(_) => {}
+            Component::RootDir => {}
+            Component::CurDir => {}
+            Component::ParentDir => {
+                if items.saturating_sub(popped) > 0 {
+                    new.pop();
+                    popped += 1;
+                }
+            }
+            Component::Normal(item) => {
+                new.push(item);
+                items += 1;
+            }
+        }
+    }
+
+    new
+}
+
+pub async fn get_data_dir(dirname: &str) -> Result<PathBuf, DataError> {
     let mut path = match dirs_next::data_dir() {
         Some(path) => path,
         None => env::current_dir()?,
@@ -28,7 +55,7 @@ pub async fn get_data_dir(dirname: &str) -> Result<PathBuf, io::Error> {
     Ok(path)
 }
 
-pub async fn ensure_folder_exists(path: &Path) -> Result<(), io::Error> {
+pub async fn ensure_folder_exists(path: &Path) -> Result<(), DataError> {
     let metadata = fs::metadata(path).await;
 
     match metadata {
@@ -47,16 +74,20 @@ pub async fn ensure_folder_exists(path: &Path) -> Result<(), io::Error> {
 }
 
 #[derive(Error, Debug)]
-pub enum OpenError {
+pub enum DataError {
     #[error("File is already locked by another process")]
     AlreadyLocked,
     #[error(transparent)]
     Io(#[from] io::Error),
     #[error(transparent)]
+    Deserialization(#[from] toml::de::Error),
+    #[error(transparent)]
+    Serialization(#[from] toml::ser::Error),
+    #[error("File locking task was terminated or panicked")]
     BlockingTaskFailed(#[from] JoinError),
 }
 
-impl From<FileLockError> for OpenError {
+impl From<FileLockError> for DataError {
     fn from(value: FileLockError) -> Self {
         match value {
             FileLockError::AlreadyLocked => Self::AlreadyLocked,
@@ -65,17 +96,7 @@ impl From<FileLockError> for OpenError {
     }
 }
 
-#[derive(Error, Debug)]
-pub enum ConfigError {
-    #[error(transparent)]
-    Io(#[from] io::Error),
-    #[error(transparent)]
-    Deserialization(#[from] toml::de::Error),
-    #[error(transparent)]
-    Serialization(#[from] toml::ser::Error),
-}
-
-async fn lock_file(file: File, mode: FileLockMode) -> Result<File, OpenError> {
+async fn lock_file(file: File, mode: FileLockMode) -> Result<File, DataError> {
     let std_file = file.into_std().await;
 
     let file = task::spawn_blocking(move || -> Result<File, FileLockError> {
@@ -95,7 +116,7 @@ pub struct ConfigFile {
 }
 
 impl ConfigFile {
-    pub async fn new(path: &Path) -> Result<Self, OpenError> {
+    pub async fn new(path: &Path) -> Result<Self, DataError> {
         let file = File::open(path).await?;
         let file = lock_file(file, FileLockMode::Shared).await?;
         let metadata = file.metadata().await?;
@@ -105,7 +126,7 @@ impl ConfigFile {
             buffer: String::with_capacity(metadata.len().try_into().unwrap_or_default()),
         })
     }
-    pub async fn read<T>(&mut self) -> Result<T, ConfigError>
+    pub async fn read<T>(&mut self) -> Result<T, DataError>
     where
         T: DeserializeOwned,
     {
@@ -124,7 +145,7 @@ pub struct WritableConfigFile {
 }
 
 impl WritableConfigFile {
-    pub async fn new(path: &Path) -> Result<Self, OpenError> {
+    pub async fn new(path: &Path) -> Result<Self, DataError> {
         let file = OpenOptions::new()
             .create(true)
             .truncate(false)
@@ -140,7 +161,7 @@ impl WritableConfigFile {
             buffer: String::with_capacity(metadata.len().try_into().unwrap_or_default()),
         })
     }
-    pub async fn read<T>(&mut self) -> Result<T, ConfigError>
+    pub async fn read<T>(&mut self) -> Result<T, DataError>
     where
         T: DeserializeOwned,
     {
@@ -150,7 +171,7 @@ impl WritableConfigFile {
         let deserializer = Deserializer::new(&self.buffer);
         Ok(T::deserialize(deserializer)?)
     }
-    pub async fn write<T>(&mut self, data: &T) -> Result<(), ConfigError>
+    pub async fn write<T>(&mut self, data: &T) -> Result<(), DataError>
     where
         T: Serialize,
     {
@@ -173,7 +194,7 @@ pub struct DataManager {
 }
 
 impl DataManager {
-    pub async fn new(root: PathBuf, mut extension: Option<OsString>) -> Result<Self, io::Error> {
+    pub async fn new(root: PathBuf, mut extension: Option<OsString>) -> Result<Self, DataError> {
         ensure_folder_exists(&root).await?;
 
         if let Some(extension) = &mut extension {
@@ -198,7 +219,7 @@ impl DataManager {
             Err(_) => None,
         }
     }
-    pub async fn scan(&self) -> Result<Vec<Uuid>, io::Error> {
+    pub async fn scan(&self) -> Result<Vec<Uuid>, DataError> {
         let mut items = Vec::new();
         let mut buffer = Uuid::encode_buffer();
 
@@ -243,7 +264,7 @@ pub struct ResourceManager {
 }
 
 impl ResourceManager {
-    pub async fn new(root: PathBuf) -> Result<Self, io::Error> {
+    pub async fn new(root: PathBuf) -> Result<Self, DataError> {
         ensure_folder_exists(&root).await?;
 
         Ok(Self { root })
@@ -261,7 +282,7 @@ impl ResourceManager {
             Err(_) => None,
         }
     }
-    pub async fn scan(&self) -> Result<Vec<Uuid>, io::Error> {
+    pub async fn scan(&self) -> Result<Vec<Uuid>, DataError> {
         let mut items = Vec::new();
         let mut buffer = Uuid::encode_buffer();
 
