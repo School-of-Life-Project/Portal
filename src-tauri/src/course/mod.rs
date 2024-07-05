@@ -6,6 +6,7 @@ use std::{
 };
 
 use serde::{Deserialize, Serialize, Serializer};
+use tauri::Manager;
 use thiserror::Error;
 use tokio::{
     fs::{self, ReadDir},
@@ -92,7 +93,7 @@ pub struct Course {
 }
 
 impl Course {
-    fn get_files(&self) -> Vec<&PathBuf> {
+    fn get_resources(&self) -> Vec<&PathBuf> {
         let mut files = Vec::new();
 
         for book in &self.books {
@@ -168,9 +169,27 @@ pub async fn get_course(
         .await
         .map_err(|e| ErrorWrapper::new(format!("Unable to get Course {}", id), &e))?;
 
-    // TODO: Use app_handle.asset_protocol_scope() + FsScope.allow_file() to selectively allow access to course files
+    if let Some(course) = &course {
+        let scope = app_handle.asset_protocol_scope();
 
-    todo!()
+        for path in course.get_resources() {
+            if let Ok(metadata) = fs::metadata(path).await {
+                if metadata.is_dir() {
+                    scope.allow_directory(path, true)
+                } else {
+                    scope.allow_file(path)
+                }
+                .map_err(|e| {
+                    ErrorWrapper::new(
+                        format!("Unable to allow access to Course {} path {:?}", id, path),
+                        &e,
+                    )
+                })?;
+            }
+        }
+    }
+
+    Ok(course)
 }
 
 #[tauri::command]
