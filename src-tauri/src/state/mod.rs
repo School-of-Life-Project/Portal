@@ -1,7 +1,9 @@
 use std::{ffi::OsString, path::PathBuf};
 
+use futures::{future::try_join5, try_join};
 use serde::{Deserialize, Serialize};
-use tokio::sync::Mutex;
+use tauri::async_runtime::set;
+use tokio::{fs, sync::Mutex};
 use uuid::Uuid;
 
 pub mod wrapper;
@@ -17,6 +19,47 @@ struct State {
     settings: Mutex<WritableConfigFile>,
 }
 
+/*
+
+App flow:
+
+- Course viewer
+    - (get) Course (+resources)
+        - (get) CourseProgress
+    - (set) CourseProgress
+- Homepage
+    - (get) ActiveCourses
+    - (get) Course
+        - (get) CourseProgress
+
+- Course Map
+    - (get, list) CourseMap
+    - (get, list) Course
+        - (get, set) CourseProgress
+    - (get, set) ActiveCourses
+
+New API outline:
+
+    list Course
+    list CourseMap
+
+    get CourseMap {uuid}
+        returns CourseMap
+
+    get ActiveCourses
+        returns []Uuid
+    set ActiveCourses []Uuid
+
+
+    get Course {id}
+        returns (Course, CourseProgress)
+    set CourseProgress {id}
+
+
+
+
+*/
+
 impl State {
     async fn new() -> Result<Self, DataError> {
         let data_dir = data::get_data_dir(crate::IDENTIFIER).await?;
@@ -24,56 +67,50 @@ impl State {
         let extension = Some(OsString::from("toml"));
         let course_map_path = data_dir.join("Course Maps");
         let course_path = data_dir.join("Courses");
-        let progress_path = data_dir.join("Progress");
+        let progress_path = data_dir.join("Progress Data");
         let active_courses_path = data_dir.join("Active Courses.toml");
         let settings_path = data_dir.join("Settings.toml");
 
+        let (course_maps, courses, progress, active_courses, settings) = try_join!(
+            DataManager::new(course_map_path, extension.clone()),
+            ResourceManager::new(course_path),
+            DataManager::new(progress_path, extension),
+            WritableConfigFile::new(&active_courses_path),
+            WritableConfigFile::new(&settings_path),
+        )?;
+
         Ok(Self {
             data_dir,
-            course_maps: DataManager::new(course_map_path, extension.clone()).await?,
-            courses: ResourceManager::new(course_path).await?,
-            progress: DataManager::new(progress_path, extension).await?,
-            active_courses: Mutex::new(WritableConfigFile::new(&active_courses_path).await?),
-            settings: Mutex::new(WritableConfigFile::new(&settings_path).await?),
+            course_maps,
+            courses,
+            progress,
+            active_courses: Mutex::new(active_courses),
+            settings: Mutex::new(settings),
         })
     }
-    async fn get_course_map_list(&self) -> Result<Vec<Uuid>, DataError> {
-        self.course_maps.scan().await
-    }
-    async fn get_course_map(&self, id: Uuid) -> Result<CourseMap, DataError> {
-        let path = self.course_maps.get(id);
+    async fn get_course(&self, id: Uuid) -> Result<(Course, CourseProgress), DataError> {
+        let course_root = self.courses.get(id).await?;
+        let course_index_path = course_root.join("course.toml");
+        let course_progress_path = self.progress.get(id);
 
-        let mut file = ConfigFile::new(&path).await?;
-        file.read().await
-    }
-    async fn get_course_list(&self) -> Result<Vec<Uuid>, DataError> {
-        self.courses.scan().await
-    }
-    async fn get_course(&self, id: Uuid) -> Result<Course, DataError> {
-        let root = self.courses.get(id).await?;
+        let (mut course, course_progress) = if self.progress.has(id).await {
+            let (mut index, mut progress) = try_join!(
+                ConfigFile::new(&course_index_path),
+                ConfigFile::new(&course_progress_path)
+            )?;
 
-        let mut index = ConfigFile::new(&root.join("course.toml")).await?;
-        let mut course: Course = index.read().await?;
+            try_join!(index.read::<Course>(), progress.read())?
+        } else {
+            let mut index = ConfigFile::new(&course_index_path).await?;
+
+            (index.read().await?, CourseProgress::default())
+        };
 
         for book in course.books.iter_mut() {
-            book.file = data::into_relative_path(&root, &book.file);
+            book.file = data::into_relative_path(&course_root, &book.file);
         }
 
-        Ok(course)
-    }
-    async fn get_course_progress(&self, id: Uuid) -> Result<CourseProgress, DataError> {
-        let path = self.progress.get(id);
-
-        let mut file = WritableConfigFile::new(&path).await?;
-
-        if file.is_empty().await? {
-            let data = CourseProgress::default();
-
-            file.write(&data).await?;
-            Ok(data)
-        } else {
-            file.read().await
-        }
+        Ok((course, course_progress))
     }
     async fn set_course_progress(&self, id: Uuid, data: CourseProgress) -> Result<(), DataError> {
         let path = self.progress.get(id);
@@ -81,14 +118,23 @@ impl State {
         let mut file = WritableConfigFile::new(&path).await?;
         file.write(&data).await
     }
+    async fn get_course_map_list(&self) -> Result<Vec<Uuid>, DataError> {
+        self.course_maps.scan().await
+    }
+    async fn get_course_list(&self) -> Result<Vec<Uuid>, DataError> {
+        self.courses.scan().await
+    }
+    async fn get_course_map(&self, id: Uuid) -> Result<CourseMap, DataError> {
+        let path = self.course_maps.get(id);
+
+        let mut file = ConfigFile::new(&path).await?;
+        file.read().await
+    }
     async fn get_active_courses(&self) -> Result<Vec<Uuid>, DataError> {
         let mut file = self.active_courses.lock().await;
 
         if file.is_empty().await? {
-            let data = Vec::new();
-
-            file.write(&data).await?;
-            Ok(data)
+            Ok(Vec::new())
         } else {
             file.read().await
         }
@@ -101,10 +147,7 @@ impl State {
         let mut file = self.settings.lock().await;
 
         if file.is_empty().await? {
-            let data = Settings::default();
-
-            file.write(&data).await?;
-            Ok(data)
+            Ok(Settings::default())
         } else {
             file.read().await
         }
@@ -149,7 +192,7 @@ struct Textbook {
 
 #[derive(Serialize, Deserialize, Debug)]
 struct Chapter {
-    id: Option<String>,
+    root: Option<String>,
     sections: Vec<Vec<String>>,
 }
 

@@ -18,7 +18,6 @@ fn main() -> Result<()> {
             wrapper::get_course_map,
             wrapper::get_course_list,
             wrapper::get_course,
-            wrapper::get_course_progress,
             wrapper::set_course_progress,
             wrapper::get_active_courses,
             wrapper::set_active_courses,

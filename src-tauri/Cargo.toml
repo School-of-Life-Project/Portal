@@ -32,6 +32,7 @@ advisory-lock = "0.3.0"
 anyhow = "1.0.86"
 thiserror = "1.0.61"
 serde-error = "0.1.2"
+futures = "0.3.30"
 
 [features]
 custom-protocol = [

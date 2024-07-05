@@ -209,6 +209,12 @@ impl DataManager {
 
         Ok(Self { root, extension })
     }
+    pub async fn has(&self, id: Uuid) -> bool {
+        match fs::metadata(self.get(id)).await {
+            Ok(metadata) => metadata.is_file(),
+            Err(_) => false,
+        }
+    }
     pub fn get(&self, id: Uuid) -> PathBuf {
         let mut path = self
             .root

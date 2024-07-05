@@ -98,10 +98,10 @@ pub async fn get_course(
     app_handle: tauri::AppHandle,
     state: tauri::State<'_, StateWrapper>,
     id: Uuid,
-) -> Result<Course, ErrorWrapper> {
-    let state = state.state().await?;
+) -> Result<(Course, CourseProgress), ErrorWrapper> {
+    let state: &State = state.state().await?;
 
-    let course = state
+    let (course, progress) = state
         .get_course(id)
         .await
         .map_err(|e| ErrorWrapper::new(format!("Unable to get Course {}", id), &e))?;
@@ -124,20 +124,7 @@ pub async fn get_course(
         }
     }
 
-    Ok(course)
-}
-
-#[tauri::command]
-pub async fn get_course_progress(
-    state: tauri::State<'_, StateWrapper>,
-    id: Uuid,
-) -> Result<CourseProgress, ErrorWrapper> {
-    let state = state.state().await?;
-
-    state
-        .get_course_progress(id)
-        .await
-        .map_err(|e| ErrorWrapper::new(format!("Unable to get progress for Course {}", id), &e))
+    Ok((course, progress))
 }
 
 #[tauri::command]
