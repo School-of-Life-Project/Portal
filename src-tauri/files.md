@@ -6,11 +6,11 @@
 ## structure
 
 - $APPDATA
-	- /course_maps/{name}.v1.toml
+	- /course_maps/{name}.toml
 	- /courses/{uuid}/
-		- course.v1.toml
+		- course.toml
 		- accompanying course files
 		- automatically decompress .zip files
 	- /progress/
-		- {uuid}.toml
+		- /courses/{uuid}.toml
 		- active.toml

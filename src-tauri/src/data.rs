@@ -15,13 +15,13 @@ use tokio::{
     sync::{Mutex, RwLock},
 };
 use toml::{Deserializer, Serializer};
-use uuid::Uuid;
+use uuid::{fmt::Simple, Uuid};
 
 pub fn get_data_dir(app_handle: tauri::AppHandle) -> Option<PathBuf> {
     app_handle.path_resolver().app_data_dir()
 }
 
-async fn ensure_folder_exists(path: &Path) -> Result<(), io::Error> {
+pub async fn ensure_folder_exists(path: &Path) -> Result<(), io::Error> {
     let metadata = fs::metadata(path).await;
 
     match metadata {
@@ -67,6 +67,7 @@ Plans:
 
 */
 
+/// A custom Error type for errors returned by this module.
 #[derive(From, Debug, Display, Error)]
 pub enum DataError {
     Io(io::Error),
@@ -74,12 +75,13 @@ pub enum DataError {
     TomlSe(toml::ser::Error),
 }
 
-pub struct ActiveConfigFile {
+/// A read-write manager of TOML configuration files.
+pub struct ConfigFile {
     pub file: File,
     buffer: String,
 }
 
-impl ActiveConfigFile {
+impl ConfigFile {
     pub async fn new(path: &Path) -> Result<Self, DataError> {
         let file = OpenOptions::new().read(true).write(true).open(path).await?;
 
@@ -114,28 +116,68 @@ impl ActiveConfigFile {
     }
 }
 
+/// DataManager is a read-write manager of UUID-indexed ConfigFile objects.
+///
+/// Each ConfigFile maps to a TOML file within the DataManager's root folder.
 pub struct DataManager {
     pub root: PathBuf,
-    pub files: Arc<RwLock<HashMap<OsString, Weak<Mutex<ActiveConfigFile>>>>>,
+    files: Arc<RwLock<HashMap<Uuid, Weak<Mutex<ConfigFile>>>>>,
 }
 
 impl DataManager {
     pub async fn new(root: PathBuf) -> Result<Self, DataError> {
-        todo!()
+        ensure_folder_exists(&root).await?;
+
+        Ok(Self {
+            root,
+            files: Arc::new(RwLock::new(HashMap::new())),
+        })
     }
-    pub async fn get<T>(name: &OsStr) -> Result<T, DataError>
+    pub async fn get<T>(&self, id: Uuid) -> Result<T, DataError>
     where
         T: DeserializeOwned,
     {
         todo!()
     }
-    pub async fn get_all<T>() -> Result<Vec<T>, DataError>
+    pub async fn scan<T>(&self) -> Result<Vec<Uuid>, DataError>
     where
         T: DeserializeOwned,
     {
-        todo!()
+        let mut items = Vec::new();
+        let mut buffer = Uuid::encode_buffer();
+
+        let extension = OsString::from("toml");
+
+        let mut entries = fs::read_dir(&self.root).await?;
+        while let Some(entry) = entries.next_entry().await? {
+            let path = entry.path();
+
+            let is_file = match fs::metadata(&path).await {
+                Ok(metadata) => metadata.is_file(),
+                Err(_) => false,
+            };
+
+            if !is_file || path.extension() != Some(&extension) {
+                continue;
+            }
+
+            let filestem = path.file_stem().unwrap_or_default().to_string_lossy();
+
+            let uuid = Uuid::try_parse(&filestem).unwrap_or_else(|_| Uuid::new_v4());
+            let formatted = Simple::from_uuid(uuid).encode_lower(&mut buffer);
+
+            if *formatted != *filestem {
+                let mut new_path = path.with_file_name(formatted);
+                new_path.set_extension(&extension);
+                fs::rename(&path, new_path).await?;
+            }
+
+            items.push(uuid);
+        }
+
+        Ok(items)
     }
-    pub async fn set<T>(name: &OsStr, data: &T) -> Result<(), DataError>
+    pub async fn set<T>(&self, id: Uuid, data: &T) -> Result<(), DataError>
     where
         T: Serialize,
     {
@@ -143,18 +185,23 @@ impl DataManager {
     }
 }
 
+/// ResourceManager is a read-only resource bundle manager.
+///
+/// Resource bundles are folders with a valid Uuid as their name.
 pub struct ResourceManager {
     pub root: PathBuf,
 }
 
 impl ResourceManager {
-    pub async fn new(root: PathBuf) -> Result<Self, DataError> {
+    pub async fn new(root: PathBuf) -> Result<Self, io::Error> {
         ensure_folder_exists(&root).await?;
 
         Ok(Self { root })
     }
     pub async fn get(&self, id: Uuid) -> Option<PathBuf> {
-        let path = self.root.join(format!("{}", id));
+        let path = self
+            .root
+            .join(Simple::from_uuid(id).encode_lower(&mut Uuid::encode_buffer()));
 
         match fs::metadata(&path).await {
             Ok(metadata) => match metadata.is_dir() {
@@ -164,8 +211,9 @@ impl ResourceManager {
             Err(_) => None,
         }
     }
-    pub async fn scan(&self) -> Result<Vec<Uuid>, DataError> {
+    pub async fn scan(&self) -> Result<Vec<Uuid>, io::Error> {
         let mut items = Vec::new();
+        let mut buffer = Uuid::encode_buffer();
 
         let mut entries = fs::read_dir(&self.root).await?;
         while let Some(entry) = entries.next_entry().await? {
@@ -176,21 +224,20 @@ impl ResourceManager {
                 Err(_) => false,
             };
 
-            if is_dir {
-                let uuid = Uuid::try_parse(&path.file_name().unwrap_or_default().to_string_lossy());
-
-                match uuid {
-                    Ok(uuid) => items.push(uuid),
-                    Err(_) => {
-                        let uuid = Uuid::new_v4();
-                        let dest = path.with_file_name(format!("{}", uuid));
-
-                        fs::rename(path, dest).await?;
-
-                        items.push(uuid)
-                    }
-                }
+            if !is_dir {
+                continue;
             }
+
+            let filename = path.file_name().unwrap_or_default().to_string_lossy();
+
+            let uuid = Uuid::try_parse(&filename).unwrap_or_else(|_| Uuid::new_v4());
+            let formatted = Simple::from_uuid(uuid).encode_lower(&mut buffer);
+
+            if *formatted != *filename {
+                fs::rename(&path, path.with_file_name(formatted)).await?;
+            }
+
+            items.push(uuid);
         }
 
         Ok(items)
