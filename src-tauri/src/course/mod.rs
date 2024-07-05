@@ -11,25 +11,15 @@ use tokio::{
     io,
     sync::{Mutex, OnceCell},
 };
+use uuid::Uuid;
+
+pub mod wrapper;
 
 use crate::data::{
     self, ConfigError, ConfigFile, DataManager, OpenError, ResourceManager, WritableConfigFile,
 };
 
-pub struct StateWrapper {
-    inner: Arc<OnceCell<State>>,
-}
-
-impl StateWrapper {
-    pub fn new() -> Self {
-        Self {
-            inner: Arc::new(OnceCell::new()),
-        }
-    }
-    async fn state(&self) -> Result<&State, OpenError> {
-        self.inner.get_or_try_init(|| State::new()).await
-    }
-}
+use self::wrapper::{ErrorWrapper, StateWrapper};
 
 struct State {
     data_dir: PathBuf,
@@ -81,30 +71,9 @@ struct Chapter {
     sections: Vec<Vec<String>>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
-pub struct ErrorWrapper {
-    message: String,
-    cause: serde_error::Error,
-}
-
-impl ErrorWrapper {
-    fn new<T>(message: String, inner: &T) -> Self
-    where
-        T: ?Sized + std::error::Error,
-    {
-        Self {
-            message,
-            cause: serde_error::Error::new(inner),
-        }
-    }
-}
-
 #[tauri::command]
 pub async fn open_data_dir(state: tauri::State<'_, StateWrapper>) -> Result<(), ErrorWrapper> {
-    let state = state
-        .state()
-        .await
-        .map_err(|e| ErrorWrapper::new("Unable to open application directories".to_string(), &e))?;
+    let state = state.state().await?;
 
     open::that_detached(&state.data_dir).map_err(|e| {
         ErrorWrapper::new(
@@ -114,6 +83,15 @@ pub async fn open_data_dir(state: tauri::State<'_, StateWrapper>) -> Result<(), 
     })?;
 
     Ok(())
+}
+
+#[tauri::command]
+pub async fn get_course_list(
+    state: tauri::State<'_, StateWrapper>,
+) -> Result<Vec<Uuid>, ErrorWrapper> {
+    let state = state.state().await?;
+
+    todo!()
 }
 
 /*#[tauri::command]
