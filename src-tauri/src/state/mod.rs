@@ -1,25 +1,12 @@
-use std::{
-    error::Error,
-    ffi::OsString,
-    path::{Component, Path, PathBuf},
-    sync::Arc,
-};
+use std::{ffi::OsString, path::PathBuf};
 
-use serde::{Deserialize, Serialize, Serializer};
-use tauri::Manager;
-use thiserror::Error;
-use tokio::{
-    fs::{self, ReadDir},
-    io,
-    sync::{Mutex, OnceCell},
-};
+use serde::{Deserialize, Serialize};
+use tokio::sync::Mutex;
 use uuid::Uuid;
 
 pub mod wrapper;
 
 use crate::data::{self, ConfigFile, DataError, DataManager, ResourceManager, WritableConfigFile};
-
-use self::wrapper::{ErrorWrapper, StateWrapper};
 
 struct State {
     data_dir: PathBuf,
@@ -54,7 +41,7 @@ impl State {
         self.course_maps.scan().await
     }
     async fn get_course_map(&self, id: Uuid) -> Result<CourseMap, DataError> {
-        let path = self.course_maps.get(id).await?;
+        let path = self.course_maps.get(id);
 
         let mut file = ConfigFile::new(&path).await?;
         file.read().await
@@ -75,20 +62,36 @@ impl State {
         Ok(course)
     }
     async fn get_course_progress(&self, id: Uuid) -> Result<CourseProgress, DataError> {
-        let path = self.progress.get(id).await?;
+        let path = self.progress.get(id);
 
-        let mut file = ConfigFile::new(&path).await?;
-        file.read().await
+        let mut file = WritableConfigFile::new(&path).await?;
+
+        if file.is_empty().await? {
+            let data = CourseProgress::default();
+
+            file.write(&data).await?;
+            Ok(data)
+        } else {
+            file.read().await
+        }
     }
     async fn set_course_progress(&self, id: Uuid, data: CourseProgress) -> Result<(), DataError> {
-        let path = self.progress.get(id).await?;
+        let path = self.progress.get(id);
 
         let mut file = WritableConfigFile::new(&path).await?;
         file.write(&data).await
     }
     async fn get_active_courses(&self) -> Result<Vec<Uuid>, DataError> {
         let mut file = self.active_courses.lock().await;
-        file.read().await
+
+        if file.is_empty().await? {
+            let data = Vec::new();
+
+            file.write(&data).await?;
+            Ok(data)
+        } else {
+            file.read().await
+        }
     }
     async fn set_active_courses(&self, data: Vec<Uuid>) -> Result<(), DataError> {
         let mut file = self.active_courses.lock().await;
@@ -96,7 +99,15 @@ impl State {
     }
     async fn get_settings(&self) -> Result<Settings, DataError> {
         let mut file = self.settings.lock().await;
-        file.read().await
+
+        if file.is_empty().await? {
+            let data = Settings::default();
+
+            file.write(&data).await?;
+            Ok(data)
+        } else {
+            file.read().await
+        }
     }
     async fn set_settings(&self, data: Settings) -> Result<(), DataError> {
         let mut file = self.settings.lock().await;
@@ -126,7 +137,7 @@ impl Course {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Default, Debug)]
 pub struct CourseProgress {}
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -142,5 +153,5 @@ struct Chapter {
     sections: Vec<Vec<String>>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Default)]
 pub struct Settings {}

@@ -162,6 +162,11 @@ impl WritableConfigFile {
             buffer: String::with_capacity(metadata.len().try_into().unwrap_or_default()),
         })
     }
+    pub async fn is_empty(&mut self) -> Result<bool, DataError> {
+        let metadata = self.file.metadata().await?;
+
+        Ok(metadata.len() == 0)
+    }
     pub async fn read<T>(&mut self) -> Result<T, DataError>
     where
         T: DeserializeOwned,
@@ -204,7 +209,7 @@ impl DataManager {
 
         Ok(Self { root, extension })
     }
-    pub async fn get(&self, id: Uuid) -> Result<PathBuf, DataError> {
+    pub fn get(&self, id: Uuid) -> PathBuf {
         let mut path = self
             .root
             .join(Simple::from_uuid(id).encode_lower(&mut Uuid::encode_buffer()));
@@ -212,14 +217,7 @@ impl DataManager {
             path.set_extension(extension);
         }
 
-        match fs::metadata(&path).await {
-            Ok(metadata) => match metadata.is_dir() {
-                true => Ok(path),
-                //false => Err(DataError::Io(io::Error::from(ErrorKind::IsADirectory))),
-                false => Err(DataError::Io(io::Error::from(ErrorKind::NotFound))),
-            },
-            Err(err) => Err(DataError::Io(err)),
-        }
+        path
     }
     pub async fn scan(&self) -> Result<Vec<Uuid>, DataError> {
         let mut items = Vec::new();
