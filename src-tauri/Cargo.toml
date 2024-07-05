@@ -24,12 +24,10 @@ uuid = { version = "1.9.1", features = [
 	"serde",
 ] }
 toml = "0.8.14"
-ring = "0.17.8"
 tokio = { version = "1.38.0", features = [
 	"fs",
 ] }
 open = "5.2.0"
-fs4 = { version = "0.8.4", features = ["tokio"] }
 derive_more = "0.99.18"
 
 [features]

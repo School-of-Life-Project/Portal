@@ -1,16 +1,20 @@
 use std::{
-    io::ErrorKind,
+    cmp,
+    collections::HashMap,
+    ffi::{OsStr, OsString},
     path::{Path, PathBuf},
+    sync::{Arc, Weak},
 };
 
 use derive_more::{Display, Error, From};
 
-use serde::{de::DeserializeOwned, Deserialize, Serialize};
+use serde::{de::DeserializeOwned, Serialize};
 use tokio::{
-    fs::{self, DirEntry, File, ReadDir},
-    io::{self, AsyncReadExt},
-    task,
+    fs::{self, File, OpenOptions},
+    io::{self, AsyncReadExt, AsyncWriteExt},
+    sync::{Mutex, RwLock},
 };
+use toml::{Deserializer, Serializer};
 use uuid::Uuid;
 
 pub fn get_data_dir(app_handle: tauri::AppHandle) -> Option<PathBuf> {
@@ -35,19 +39,8 @@ async fn ensure_folder_exists(path: &Path) -> Result<(), io::Error> {
     Ok(())
 }
 
-pub async fn deserialize_file<T>(path: &Path) -> Result<T, DataError>
+/*pub async fn deserialize_config_folder<T>(path: &Path) -> Result<Vec<T>, DataError>
 where
-    T: DeserializeOwned,
-{
-    let data = fs::read_to_string(path).await?;
-    Ok(toml::from_str(&data)?)
-}
-
-pub async fn deserialize_config_folder<F, T>(
-    path: &Path,
-) -> Result<Vec<Result<T, toml::de::Error>>, io::Error>
-where
-    F: Fn(&Path) -> bool,
     T: DeserializeOwned,
 {
     ensure_folder_exists(path).await?;
@@ -60,12 +53,12 @@ where
 
         if path.ends_with(".toml") {
             let data = fs::read_to_string(&path).await?;
-            items.push(toml::from_str(&data));
+            items.push(toml::from_str(&data)?);
         }
     }
 
     Ok(items)
-}
+}*/
 
 /*
 Plans:
@@ -76,8 +69,78 @@ Plans:
 
 #[derive(From, Debug, Display, Error)]
 pub enum DataError {
-    ioError(io::Error),
-    tomlError(toml::de::Error),
+    Io(io::Error),
+    TomlDe(toml::de::Error),
+    TomlSe(toml::ser::Error),
+}
+
+pub struct ActiveConfigFile {
+    pub file: File,
+    buffer: String,
+}
+
+impl ActiveConfigFile {
+    pub async fn new(path: &Path) -> Result<Self, DataError> {
+        let file = OpenOptions::new().read(true).write(true).open(path).await?;
+
+        Ok(Self {
+            file,
+            buffer: String::new(),
+        })
+    }
+    pub async fn read<T>(&mut self) -> Result<T, DataError>
+    where
+        T: DeserializeOwned,
+    {
+        self.buffer.clear();
+        self.file.read_to_string(&mut self.buffer).await?;
+
+        let deserializer = Deserializer::new(&self.buffer);
+        Ok(T::deserialize(deserializer)?)
+    }
+    pub async fn write<T>(&mut self, data: &T) -> Result<(), DataError>
+    where
+        T: Serialize,
+    {
+        self.buffer.clear();
+
+        let serializer = Serializer::new(&mut self.buffer);
+        data.serialize(serializer)?;
+
+        self.file.write_all(self.buffer.as_bytes()).await?;
+        self.file.set_len(self.buffer.len() as u64).await?;
+
+        Ok(())
+    }
+}
+
+pub struct DataManager {
+    pub root: PathBuf,
+    pub files: Arc<RwLock<HashMap<OsString, Weak<Mutex<ActiveConfigFile>>>>>,
+}
+
+impl DataManager {
+    pub async fn new(root: PathBuf) -> Result<Self, DataError> {
+        todo!()
+    }
+    pub async fn get<T>(name: &OsStr) -> Result<T, DataError>
+    where
+        T: DeserializeOwned,
+    {
+        todo!()
+    }
+    pub async fn get_all<T>() -> Result<Vec<T>, DataError>
+    where
+        T: DeserializeOwned,
+    {
+        todo!()
+    }
+    pub async fn set<T>(name: &OsStr, data: &T) -> Result<(), DataError>
+    where
+        T: Serialize,
+    {
+        todo!()
+    }
 }
 
 pub struct ResourceManager {
@@ -90,7 +153,6 @@ impl ResourceManager {
 
         Ok(Self { root })
     }
-
     pub async fn get(&self, id: Uuid) -> Option<PathBuf> {
         let path = self.root.join(format!("{}", id));
 
