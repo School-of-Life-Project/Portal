@@ -5,8 +5,8 @@ use std::{
 };
 
 use advisory_lock::{AdvisoryFileLock, FileLockError, FileLockMode};
-use derive_more::{Display, Error, From};
 use serde::{de::DeserializeOwned, Serialize};
+use thiserror::Error;
 use tokio::{
     fs::{self, File, OpenOptions},
     io::{self, AsyncReadExt, AsyncWriteExt},
@@ -46,14 +46,36 @@ pub async fn ensure_folder_exists(path: &Path) -> Result<(), io::Error> {
     Ok(())
 }
 
-/// An error encountered when locking a ConfigFile
-#[derive(From, Debug, Display, Error)]
-pub enum LockError {
-    Tokio(JoinError),
-    Sys(FileLockError),
+#[derive(Error, Debug)]
+pub enum OpenError {
+    #[error("File is already locked by another process")]
+    AlreadyLocked,
+    #[error(transparent)]
+    Io(#[from] io::Error),
+    #[error(transparent)]
+    BlockingTaskFailed(#[from] JoinError),
 }
 
-async fn lock_file(file: File, mode: FileLockMode) -> Result<File, LockError> {
+impl From<FileLockError> for OpenError {
+    fn from(value: FileLockError) -> Self {
+        match value {
+            FileLockError::AlreadyLocked => Self::AlreadyLocked,
+            FileLockError::Io(err) => Self::Io(err),
+        }
+    }
+}
+
+#[derive(Error, Debug)]
+pub enum ConfigError {
+    #[error(transparent)]
+    Io(#[from] io::Error),
+    #[error(transparent)]
+    Deserialization(#[from] toml::de::Error),
+    #[error(transparent)]
+    Serialization(#[from] toml::ser::Error),
+}
+
+async fn lock_file(file: File, mode: FileLockMode) -> Result<File, OpenError> {
     let std_file = file.into_std().await;
 
     let file = task::spawn_blocking(move || -> Result<File, FileLockError> {
@@ -66,15 +88,6 @@ async fn lock_file(file: File, mode: FileLockMode) -> Result<File, LockError> {
     Ok(file)
 }
 
-/// A custom Error type for ConfigFile.
-#[derive(From, Debug, Display, Error)]
-pub enum DataError {
-    Io(io::Error),
-    TomlDe(toml::de::Error),
-    TomlSe(toml::ser::Error),
-    Lock(LockError),
-}
-
 /// A read-only handle to a TOML configuration file.
 pub struct ConfigFile {
     pub file: File,
@@ -82,7 +95,7 @@ pub struct ConfigFile {
 }
 
 impl ConfigFile {
-    pub async fn new(path: &Path) -> Result<Self, DataError> {
+    pub async fn new(path: &Path) -> Result<Self, OpenError> {
         let file = File::open(path).await?;
         let file = lock_file(file, FileLockMode::Shared).await?;
         let metadata = file.metadata().await?;
@@ -92,7 +105,7 @@ impl ConfigFile {
             buffer: String::with_capacity(metadata.len().try_into().unwrap_or_default()),
         })
     }
-    pub async fn read<T>(&mut self) -> Result<T, DataError>
+    pub async fn read<T>(&mut self) -> Result<T, ConfigError>
     where
         T: DeserializeOwned,
     {
@@ -111,7 +124,7 @@ pub struct WritableConfigFile {
 }
 
 impl WritableConfigFile {
-    pub async fn new(path: &Path) -> Result<Self, DataError> {
+    pub async fn new(path: &Path) -> Result<Self, OpenError> {
         let file = OpenOptions::new()
             .create(true)
             .truncate(false)
@@ -127,7 +140,7 @@ impl WritableConfigFile {
             buffer: String::with_capacity(metadata.len().try_into().unwrap_or_default()),
         })
     }
-    pub async fn read<T>(&mut self) -> Result<T, DataError>
+    pub async fn read<T>(&mut self) -> Result<T, ConfigError>
     where
         T: DeserializeOwned,
     {
@@ -137,7 +150,7 @@ impl WritableConfigFile {
         let deserializer = Deserializer::new(&self.buffer);
         Ok(T::deserialize(deserializer)?)
     }
-    pub async fn write<T>(&mut self, data: &T) -> Result<(), DataError>
+    pub async fn write<T>(&mut self, data: &T) -> Result<(), ConfigError>
     where
         T: Serialize,
     {
