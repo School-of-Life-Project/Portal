@@ -1,7 +1,7 @@
 use std::{
-    cmp,
     collections::HashMap,
-    ffi::{OsStr, OsString},
+    env,
+    ffi::OsString,
     path::{Path, PathBuf},
     sync::{Arc, Weak},
 };
@@ -17,8 +17,17 @@ use tokio::{
 use toml::{Deserializer, Serializer};
 use uuid::{fmt::Simple, Uuid};
 
-pub fn get_data_dir(app_handle: tauri::AppHandle) -> Option<PathBuf> {
-    app_handle.path_resolver().app_data_dir()
+pub async fn get_data_dir(dirname: &str) -> Result<PathBuf, io::Error> {
+    let mut path = match dirs_next::data_dir() {
+        Some(path) => path,
+        None => env::current_dir()?,
+    };
+    path.push("item");
+    path.set_file_name(dirname);
+
+    ensure_folder_exists(&path).await?;
+
+    Ok(path)
 }
 
 pub async fn ensure_folder_exists(path: &Path) -> Result<(), io::Error> {
@@ -62,10 +71,11 @@ impl ConfigFile {
             .write(true)
             .open(path)
             .await?;
+        let metadata = file.metadata().await?;
 
         Ok(Self {
             file,
-            buffer: String::new(),
+            buffer: String::with_capacity(metadata.len().try_into().unwrap_or_default()),
         })
     }
     pub async fn read<T>(&mut self) -> Result<T, DataError>
@@ -137,10 +147,76 @@ impl DataManager {
 
         Ok(mutex.lock_owned().await)
     }
-    pub async fn scan<T>(&self) -> Result<Vec<Uuid>, DataError>
+    pub async fn scan(&self) -> Result<Vec<Uuid>, DataError> {
+        let mut items = Vec::new();
+        let mut buffer = Uuid::encode_buffer();
+
+        let mut entries = fs::read_dir(&self.root).await?;
+        while let Some(entry) = entries.next_entry().await? {
+            let path = entry.path();
+
+            let is_file = match fs::metadata(&path).await {
+                Ok(metadata) => metadata.is_file(),
+                Err(_) => false,
+            };
+
+            if !is_file || path.extension() != Some(&self.extension) {
+                continue;
+            }
+
+            let filestem = path.file_stem().unwrap_or_default().to_string_lossy();
+
+            let uuid = Uuid::try_parse(&filestem).unwrap_or_else(|_| Uuid::new_v4());
+            let formatted = Simple::from_uuid(uuid).encode_lower(&mut buffer);
+
+            if *formatted != *filestem {
+                let mut new_path = path.with_file_name(formatted);
+                new_path.set_extension(&self.extension);
+                fs::rename(&path, new_path).await?;
+            }
+
+            items.push(uuid);
+        }
+
+        Ok(items)
+    }
+}
+
+/// A read-only version of DataManager, optimized for reading large numbers of files.
+pub struct BasicDataManager {
+    pub root: PathBuf,
+    extension: OsString,
+}
+
+impl BasicDataManager {
+    pub async fn new(root: PathBuf) -> Result<Self, DataError> {
+        ensure_folder_exists(&root).await?;
+
+        Ok(Self {
+            root,
+            extension: OsString::from("toml"),
+        })
+    }
+    pub async fn get<T>(&self, id: Uuid) -> Result<T, DataError>
     where
         T: DeserializeOwned,
     {
+        let mut path = self
+            .root
+            .join(Simple::from_uuid(id).encode_lower(&mut Uuid::encode_buffer()));
+        path.set_extension(OsString::from(&self.extension));
+
+        let mut file = File::open(path).await?;
+        let metadata = file.metadata().await?;
+
+        let mut buffer = String::with_capacity(metadata.len().try_into().unwrap_or_default());
+
+        file.read_to_string(&mut buffer).await?;
+
+        let deserializer = Deserializer::new(&buffer);
+        Ok(T::deserialize(deserializer)?)
+    }
+    pub async fn scan(&self) -> Result<Vec<Uuid>, io::Error> {
         let mut items = Vec::new();
         let mut buffer = Uuid::encode_buffer();
 
@@ -232,16 +308,4 @@ impl ResourceManager {
 
         Ok(items)
     }
-}
-
-#[tauri::command]
-pub async fn open_data_dir(app_handle: tauri::AppHandle) -> Result<(), String> {
-    let path = get_data_dir(app_handle).ok_or("Unable to find application data directory")?;
-
-    ensure_folder_exists(&path)
-        .await
-        .map_err(|err| format!("Unable to open application data directory: {}", err))?;
-
-    open::that_detached(&path)
-        .map_err(|err| format!("Unable to launch system file opener: {}", err))
 }

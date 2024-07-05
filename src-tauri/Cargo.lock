@@ -2231,6 +2231,7 @@ name = "school-of-life-portal"
 version = "0.0.0"
 dependencies = [
  "derive_more",
+ "dirs-next",
  "open",
  "serde",
  "serde_json",

@@ -29,6 +29,7 @@ tokio = { version = "1.38.0", features = [
 ] }
 open = "5.2.0"
 derive_more = "0.99.18"
+dirs-next = "2.0.0"
 
 [features]
 custom-protocol = [
