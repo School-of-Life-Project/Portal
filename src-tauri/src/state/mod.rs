@@ -75,22 +75,32 @@ impl State {
         Ok(course)
     }
     async fn get_course_progress(&self, id: Uuid) -> Result<CourseProgress, DataError> {
-        todo!()
+        let path = self.progress.get(id).await?;
+
+        let mut file = ConfigFile::new(&path).await?;
+        file.read().await
     }
     async fn set_course_progress(&self, id: Uuid, data: CourseProgress) -> Result<(), DataError> {
-        todo!()
+        let path = self.progress.get(id).await?;
+
+        let mut file = WritableConfigFile::new(&path).await?;
+        file.write(&data).await
     }
     async fn get_active_courses(&self) -> Result<Vec<Uuid>, DataError> {
-        todo!()
+        let mut file = self.active_courses.lock().await;
+        file.read().await
     }
     async fn set_active_courses(&self, data: Vec<Uuid>) -> Result<(), DataError> {
-        todo!()
+        let mut file = self.active_courses.lock().await;
+        file.write(&data).await
     }
     async fn get_settings(&self) -> Result<Settings, DataError> {
-        todo!()
+        let mut file = self.settings.lock().await;
+        file.read().await
     }
     async fn set_settings(&self, data: Settings) -> Result<(), DataError> {
-        todo!()
+        let mut file = self.settings.lock().await;
+        file.write(&data).await
     }
 }
 
