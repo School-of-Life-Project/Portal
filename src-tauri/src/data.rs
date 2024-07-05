@@ -1,6 +1,7 @@
 use std::{
     env,
     ffi::OsString,
+    io::ErrorKind,
     path::{Component, Path, PathBuf},
 };
 
@@ -203,7 +204,7 @@ impl DataManager {
 
         Ok(Self { root, extension })
     }
-    pub async fn get(&self, id: Uuid) -> Option<PathBuf> {
+    pub async fn get(&self, id: Uuid) -> Result<PathBuf, DataError> {
         let mut path = self
             .root
             .join(Simple::from_uuid(id).encode_lower(&mut Uuid::encode_buffer()));
@@ -213,10 +214,11 @@ impl DataManager {
 
         match fs::metadata(&path).await {
             Ok(metadata) => match metadata.is_dir() {
-                true => Some(path),
-                false => None,
+                true => Ok(path),
+                //false => Err(DataError::Io(io::Error::from(ErrorKind::IsADirectory))),
+                false => Err(DataError::Io(io::Error::from(ErrorKind::NotFound))),
             },
-            Err(_) => None,
+            Err(err) => Err(DataError::Io(err)),
         }
     }
     pub async fn scan(&self) -> Result<Vec<Uuid>, DataError> {
@@ -269,17 +271,18 @@ impl ResourceManager {
 
         Ok(Self { root })
     }
-    pub async fn get(&self, id: Uuid) -> Option<PathBuf> {
+    pub async fn get(&self, id: Uuid) -> Result<PathBuf, DataError> {
         let path = self
             .root
             .join(Simple::from_uuid(id).encode_lower(&mut Uuid::encode_buffer()));
 
         match fs::metadata(&path).await {
             Ok(metadata) => match metadata.is_dir() {
-                true => Some(path),
-                false => None,
+                true => Ok(path),
+                //false => Err(DataError::Io(io::Error::from(ErrorKind::NotADirectory))),
+                false => Err(DataError::Io(io::Error::from(ErrorKind::NotFound))),
             },
-            Err(_) => None,
+            Err(err) => Err(DataError::Io(err)),
         }
     }
     pub async fn scan(&self) -> Result<Vec<Uuid>, DataError> {

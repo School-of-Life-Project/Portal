@@ -53,32 +53,26 @@ impl State {
     async fn get_course_map_list(&self) -> Result<Vec<Uuid>, DataError> {
         self.course_maps.scan().await
     }
-    async fn get_course_map(&self, id: Uuid) -> Result<Option<CourseMap>, DataError> {
-        match self.course_maps.get(id).await {
-            Some(path) => {
-                let mut file = ConfigFile::new(&path).await?;
-                file.read().await
-            }
-            None => Ok(None),
-        }
+    async fn get_course_map(&self, id: Uuid) -> Result<CourseMap, DataError> {
+        let path = self.course_maps.get(id).await?;
+
+        let mut file = ConfigFile::new(&path).await?;
+        file.read().await
     }
     async fn get_course_list(&self) -> Result<Vec<Uuid>, DataError> {
         self.courses.scan().await
     }
-    async fn get_course(&self, id: Uuid) -> Result<Option<Course>, DataError> {
-        match self.courses.get(id).await {
-            Some(root) => {
-                let mut index = ConfigFile::new(&root.join("course.toml")).await?;
-                let mut course: Course = index.read().await?;
+    async fn get_course(&self, id: Uuid) -> Result<Course, DataError> {
+        let root = self.courses.get(id).await?;
 
-                for book in course.books.iter_mut() {
-                    book.file = data::into_relative_path(&root, &book.file);
-                }
+        let mut index = ConfigFile::new(&root.join("course.toml")).await?;
+        let mut course: Course = index.read().await?;
 
-                Ok(Some(course))
-            }
-            None => Ok(None),
+        for book in course.books.iter_mut() {
+            book.file = data::into_relative_path(&root, &book.file);
         }
+
+        Ok(course)
     }
     async fn get_course_progress(&self, id: Uuid) -> Result<CourseProgress, DataError> {
         todo!()

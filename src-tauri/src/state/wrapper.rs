@@ -72,7 +72,7 @@ pub async fn get_course_map_list(
 pub async fn get_course_map(
     state: tauri::State<'_, StateWrapper>,
     id: Uuid,
-) -> Result<Option<CourseMap>, ErrorWrapper> {
+) -> Result<CourseMap, ErrorWrapper> {
     let state = state.state().await?;
 
     state
@@ -98,7 +98,7 @@ pub async fn get_course(
     app_handle: tauri::AppHandle,
     state: tauri::State<'_, StateWrapper>,
     id: Uuid,
-) -> Result<Option<Course>, ErrorWrapper> {
+) -> Result<Course, ErrorWrapper> {
     let state = state.state().await?;
 
     let course = state
@@ -106,23 +106,21 @@ pub async fn get_course(
         .await
         .map_err(|e| ErrorWrapper::new(format!("Unable to get Course {}", id), &e))?;
 
-    if let Some(course) = &course {
-        let scope = app_handle.asset_protocol_scope();
+    let scope = app_handle.asset_protocol_scope();
 
-        for path in course.get_resources() {
-            if let Ok(metadata) = fs::metadata(path).await {
-                if metadata.is_dir() {
-                    scope.allow_directory(path, true)
-                } else {
-                    scope.allow_file(path)
-                }
-                .map_err(|e| {
-                    ErrorWrapper::new(
-                        format!("Unable to update renderer permissions for path {:?}", path),
-                        &e,
-                    )
-                })?;
+    for path in course.get_resources() {
+        if let Ok(metadata) = fs::metadata(path).await {
+            if metadata.is_dir() {
+                scope.allow_directory(path, true)
+            } else {
+                scope.allow_file(path)
             }
+            .map_err(|e| {
+                ErrorWrapper::new(
+                    format!("Unable to update renderer permissions for path {:?}", path),
+                    &e,
+                )
+            })?;
         }
     }
 
