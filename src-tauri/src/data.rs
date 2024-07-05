@@ -55,7 +55,13 @@ pub struct ConfigFile {
 
 impl ConfigFile {
     pub async fn new(path: &Path) -> Result<Self, DataError> {
-        let file = OpenOptions::new().read(true).write(true).open(path).await?;
+        let file = OpenOptions::new()
+            .create(true)
+            .truncate(false)
+            .read(true)
+            .write(true)
+            .open(path)
+            .await?;
 
         Ok(Self {
             file,
@@ -112,7 +118,6 @@ impl DataManager {
             .root
             .join(Simple::from_uuid(id).encode_lower(&mut Uuid::encode_buffer()));
         path.set_extension(OsString::from(&self.extension));
-        fs::canonicalize(&path).await?;
 
         ConfigFile::new(&path).await
     }
