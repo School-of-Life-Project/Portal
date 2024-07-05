@@ -13,7 +13,22 @@ use tokio::{
 
 use crate::data::{self, ConfigFile, DataError, DataManager, ResourceManager, WritableConfigFile};
 
-pub struct State {
+pub struct StateWrapper {
+    inner: Arc<OnceCell<State>>,
+}
+
+impl StateWrapper {
+    pub fn new() -> Self {
+        Self {
+            inner: Arc::new(OnceCell::new()),
+        }
+    }
+    async fn state(&self) -> Result<&State, DataError> {
+        self.inner.get_or_try_init(|| State::new()).await
+    }
+}
+
+struct State {
     data_dir: PathBuf,
     course_maps: DataManager,
     courses: ResourceManager,
@@ -23,7 +38,7 @@ pub struct State {
 }
 
 impl State {
-    pub async fn new() -> Result<Self, DataError> {
+    async fn new() -> Result<Self, DataError> {
         let data_dir = data::get_data_dir(crate::IDENTIFIER).await?;
 
         let extension = Some(OsString::from("toml"));
@@ -64,10 +79,21 @@ struct Chapter {
 }
 
 #[tauri::command]
+pub async fn open_data_dir(state: tauri::State<'_, StateWrapper>) -> Result<(), String> {
+    let state = state
+        .state()
+        .await
+        .map_err(|err| format!("Unable to initalize application folders: {}", err))?;
+
+    open::that_detached(&state.data_dir)
+        .map_err(|err| format!("Unable to launch system file opener: {}", err))
+}
+
+#[tauri::command]
 pub async fn get_courses(
     window: tauri::Window,
     app_handle: tauri::AppHandle,
-    state: tauri::State<'_, State>,
+    state: tauri::State<'_, StateWrapper>,
 ) -> Result<Vec<Course>, String> {
     //let mut path = data::get_data_dir(app_handle).ok_or("Unable to find application data directory")?;
     //path.push("courses");
