@@ -14,7 +14,7 @@
 				"all": false,
 				"readFile": true,
 				"scope": [
-					"$APPDATA/*"
+					"$APPDATA/courses/*"
 				]
 			}
 		},

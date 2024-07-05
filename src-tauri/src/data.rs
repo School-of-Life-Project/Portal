@@ -12,7 +12,7 @@ use serde::{de::DeserializeOwned, Serialize};
 use tokio::{
     fs::{self, File, OpenOptions},
     io::{self, AsyncReadExt, AsyncWriteExt},
-    sync::{Mutex, RwLock},
+    sync::{Mutex, OwnedMutexGuard},
 };
 use toml::{Deserializer, Serializer};
 use uuid::{fmt::Simple, Uuid};
@@ -38,34 +38,6 @@ pub async fn ensure_folder_exists(path: &Path) -> Result<(), io::Error> {
 
     Ok(())
 }
-
-/*pub async fn deserialize_config_folder<T>(path: &Path) -> Result<Vec<T>, DataError>
-where
-    T: DeserializeOwned,
-{
-    ensure_folder_exists(path).await?;
-
-    let mut items = Vec::new();
-
-    let mut entries = fs::read_dir(path).await?;
-    while let Some(entry) = entries.next_entry().await? {
-        let path = entry.path();
-
-        if path.ends_with(".toml") {
-            let data = fs::read_to_string(&path).await?;
-            items.push(toml::from_str(&data)?);
-        }
-    }
-
-    Ok(items)
-}*/
-
-/*
-Plans:
-- Course maps: No sorting required
-- Courses: Organized by UUID
-
-*/
 
 /// A custom Error type for errors returned by this module.
 #[derive(From, Debug, Display, Error)]
@@ -121,7 +93,8 @@ impl ConfigFile {
 /// Each ConfigFile maps to a TOML file within the DataManager's root folder.
 pub struct DataManager {
     pub root: PathBuf,
-    files: Arc<RwLock<HashMap<Uuid, Weak<Mutex<ConfigFile>>>>>,
+    files: Arc<Mutex<HashMap<Uuid, Weak<Mutex<ConfigFile>>>>>,
+    extension: OsString,
 }
 
 impl DataManager {
@@ -130,14 +103,34 @@ impl DataManager {
 
         Ok(Self {
             root,
-            files: Arc::new(RwLock::new(HashMap::new())),
+            files: Arc::new(Mutex::new(HashMap::new())),
+            extension: OsString::from("toml"),
         })
     }
-    pub async fn get<T>(&self, id: Uuid) -> Result<T, DataError>
-    where
-        T: DeserializeOwned,
-    {
-        todo!()
+    async fn new_file(&self, id: Uuid) -> Result<ConfigFile, DataError> {
+        let mut path = self
+            .root
+            .join(Simple::from_uuid(id).encode_lower(&mut Uuid::encode_buffer()));
+        path.set_extension(OsString::from(&self.extension));
+        fs::canonicalize(&path).await?;
+
+        ConfigFile::new(&path).await
+    }
+    pub async fn get(&self, id: Uuid) -> Result<OwnedMutexGuard<ConfigFile>, DataError> {
+        let mut files = self.files.lock().await;
+
+        let mutex = match files.get(&id).and_then(|file| file.upgrade()) {
+            Some(file) => file.clone(),
+            None => {
+                let new = Arc::new(Mutex::new(self.new_file(id).await?));
+
+                files.insert(id, Arc::downgrade(&new));
+
+                new
+            }
+        };
+
+        Ok(mutex.lock_owned().await)
     }
     pub async fn scan<T>(&self) -> Result<Vec<Uuid>, DataError>
     where
@@ -145,8 +138,6 @@ impl DataManager {
     {
         let mut items = Vec::new();
         let mut buffer = Uuid::encode_buffer();
-
-        let extension = OsString::from("toml");
 
         let mut entries = fs::read_dir(&self.root).await?;
         while let Some(entry) = entries.next_entry().await? {
@@ -157,7 +148,7 @@ impl DataManager {
                 Err(_) => false,
             };
 
-            if !is_file || path.extension() != Some(&extension) {
+            if !is_file || path.extension() != Some(&self.extension) {
                 continue;
             }
 
@@ -168,7 +159,7 @@ impl DataManager {
 
             if *formatted != *filestem {
                 let mut new_path = path.with_file_name(formatted);
-                new_path.set_extension(&extension);
+                new_path.set_extension(&self.extension);
                 fs::rename(&path, new_path).await?;
             }
 
@@ -176,12 +167,6 @@ impl DataManager {
         }
 
         Ok(items)
-    }
-    pub async fn set<T>(&self, id: Uuid, data: &T) -> Result<(), DataError>
-    where
-        T: Serialize,
-    {
-        todo!()
     }
 }
 
