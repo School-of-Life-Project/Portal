@@ -9,13 +9,8 @@
 	},
 	"tauri": {
 		"allowlist": {
-			"all": false,
-			"fs": {
-				"all": false,
-				"readFile": true,
-				"scope": [
-					"$APPDATA/courses/*"
-				]
+			"protocol": {
+				"asset": true
 			}
 		},
 		"windows": [

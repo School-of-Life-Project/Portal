@@ -123,6 +123,7 @@ pub async fn get_course_map_list(
 
 #[tauri::command]
 pub async fn get_course(
+    app_handle: tauri::AppHandle,
     state: tauri::State<'_, StateWrapper>,
     id: Uuid,
 ) -> Result<Option<Course>, ErrorWrapper> {
@@ -131,6 +132,8 @@ pub async fn get_course(
     match state.courses.get(id).await {
         Some(path) => {
             todo!()
+
+            // TODO: Use app_handle.asset_protocol_scope() + FsScope.allow_file() to selectively allow access to course files
         }
         None => Ok(None),
     }
