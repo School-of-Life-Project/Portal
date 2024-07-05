@@ -5,23 +5,25 @@ use anyhow::{Context, Result};
 mod data;
 mod state;
 
+use state::wrapper;
+
 const IDENTIFIER: &str = "com.schoolOfLifeProject.Portal";
 
 fn main() -> Result<()> {
     tauri::Builder::default()
-        .manage(state::wrapper::StateWrapper::new())
+        .manage(wrapper::StateWrapper::new())
         .invoke_handler(tauri::generate_handler![
-            state::open_data_dir,
-            state::get_course_map_list,
-            state::get_course_map,
-            state::get_course_list,
-            state::get_course,
-            state::get_course_progress,
-            state::set_course_progress,
-            state::get_active_courses,
-            state::set_active_courses,
-            state::get_settings,
-            state::set_settings,
+            wrapper::open_data_dir,
+            wrapper::get_course_map_list,
+            wrapper::get_course_map,
+            wrapper::get_course_list,
+            wrapper::get_course,
+            wrapper::get_course_progress,
+            wrapper::set_course_progress,
+            wrapper::get_active_courses,
+            wrapper::set_active_courses,
+            wrapper::get_settings,
+            wrapper::set_settings,
         ])
         .run(tauri::generate_context!())
         .context("Failed to initalize application window")
