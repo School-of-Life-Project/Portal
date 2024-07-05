@@ -53,6 +53,9 @@ impl State {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+pub struct CourseMap {}
+
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Course {
     title: String,
     description: Option<String>,
@@ -86,12 +89,79 @@ pub async fn open_data_dir(state: tauri::State<'_, StateWrapper>) -> Result<(), 
 }
 
 #[tauri::command]
+pub async fn get_course_map(
+    state: tauri::State<'_, StateWrapper>,
+    id: Uuid,
+) -> Result<Option<CourseMap>, ErrorWrapper> {
+    let state = state.state().await?;
+
+    match state.course_maps.get(id).await {
+        Some(path) => {
+            let mut file = ConfigFile::new(&path)
+                .await
+                .map_err(|e| ErrorWrapper::new(format!("Unable to open CourseMap {}", id), &e))?;
+            file.read()
+                .await
+                .map_err(|e| ErrorWrapper::new(format!("Unable to read CourseMap {}", id), &e))
+        }
+        None => Ok(None),
+    }
+}
+
+#[tauri::command]
+pub async fn get_course_map_list(
+    state: tauri::State<'_, StateWrapper>,
+) -> Result<Vec<Uuid>, ErrorWrapper> {
+    let state = state.state().await?;
+
+    state
+        .course_maps
+        .scan()
+        .await
+        .map_err(|e| ErrorWrapper::new("Unable to get CourseMap list".to_string(), &e))
+}
+
+#[tauri::command]
+pub async fn get_course(
+    state: tauri::State<'_, StateWrapper>,
+    id: Uuid,
+) -> Result<Option<Course>, ErrorWrapper> {
+    let state = state.state().await?;
+
+    match state.courses.get(id).await {
+        Some(path) => {
+            todo!()
+        }
+        None => Ok(None),
+    }
+}
+
+#[tauri::command]
+pub async fn get_course_progress(
+    state: tauri::State<'_, StateWrapper>,
+    id: Uuid,
+) -> Result<Option<Course>, ErrorWrapper> {
+    let state = state.state().await?;
+
+    match state.progress.get(id).await {
+        Some(path) => {
+            todo!()
+        }
+        None => Ok(None),
+    }
+}
+
+#[tauri::command]
 pub async fn get_course_list(
     state: tauri::State<'_, StateWrapper>,
 ) -> Result<Vec<Uuid>, ErrorWrapper> {
     let state = state.state().await?;
 
-    todo!()
+    state
+        .courses
+        .scan()
+        .await
+        .map_err(|e| ErrorWrapper::new("Unable to get Course list".to_string(), &e))
 }
 
 /*#[tauri::command]
