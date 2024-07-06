@@ -1,6 +1,6 @@
 use std::{
     collections::{hash_map::Entry, HashMap, HashSet},
-    path::PathBuf,
+    path::{Path, PathBuf},
     time::Duration,
 };
 
@@ -11,10 +11,18 @@ use uuid::Uuid;
 mod state;
 pub mod wrapper;
 
+use crate::data;
+
 // TODO
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CourseMap {
     uuid: Option<Uuid>,
+}
+
+impl CourseMap {
+    fn update_id(&mut self, id: Uuid) {
+        self.uuid = Some(id);
+    }
 }
 
 /// A Course bundle index
@@ -28,6 +36,26 @@ pub struct Course {
     description: Option<String>,
     /// The textbooks which are a part of this course.
     books: Vec<Textbook>,
+}
+
+impl Course {
+    fn update_root(&mut self, root: &Path, id: Uuid) {
+        self.uuid = Some(id);
+
+        for book in &mut self.books {
+            book.file = data::into_relative_path(root, &book.file);
+        }
+    }
+    /// Get a list of all files included in a ``Course``
+    fn get_resources(&self) -> Vec<&PathBuf> {
+        let mut files = Vec::with_capacity(self.books.len());
+
+        for book in &self.books {
+            files.push(&book.file);
+        }
+
+        files
+    }
 }
 
 /// A Textbook within a ``Course``
@@ -55,19 +83,6 @@ struct Chapter {
     ///
     /// Sections should only be included when a section's completion is meaningful to progress within the overall course.
     sections: Vec<Vec<String>>,
-}
-
-impl Course {
-    /// Get a list of all files included in a ``Course``
-    fn get_resources(&self) -> Vec<&PathBuf> {
-        let mut files = Vec::with_capacity(self.books.len());
-
-        for book in &self.books {
-            files.push(&book.file);
-        }
-
-        files
-    }
 }
 
 /// The raw data used to keep track of ``Course`` completion
@@ -245,5 +260,6 @@ impl OverallProgress {
     }
 }
 
+// TODO
 #[derive(Serialize, Deserialize, Debug, Default)]
 pub struct Settings {}

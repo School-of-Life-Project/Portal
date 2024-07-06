@@ -12,8 +12,6 @@ use super::{
 use crate::data::{self, ConfigFile, DataManager, Error, ResourceManager, WritableConfigFile};
 
 // TODO:
-// - Find opportunities to improve concurrency
-// - Find deadlock opportunities
 // - Find opportunities to improve overall performance
 // - Write unit tests
 // - Start working on frontend API bindings
@@ -32,7 +30,7 @@ const MAX_FS_CONCURRENCY: usize = 8;
 
 impl State {
     pub(super) async fn new() -> Result<Self, Error> {
-        let data_dir = data::get_data_dir(crate::IDENTIFIER).await?;
+        let data_dir = data::get_data_dir(crate::IDENTIFIER)?;
 
         let extension = Some(OsString::from("toml"));
         let course_map_path = data_dir.join("Course Maps");
@@ -61,58 +59,51 @@ impl State {
             settings: Mutex::new(settings),
         })
     }
-    async fn _get_course_index(&self, id: Uuid) -> Result<Course, Error> {
-        let root = self.courses.get(id).await?;
+    async fn get_course_index(&self, id: Uuid) -> Result<Course, Error> {
+        let root = self.courses.get(id);
 
-        let mut index = ConfigFile::new(&root.join("course.toml")).await?;
+        let mut file = ConfigFile::new(&root.join("course.toml")).await?;
 
-        let mut course = index.read::<Course>().await?;
+        let mut course = file.read::<Course>().await?;
 
-        course.uuid = Some(id);
-
-        for book in &mut course.books {
-            book.file = data::into_relative_path(&root, &book.file);
-        }
+        course.update_root(&root, id);
 
         Ok(course)
     }
-    async fn _get_course_completion(&self, id: Uuid) -> Result<CourseCompletion, Error> {
-        if !self.completion.has(id).await {
-            return Ok(CourseCompletion::default());
-        }
-
-        let path = self.completion.get(id);
-        let mut file = ConfigFile::new(&path).await?;
-
-        file.read().await
-    }
     pub(super) async fn get_course(&self, id: Uuid) -> Result<(Course, CourseCompletion), Error> {
-        try_join!(self._get_course_index(id), self._get_course_completion(id))
+        try_join!(self.get_course_index(id), async {
+            let path = self.completion.get(id);
+            match ConfigFile::new(&path).await {
+                Ok(mut file) => file.read().await,
+                Err(err) => {
+                    if err.is_not_found() {
+                        Ok(CourseCompletion::default())
+                    } else {
+                        Err(err)
+                    }
+                }
+            }
+        })
     }
     pub(super) async fn get_courses(
         &self,
     ) -> Result<Vec<Result<(Course, CourseProgress), ErrorWrapper>>, Error> {
-        let course_list = self.courses.scan().await?;
-        self._get_courses(course_list).await
+        self.hydrate_course_list(self.courses.scan().await?).await
     }
     pub(super) async fn get_courses_active(
         &self,
     ) -> Result<Vec<Result<(Course, CourseProgress), ErrorWrapper>>, Error> {
         let mut file = self.active_courses.lock().await;
 
-        let course_list: HashSet<Uuid> = if file.is_empty().await? {
-            HashSet::new()
-        } else {
-            file.read().await?
-        };
+        let course_list: HashSet<Uuid> = file.read().await?;
 
-        self._get_courses(course_list).await
+        self.hydrate_course_list(course_list).await
     }
-    async fn _get_courses(
+    async fn hydrate_course_list(
         &self,
         course_list: HashSet<Uuid>,
     ) -> Result<Vec<Result<(Course, CourseProgress), ErrorWrapper>>, Error> {
-        let course_list: Vec<_> = course_list.into_iter().collect();
+        let course_list: Vec<Uuid> = course_list.into_iter().collect();
 
         let mut courses = Vec::with_capacity(course_list.len());
 
@@ -144,8 +135,7 @@ impl State {
     pub(super) async fn get_course_maps(
         &self,
     ) -> Result<Vec<Result<CourseMap, ErrorWrapper>>, Error> {
-        let course_map_list = self.course_maps.scan().await?;
-        let course_map_list: Vec<_> = course_map_list.into_iter().collect();
+        let course_map_list: Vec<Uuid> = self.course_maps.scan().await?.into_iter().collect();
 
         let mut course_maps = Vec::with_capacity(course_map_list.len());
 
@@ -153,7 +143,7 @@ impl State {
             let mut future_set = Vec::with_capacity(MAX_FS_CONCURRENCY);
 
             for course_map in course_map_chunk {
-                future_set.push(self._get_course_map(*course_map));
+                future_set.push(self.get_course_map(*course_map));
             }
 
             let results = join_all(future_set).await;
@@ -170,24 +160,19 @@ impl State {
 
         Ok(course_maps)
     }
-    async fn _get_course_map(&self, id: Uuid) -> Result<CourseMap, Error> {
+    async fn get_course_map(&self, id: Uuid) -> Result<CourseMap, Error> {
         let path = self.course_maps.get(id);
 
         let mut file = ConfigFile::new(&path).await?;
         let mut map: CourseMap = file.read().await?;
-
-        map.uuid = Some(id);
+        map.update_id(id);
 
         Ok(map)
     }
     pub(super) async fn set_course_active_status(&self, id: Uuid, data: bool) -> Result<(), Error> {
         let mut file = self.active_courses.lock().await;
 
-        let mut active_courses: HashSet<Uuid> = if file.is_empty().await? {
-            HashSet::new()
-        } else {
-            file.read().await?
-        };
+        let mut active_courses: HashSet<Uuid> = file.read().await?;
 
         if data {
             active_courses.insert(id);
@@ -197,28 +182,20 @@ impl State {
 
         file.write(&active_courses).await
     }
-    async fn _set_course_completion(
-        &self,
-        id: Uuid,
-        data: &CourseCompletion,
-    ) -> Result<CourseCompletion, Error> {
-        let completion_path = self.completion.get(id);
-
-        let mut file = WritableConfigFile::new(&completion_path).await?;
-        let old = file.read().await?;
-        file.write(&data).await?;
-
-        Ok(old)
-    }
     pub(super) async fn set_course_completion(
         &self,
         id: Uuid,
         data: CourseCompletion,
     ) -> Result<(), Error> {
-        let (course, old_completion) = try_join!(
-            self._get_course_index(id),
-            self._set_course_completion(id, &data)
-        )?;
+        let (course, old_completion) = try_join!(self.get_course_index(id), async {
+            let completion_path = self.completion.get(id);
+
+            let mut file = WritableConfigFile::new(&completion_path).await?;
+            let old = file.read().await?;
+            file.write(&data).await?;
+
+            Ok(old)
+        })?;
 
         let old_progress = CourseProgress::calculate(&course, &old_completion);
         let new_progress = CourseProgress::calculate(&course, &data);
@@ -234,12 +211,7 @@ impl State {
     }
     pub(super) async fn get_settings(&self) -> Result<Settings, Error> {
         let mut file = self.settings.lock().await;
-
-        if file.is_empty().await? {
-            Ok(Settings::default())
-        } else {
-            file.read().await
-        }
+        file.read().await
     }
     pub(super) async fn set_settings(&self, data: Settings) -> Result<(), Error> {
         let mut file = self.settings.lock().await;
@@ -247,11 +219,6 @@ impl State {
     }
     pub(super) async fn get_overall_progress(&self) -> Result<OverallProgress, Error> {
         let mut file = self.overall_progress.lock().await;
-
-        if file.is_empty().await? {
-            Ok(OverallProgress::default())
-        } else {
-            file.read().await
-        }
+        file.read().await
     }
 }

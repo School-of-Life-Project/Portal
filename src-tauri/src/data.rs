@@ -44,15 +44,13 @@ pub fn into_relative_path(root: &Path, path: &Path) -> PathBuf {
     new
 }
 
-pub async fn get_data_dir(dirname: &str) -> Result<PathBuf, Error> {
+pub fn get_data_dir(dirname: &str) -> Result<PathBuf, Error> {
     let mut path = match dirs_next::data_dir() {
         Some(path) => path,
         None => env::current_dir()?,
     };
     path.push("item");
     path.set_file_name(dirname);
-
-    ensure_folder_exists(&path).await?;
 
     Ok(path)
 }
@@ -89,6 +87,16 @@ pub enum Error {
     BlockingTaskFailed(#[from] JoinError),
 }
 
+impl Error {
+    pub fn is_not_found(&self) -> bool {
+        if let Self::Io(err) = self {
+            err.kind() == ErrorKind::NotFound
+        } else {
+            false
+        }
+    }
+}
+
 impl From<FileLockError> for Error {
     fn from(value: FileLockError) -> Self {
         match value {
@@ -112,6 +120,9 @@ async fn lock_file(file: File, mode: FileLockMode) -> Result<File, Error> {
 }
 
 /// A read-only handle to a TOML configuration file.
+///
+/// If the file does not yet exist, it will be created.
+/// If the file is blank when being read, the Default version of the object will be returned.
 pub struct ConfigFile {
     pub file: File,
     buffer: String,
@@ -163,17 +174,16 @@ impl WritableConfigFile {
             buffer: String::with_capacity(metadata.len().try_into().unwrap_or_default()),
         })
     }
-    pub async fn is_empty(&mut self) -> Result<bool, Error> {
-        let metadata = self.file.metadata().await?;
-
-        Ok(metadata.len() == 0)
-    }
     pub async fn read<T>(&mut self) -> Result<T, Error>
     where
-        T: DeserializeOwned,
+        T: DeserializeOwned + Default,
     {
         self.buffer.clear();
         self.file.read_to_string(&mut self.buffer).await?;
+
+        if self.buffer.is_empty() {
+            return Ok(T::default());
+        }
 
         let deserializer = Deserializer::new(&self.buffer);
         Ok(T::deserialize(deserializer)?)
@@ -210,12 +220,9 @@ impl DataManager {
 
         Ok(Self { root, extension })
     }
-    pub async fn has(&self, id: Uuid) -> bool {
-        match fs::metadata(self.get(id)).await {
-            Ok(metadata) => metadata.is_file(),
-            Err(_) => false,
-        }
-    }
+    /// Get the path corresponding to a Uuid.
+    ///
+    /// The returned path may or may not exist; It is the caller's responsibily to handle this properly.
     pub fn get(&self, id: Uuid) -> PathBuf {
         let mut path = self
             .root
@@ -234,7 +241,7 @@ impl DataManager {
         while let Some(entry) = entries.next_entry().await? {
             let path = entry.path();
 
-            let is_file = match fs::metadata(&path).await {
+            let is_file = match entry.metadata().await {
                 Ok(metadata) => metadata.is_file(),
                 Err(_) => false,
             };
@@ -280,21 +287,12 @@ impl ResourceManager {
 
         Ok(Self { root })
     }
-    pub async fn get(&self, id: Uuid) -> Result<PathBuf, Error> {
-        let path = self
-            .root
-            .join(Simple::from_uuid(id).encode_lower(&mut Uuid::encode_buffer()));
-
-        match fs::metadata(&path).await {
-            Ok(metadata) => {
-                if metadata.is_dir() {
-                    Ok(path)
-                } else {
-                    Err(Error::Io(io::Error::from(ErrorKind::NotFound)))
-                }
-            }
-            Err(err) => Err(Error::Io(err)),
-        }
+    /// Get the path corresponding to a Uuid.
+    ///
+    /// The returned path may or may not exist; It is the caller's responsibily to handle this properly.
+    pub fn get(&self, id: Uuid) -> PathBuf {
+        self.root
+            .join(Simple::from_uuid(id).encode_lower(&mut Uuid::encode_buffer()))
     }
     pub async fn scan(&self) -> Result<HashSet<Uuid>, Error> {
         let mut items = HashSet::new();
@@ -304,7 +302,7 @@ impl ResourceManager {
         while let Some(entry) = entries.next_entry().await? {
             let path = entry.path();
 
-            let is_dir = match fs::metadata(&path).await {
+            let is_dir = match entry.metadata().await {
                 Ok(metadata) => metadata.is_dir(),
                 Err(_) => false,
             };
