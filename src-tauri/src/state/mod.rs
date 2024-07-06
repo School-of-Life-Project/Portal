@@ -2,8 +2,7 @@ use std::{ffi::OsString, path::PathBuf};
 
 use futures::{future::join_all, try_join};
 use serde::{Deserialize, Serialize};
-use tauri::async_runtime::set;
-use tokio::{fs, sync::Mutex};
+use tokio::sync::Mutex;
 use uuid::Uuid;
 use wrapper::ErrorWrapper;
 
@@ -118,16 +117,7 @@ impl State {
     async fn get_course(&self, id: Uuid) -> Result<(Course, CourseCompletion), DataError> {
         try_join!(self._get_course_index(id), self._get_course_completion(id))
     }
-    /*async fn update_course_progress(
-        &self,
-        id: Uuid,
-        data: CourseProgress,
-    ) -> Result<(), DataError> {
-        let path = self.completion.get(id);
 
-        let mut file = WritableConfigFile::new(&path).await?;
-        file.write(&data).await
-    }*/
     async fn get_courses(
         &self,
     ) -> Result<Vec<Result<(Course, CourseProgress), ErrorWrapper>>, DataError> {
@@ -214,6 +204,26 @@ impl State {
 
         Ok(map)
     }
+    async fn update_course_active_status(&self, id: Uuid, data: bool) -> Result<(), DataError> {
+        todo!()
+    }
+    async fn update_course_textbook_completion(
+        &self,
+        id: Uuid,
+        data: TextbookCompletion,
+    ) -> Result<(), DataError> {
+        todo!()
+    }
+    /*async fn update_course_progress(
+        &self,
+        id: Uuid,
+        data: CourseProgress,
+    ) -> Result<(), DataError> {
+        let path = self.completion.get(id);
+
+        let mut file = WritableConfigFile::new(&path).await?;
+        file.write(&data).await
+    }*/
 
     async fn set_active_courses(&self, data: Vec<Uuid>) -> Result<(), DataError> {
         let mut file = self.active_courses.lock().await;
@@ -234,20 +244,54 @@ impl State {
     }
 }
 
+// TODO
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CourseMap {
     uuid: Option<Uuid>,
 }
 
+/// A Course bundle index
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Course {
+    /// The unique ID of the course. Do NOT include in an index file, this will be automatically overwritten by the Course's folder name.
     uuid: Option<Uuid>,
+    /// Title for the course
     title: String,
+    /// Optional description for the course
     description: Option<String>,
+    /// The textbooks which are a part of this course.
     books: Vec<Textbook>,
 }
 
+/// A Textbook within a Course
+#[derive(Serialize, Deserialize, Debug)]
+struct Textbook {
+    /// Label for the textbook when displayed as part of a larger course.
+    /// This generally shouldn't be set to the full textbook title.
+    label: String,
+    /// The path of the textbook's corresponding ePub/PDF file, relative to the course's root directory.
+    file: PathBuf,
+    /// A list of *completable* Chapter items within the textbook.
+    chapters: Vec<Chapter>,
+}
+
+/// A completable Chapter within a Textbook
+///
+/// Chapter elements should only be included when a chapter's completion is meaningful to progress within the overall course.
+#[derive(Serialize, Deserialize, Debug)]
+struct Chapter {
+    /// The section-id corresponding to the Chapter's root.
+    ///
+    /// If this is ommitted, the completion status of the entire chapter will not be displayed within the book reader.
+    root: Option<String>,
+    /// A completable Section within a Chapter, corresponding to a book section-id.
+    ///
+    /// Sections should only be included when a section's completion is meaningful to progress within the overall course.
+    sections: Vec<Vec<String>>,
+}
+
 impl Course {
+    /// Get a list of all files included in a Course
     fn get_resources(&self) -> Vec<&PathBuf> {
         let mut files = Vec::new();
 
@@ -259,35 +303,42 @@ impl Course {
     }
 }
 
+/// The raw data used to keep track of Course completion
 #[derive(Serialize, Deserialize, Default, Debug)]
 pub struct CourseCompletion {
+    /// If the course has a manually marked completion status
     completed: Option<bool>,
-    sections_by_book: Vec<Vec<String>>,
+    books: Vec<TextbookCompletion>,
 }
 
-#[derive(Serialize, Deserialize, Default, Debug)]
+/// The raw data used to keep track of Textbook completion
+#[derive(Serialize, Deserialize, Debug)]
+pub struct TextbookCompletion {
+    book_index: usize,
+    completed_sections: Vec<String>,
+}
+
+/// The displayed progress through a course
+#[derive(Serialize, Deserialize, Debug)]
 pub struct CourseProgress {
+    /// If a course should be considered completed
     completed: bool,
-    book_chapter_completion: Vec<Vec<f32>>,
+    /// The completion of textbooks within the course. Not included if the course has been manually marked as completed.
+    completion: Vec<TextbookProgress>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct TextbookProgress {
+    /// The completion (ranging between 0 and 1) of the entire book.
+    overall_completion: f32,
+    /// The completion (ranging between 0 and 1) of each chapter within the book.
+    chapter_completion: Vec<f32>,
 }
 
 impl CourseProgress {
     fn calculate(course: &Course, completion: &CourseCompletion) -> Self {
         todo!()
     }
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-struct Textbook {
-    label: String,
-    file: PathBuf,
-    chapters: Vec<Chapter>,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-struct Chapter {
-    root: Option<String>,
-    sections: Vec<Vec<String>>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Default)]
