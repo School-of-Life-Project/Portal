@@ -250,6 +250,10 @@ impl DataManager {
             let uuid = Uuid::try_parse(&filestem).unwrap_or_else(|_| Uuid::new_v4());
             let formatted = Simple::from_uuid(uuid).encode_lower(&mut buffer);
 
+            if items.contains(&uuid) {
+                return Err(DataError::Io(io::Error::from(ErrorKind::AlreadyExists)));
+            }
+
             if *formatted != *filestem || extension != self.extension.as_deref() {
                 let mut new_path = path.with_file_name(formatted);
                 if let Some(extension) = &self.extension {
@@ -311,6 +315,10 @@ impl ResourceManager {
 
             let uuid = Uuid::try_parse(&filename).unwrap_or_else(|_| Uuid::new_v4());
             let formatted = Simple::from_uuid(uuid).encode_lower(&mut buffer);
+
+            if items.contains(&uuid) {
+                return Err(DataError::Io(io::Error::from(ErrorKind::AlreadyExists)));
+            }
 
             if *formatted != *filename {
                 fs::rename(&path, path.with_file_name(formatted)).await?;
