@@ -216,6 +216,15 @@ impl State {
         let mut file = self.settings.lock().await;
         file.write(&data).await
     }
+    async fn get_overall_progress(&self) -> Result<OverallProgress, DataError> {
+        let mut file = self.overall_progress.lock().await;
+
+        if file.is_empty().await? {
+            Ok(OverallProgress::default())
+        } else {
+            file.read().await
+        }
+    }
 }
 
 // TODO
@@ -312,6 +321,9 @@ impl CourseProgress {
             };
         }
 
+        todo!()
+    }
+    fn calculate_diff(before: &Self, after: &Self) -> (f32, f32) {
         todo!()
     }
 }

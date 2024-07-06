@@ -7,7 +7,9 @@ use tauri::Manager;
 use tokio::{fs, sync::OnceCell};
 use uuid::Uuid;
 
-use super::{Course, CourseCompletion, CourseMap, CourseProgress, Settings, State};
+use super::{
+    Course, CourseCompletion, CourseMap, CourseProgress, OverallProgress, Settings, State,
+};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ErrorWrapper {
@@ -176,4 +178,16 @@ pub async fn set_settings(
         .set_settings(data)
         .await
         .map_err(|e| ErrorWrapper::new("Unable to update Settings".to_string(), &e))
+}
+
+#[tauri::command]
+pub async fn get_overall_progress(
+    state: tauri::State<'_, StateWrapper>,
+) -> Result<OverallProgress, ErrorWrapper> {
+    let state = state.state().await?;
+
+    state
+        .get_overall_progress()
+        .await
+        .map_err(|e| ErrorWrapper::new("Unable to get total progress data".to_string(), &e))
 }

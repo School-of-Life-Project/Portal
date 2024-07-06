@@ -22,6 +22,7 @@ fn main() -> Result<()> {
             wrapper::set_course_active_status,
             wrapper::get_settings,
             wrapper::set_settings,
+            wrapper::get_overall_progress,
         ])
         .run(tauri::generate_context!())
         .context("Failed to initalize application window")
