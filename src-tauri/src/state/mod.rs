@@ -64,26 +64,18 @@ impl State {
 
         Ok(course)
     }
-    async fn _get_course_completion(
-        &self,
-        id: Uuid,
-    ) -> Result<Option<CourseCompletion>, DataError> {
+    async fn _get_course_completion(&self, id: Uuid) -> Result<CourseCompletion, DataError> {
         if !self.completion.has(id).await {
-            return Ok(None);
+            return Ok(CourseCompletion::default());
         }
 
         let path = self.completion.get(id);
         let mut file = ConfigFile::new(&path).await?;
 
-        file.read().await.map(Some)
+        file.read().await
     }
     async fn get_course(&self, id: Uuid) -> Result<(Course, CourseCompletion), DataError> {
-        let (course, completion) =
-            try_join!(self._get_course_index(id), self._get_course_completion(id))?;
-
-        let completion = completion.unwrap_or_else(|| CourseCompletion::new(&course));
-
-        Ok((course, completion))
+        try_join!(self._get_course_index(id), self._get_course_completion(id))
     }
     async fn get_courses(
         &self,
@@ -276,18 +268,12 @@ impl Course {
 }
 
 /// The raw data used to keep track of Course completion
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Default)]
 pub struct CourseCompletion {
     /// If the course has a manually marked completion status
     completed: Option<bool>,
     /// A list of all completed section-ids within each textbook within the course.
     books: Vec<Vec<String>>,
-}
-
-impl CourseCompletion {
-    fn new(course: &Course) -> Self {
-        todo!()
-    }
 }
 
 /// The displayed progress through a course
