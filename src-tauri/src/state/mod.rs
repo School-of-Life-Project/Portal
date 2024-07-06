@@ -193,15 +193,40 @@ impl State {
 
         file.write(&active_courses).await
     }
+    async fn _set_course_completion(
+        &self,
+        id: Uuid,
+        data: &CourseCompletion,
+    ) -> Result<CourseCompletion, DataError> {
+        let completion_path = self.completion.get(id);
+
+        let mut file = WritableConfigFile::new(&completion_path).await?;
+        let old = file.read().await?;
+        file.write(&data).await?;
+
+        Ok(old)
+    }
     async fn set_course_completion(
         &self,
         id: Uuid,
         data: CourseCompletion,
     ) -> Result<(), DataError> {
-        let path = self.completion.get(id);
+        let (course, old_completion) = try_join!(
+            self._get_course_index(id),
+            self._set_course_completion(id, &data)
+        )?;
 
-        let mut file = WritableConfigFile::new(&path).await?;
-        file.write(&data).await
+        let old_progress = CourseProgress::calculate(&course, &old_completion);
+        let new_progress = CourseProgress::calculate(&course, &data);
+
+        let time_change_secs = CourseCompletion::calculate_time_diff_secs(&old_completion, &data);
+        let chapter_change = CourseProgress::calculate_chapter_diff(&old_progress, &new_progress);
+
+        let mut total_progress_file = self.overall_progress.lock().await;
+
+        let mut total_progress: OverallProgress = total_progress_file.read().await?;
+        total_progress.update(chapter_change, time_change_secs);
+        total_progress_file.write(&total_progress).await
     }
     async fn get_settings(&self) -> Result<Settings, DataError> {
         let mut file = self.settings.lock().await;
