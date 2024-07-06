@@ -26,6 +26,14 @@ struct State {
     settings: Mutex<WritableConfigFile>,
 }
 
+// TODO:
+// - Better separate modules to take advantage of visibility
+// - Find opportunities to improve concurrency
+// - Find deadlock opportunities
+// - Find opportunities to improve overall performance
+// - Write unit tests
+// - Start working on frontend API bindings
+
 const MAX_FS_CONCURRENCY: usize = 8;
 
 impl State {
