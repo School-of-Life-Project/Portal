@@ -1,7 +1,9 @@
+#![allow(clippy::module_name_repetitions)]
+
 use std::{
     collections::HashSet,
     env,
-    ffi::OsString,
+    ffi::{OsStr, OsString},
     io::ErrorKind,
     path::{Component, Path, PathBuf},
 };
@@ -25,9 +27,7 @@ pub fn into_relative_path(root: &Path, path: &Path) -> PathBuf {
 
     for component in path.components() {
         match component {
-            Component::Prefix(_) => {}
-            Component::RootDir => {}
-            Component::CurDir => {}
+            Component::Prefix(_) | Component::RootDir | Component::CurDir => {}
             Component::ParentDir => {
                 if items.saturating_sub(popped) > 0 {
                     new.pop();
@@ -44,7 +44,7 @@ pub fn into_relative_path(root: &Path, path: &Path) -> PathBuf {
     new
 }
 
-pub async fn get_data_dir(dirname: &str) -> Result<PathBuf, DataError> {
+pub async fn get_data_dir(dirname: &str) -> Result<PathBuf, Error> {
     let mut path = match dirs_next::data_dir() {
         Some(path) => path,
         None => env::current_dir()?,
@@ -57,7 +57,7 @@ pub async fn get_data_dir(dirname: &str) -> Result<PathBuf, DataError> {
     Ok(path)
 }
 
-pub async fn ensure_folder_exists(path: &Path) -> Result<(), DataError> {
+pub async fn ensure_folder_exists(path: &Path) -> Result<(), Error> {
     let metadata = fs::metadata(path).await;
 
     match metadata {
@@ -76,7 +76,7 @@ pub async fn ensure_folder_exists(path: &Path) -> Result<(), DataError> {
 }
 
 #[derive(Error, Debug)]
-pub enum DataError {
+pub enum Error {
     #[error("File is already locked by another process")]
     AlreadyLocked,
     #[error(transparent)]
@@ -89,7 +89,7 @@ pub enum DataError {
     BlockingTaskFailed(#[from] JoinError),
 }
 
-impl From<FileLockError> for DataError {
+impl From<FileLockError> for Error {
     fn from(value: FileLockError) -> Self {
         match value {
             FileLockError::AlreadyLocked => Self::AlreadyLocked,
@@ -98,7 +98,7 @@ impl From<FileLockError> for DataError {
     }
 }
 
-async fn lock_file(file: File, mode: FileLockMode) -> Result<File, DataError> {
+async fn lock_file(file: File, mode: FileLockMode) -> Result<File, Error> {
     let std_file = file.into_std().await;
 
     let file = task::spawn_blocking(move || -> Result<File, FileLockError> {
@@ -118,7 +118,7 @@ pub struct ConfigFile {
 }
 
 impl ConfigFile {
-    pub async fn new(path: &Path) -> Result<Self, DataError> {
+    pub async fn new(path: &Path) -> Result<Self, Error> {
         let file = File::open(path).await?;
         let file = lock_file(file, FileLockMode::Shared).await?;
         let metadata = file.metadata().await?;
@@ -128,7 +128,7 @@ impl ConfigFile {
             buffer: String::with_capacity(metadata.len().try_into().unwrap_or_default()),
         })
     }
-    pub async fn read<T>(&mut self) -> Result<T, DataError>
+    pub async fn read<T>(&mut self) -> Result<T, Error>
     where
         T: DeserializeOwned,
     {
@@ -147,7 +147,7 @@ pub struct WritableConfigFile {
 }
 
 impl WritableConfigFile {
-    pub async fn new(path: &Path) -> Result<Self, DataError> {
+    pub async fn new(path: &Path) -> Result<Self, Error> {
         let file = OpenOptions::new()
             .create(true)
             .truncate(false)
@@ -163,12 +163,12 @@ impl WritableConfigFile {
             buffer: String::with_capacity(metadata.len().try_into().unwrap_or_default()),
         })
     }
-    pub async fn is_empty(&mut self) -> Result<bool, DataError> {
+    pub async fn is_empty(&mut self) -> Result<bool, Error> {
         let metadata = self.file.metadata().await?;
 
         Ok(metadata.len() == 0)
     }
-    pub async fn read<T>(&mut self) -> Result<T, DataError>
+    pub async fn read<T>(&mut self) -> Result<T, Error>
     where
         T: DeserializeOwned,
     {
@@ -178,7 +178,7 @@ impl WritableConfigFile {
         let deserializer = Deserializer::new(&self.buffer);
         Ok(T::deserialize(deserializer)?)
     }
-    pub async fn write<T>(&mut self, data: &T) -> Result<(), DataError>
+    pub async fn write<T>(&mut self, data: &T) -> Result<(), Error>
     where
         T: Serialize,
     {
@@ -194,14 +194,14 @@ impl WritableConfigFile {
     }
 }
 
-/// DataManager is a UUID-indexed file manager.
+/// ``DataManager`` is a UUID-indexed file manager.
 pub struct DataManager {
     pub root: PathBuf,
     pub extension: Option<OsString>,
 }
 
 impl DataManager {
-    pub async fn new(root: PathBuf, mut extension: Option<OsString>) -> Result<Self, DataError> {
+    pub async fn new(root: PathBuf, mut extension: Option<OsString>) -> Result<Self, Error> {
         ensure_folder_exists(&root).await?;
 
         if let Some(extension) = &mut extension {
@@ -226,7 +226,7 @@ impl DataManager {
 
         path
     }
-    pub async fn scan(&self) -> Result<HashSet<Uuid>, DataError> {
+    pub async fn scan(&self) -> Result<HashSet<Uuid>, Error> {
         let mut items = HashSet::new();
         let mut buffer = Uuid::encode_buffer();
 
@@ -241,7 +241,7 @@ impl DataManager {
 
             let extension = path.extension();
 
-            if !is_file || extension.map(|e| e.to_ascii_lowercase()) != self.extension {
+            if !is_file || extension.map(OsStr::to_ascii_lowercase) != self.extension {
                 continue;
             }
 
@@ -251,7 +251,7 @@ impl DataManager {
             let formatted = Simple::from_uuid(uuid).encode_lower(&mut buffer);
 
             if items.contains(&uuid) {
-                return Err(DataError::Io(io::Error::from(ErrorKind::AlreadyExists)));
+                return Err(Error::Io(io::Error::from(ErrorKind::AlreadyExists)));
             }
 
             if *formatted != *filestem || extension != self.extension.as_deref() {
@@ -269,32 +269,34 @@ impl DataManager {
     }
 }
 
-/// ResourceManager is a UUID-indexed folder manager.
+/// ``ResourceManager`` is a UUID-indexed folder manager.
 pub struct ResourceManager {
     pub root: PathBuf,
 }
 
 impl ResourceManager {
-    pub async fn new(root: PathBuf) -> Result<Self, DataError> {
+    pub async fn new(root: PathBuf) -> Result<Self, Error> {
         ensure_folder_exists(&root).await?;
 
         Ok(Self { root })
     }
-    pub async fn get(&self, id: Uuid) -> Result<PathBuf, DataError> {
+    pub async fn get(&self, id: Uuid) -> Result<PathBuf, Error> {
         let path = self
             .root
             .join(Simple::from_uuid(id).encode_lower(&mut Uuid::encode_buffer()));
 
         match fs::metadata(&path).await {
-            Ok(metadata) => match metadata.is_dir() {
-                true => Ok(path),
-                //false => Err(DataError::Io(io::Error::from(ErrorKind::NotADirectory))),
-                false => Err(DataError::Io(io::Error::from(ErrorKind::NotFound))),
-            },
-            Err(err) => Err(DataError::Io(err)),
+            Ok(metadata) => {
+                if metadata.is_dir() {
+                    Ok(path)
+                } else {
+                    Err(Error::Io(io::Error::from(ErrorKind::NotFound)))
+                }
+            }
+            Err(err) => Err(Error::Io(err)),
         }
     }
-    pub async fn scan(&self) -> Result<HashSet<Uuid>, DataError> {
+    pub async fn scan(&self) -> Result<HashSet<Uuid>, Error> {
         let mut items = HashSet::new();
         let mut buffer = Uuid::encode_buffer();
 
@@ -317,7 +319,7 @@ impl ResourceManager {
             let formatted = Simple::from_uuid(uuid).encode_lower(&mut buffer);
 
             if items.contains(&uuid) {
-                return Err(DataError::Io(io::Error::from(ErrorKind::AlreadyExists)));
+                return Err(Error::Io(io::Error::from(ErrorKind::AlreadyExists)));
             }
 
             if *formatted != *filename {

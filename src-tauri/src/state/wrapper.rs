@@ -1,4 +1,8 @@
-#![allow(clippy::type_complexity)]
+#![allow(
+    clippy::type_complexity,
+    clippy::used_underscore_binding,
+    clippy::module_name_repetitions
+)]
 
 use std::sync::Arc;
 
@@ -107,7 +111,7 @@ pub async fn get_course(
     let (course, progress) = state
         .get_course(id)
         .await
-        .map_err(|e| ErrorWrapper::new(format!("Unable to get Course {}", id), &e))?;
+        .map_err(|e| ErrorWrapper::new(format!("Unable to get Course {id}"), &e))?;
 
     let scope = app_handle.asset_protocol_scope();
 
@@ -120,7 +124,7 @@ pub async fn get_course(
             }
             .map_err(|e| {
                 ErrorWrapper::new(
-                    format!("Unable to update renderer permissions for path {:?}", path),
+                    format!("Unable to update renderer permissions for path {path:?}"),
                     &e,
                 )
             })?;
@@ -138,9 +142,10 @@ pub async fn set_course_completion(
 ) -> Result<(), ErrorWrapper> {
     let state = state.state().await?;
 
-    state.set_course_completion(id, data).await.map_err(|e| {
-        ErrorWrapper::new(format!("Unable to update completion for Course {}", id), &e)
-    })
+    state
+        .set_course_completion(id, data)
+        .await
+        .map_err(|e| ErrorWrapper::new(format!("Unable to update completion for Course {id}"), &e))
 }
 
 #[tauri::command]

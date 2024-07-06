@@ -14,7 +14,7 @@ use wrapper::ErrorWrapper;
 
 pub mod wrapper;
 
-use crate::data::{self, ConfigFile, DataError, DataManager, ResourceManager, WritableConfigFile};
+use crate::data::{self, ConfigFile, DataManager, Error, ResourceManager, WritableConfigFile};
 
 struct State {
     data_dir: PathBuf,
@@ -37,7 +37,7 @@ struct State {
 const MAX_FS_CONCURRENCY: usize = 8;
 
 impl State {
-    async fn new() -> Result<Self, DataError> {
+    async fn new() -> Result<Self, Error> {
         let data_dir = data::get_data_dir(crate::IDENTIFIER).await?;
 
         let extension = Some(OsString::from("toml"));
@@ -67,7 +67,7 @@ impl State {
             settings: Mutex::new(settings),
         })
     }
-    async fn _get_course_index(&self, id: Uuid) -> Result<Course, DataError> {
+    async fn _get_course_index(&self, id: Uuid) -> Result<Course, Error> {
         let root = self.courses.get(id).await?;
 
         let mut index = ConfigFile::new(&root.join("course.toml")).await?;
@@ -76,13 +76,13 @@ impl State {
 
         course.uuid = Some(id);
 
-        for book in course.books.iter_mut() {
+        for book in &mut course.books {
             book.file = data::into_relative_path(&root, &book.file);
         }
 
         Ok(course)
     }
-    async fn _get_course_completion(&self, id: Uuid) -> Result<CourseCompletion, DataError> {
+    async fn _get_course_completion(&self, id: Uuid) -> Result<CourseCompletion, Error> {
         if !self.completion.has(id).await {
             return Ok(CourseCompletion::default());
         }
@@ -92,18 +92,18 @@ impl State {
 
         file.read().await
     }
-    async fn get_course(&self, id: Uuid) -> Result<(Course, CourseCompletion), DataError> {
+    async fn get_course(&self, id: Uuid) -> Result<(Course, CourseCompletion), Error> {
         try_join!(self._get_course_index(id), self._get_course_completion(id))
     }
     async fn get_courses(
         &self,
-    ) -> Result<Vec<Result<(Course, CourseProgress), ErrorWrapper>>, DataError> {
+    ) -> Result<Vec<Result<(Course, CourseProgress), ErrorWrapper>>, Error> {
         let course_list = self.courses.scan().await?;
         self._get_courses(course_list).await
     }
     async fn get_courses_active(
         &self,
-    ) -> Result<Vec<Result<(Course, CourseProgress), ErrorWrapper>>, DataError> {
+    ) -> Result<Vec<Result<(Course, CourseProgress), ErrorWrapper>>, Error> {
         let mut file = self.active_courses.lock().await;
 
         let course_list: HashSet<Uuid> = if file.is_empty().await? {
@@ -117,7 +117,7 @@ impl State {
     async fn _get_courses(
         &self,
         course_list: HashSet<Uuid>,
-    ) -> Result<Vec<Result<(Course, CourseProgress), ErrorWrapper>>, DataError> {
+    ) -> Result<Vec<Result<(Course, CourseProgress), ErrorWrapper>>, Error> {
         let course_list: Vec<_> = course_list.into_iter().collect();
 
         let mut courses = Vec::with_capacity(course_list.len());
@@ -147,7 +147,7 @@ impl State {
 
         Ok(courses)
     }
-    async fn get_course_maps(&self) -> Result<Vec<Result<CourseMap, ErrorWrapper>>, DataError> {
+    async fn get_course_maps(&self) -> Result<Vec<Result<CourseMap, ErrorWrapper>>, Error> {
         let course_map_list = self.course_maps.scan().await?;
         let course_map_list: Vec<_> = course_map_list.into_iter().collect();
 
@@ -174,7 +174,7 @@ impl State {
 
         Ok(course_maps)
     }
-    async fn _get_course_map(&self, id: Uuid) -> Result<CourseMap, DataError> {
+    async fn _get_course_map(&self, id: Uuid) -> Result<CourseMap, Error> {
         let path = self.course_maps.get(id);
 
         let mut file = ConfigFile::new(&path).await?;
@@ -184,7 +184,7 @@ impl State {
 
         Ok(map)
     }
-    async fn set_course_active_status(&self, id: Uuid, data: bool) -> Result<(), DataError> {
+    async fn set_course_active_status(&self, id: Uuid, data: bool) -> Result<(), Error> {
         let mut file = self.active_courses.lock().await;
 
         let mut active_courses: HashSet<Uuid> = if file.is_empty().await? {
@@ -205,7 +205,7 @@ impl State {
         &self,
         id: Uuid,
         data: &CourseCompletion,
-    ) -> Result<CourseCompletion, DataError> {
+    ) -> Result<CourseCompletion, Error> {
         let completion_path = self.completion.get(id);
 
         let mut file = WritableConfigFile::new(&completion_path).await?;
@@ -214,11 +214,7 @@ impl State {
 
         Ok(old)
     }
-    async fn set_course_completion(
-        &self,
-        id: Uuid,
-        data: CourseCompletion,
-    ) -> Result<(), DataError> {
+    async fn set_course_completion(&self, id: Uuid, data: CourseCompletion) -> Result<(), Error> {
         let (course, old_completion) = try_join!(
             self._get_course_index(id),
             self._set_course_completion(id, &data)
@@ -236,7 +232,7 @@ impl State {
         total_progress.update(chapter_change, time_change_secs);
         total_progress_file.write(&total_progress).await
     }
-    async fn get_settings(&self) -> Result<Settings, DataError> {
+    async fn get_settings(&self) -> Result<Settings, Error> {
         let mut file = self.settings.lock().await;
 
         if file.is_empty().await? {
@@ -245,11 +241,11 @@ impl State {
             file.read().await
         }
     }
-    async fn set_settings(&self, data: Settings) -> Result<(), DataError> {
+    async fn set_settings(&self, data: Settings) -> Result<(), Error> {
         let mut file = self.settings.lock().await;
         file.write(&data).await
     }
-    async fn get_overall_progress(&self) -> Result<OverallProgress, DataError> {
+    async fn get_overall_progress(&self) -> Result<OverallProgress, Error> {
         let mut file = self.overall_progress.lock().await;
 
         if file.is_empty().await? {
@@ -279,7 +275,7 @@ pub struct Course {
     books: Vec<Textbook>,
 }
 
-/// A Textbook within a Course
+/// A Textbook within a ``Course``
 #[derive(Serialize, Deserialize, Debug)]
 struct Textbook {
     /// Label for the textbook when displayed as part of a larger course.
@@ -287,27 +283,27 @@ struct Textbook {
     label: String,
     /// The path of the textbook's corresponding ePub/PDF file, relative to the course's root directory.
     file: PathBuf,
-    /// A list of *completable* Chapter items within the textbook.
+    /// A list of *completable* ``Chapter`` items within the textbook.
     chapters: Vec<Chapter>,
 }
 
-/// A completable Chapter within a Textbook
+/// A completable Chapter within a ``Textbook``
 ///
-/// Chapter elements should only be included when a chapter's completion is meaningful to progress within the overall course.
+/// ``Chapter`` elements should only be included when a chapter's completion is meaningful to progress within the overall course.
 #[derive(Serialize, Deserialize, Debug)]
 struct Chapter {
-    /// The section-id corresponding to the Chapter's root.
+    /// The section-id corresponding to the chapter's root.
     ///
     /// If this is ommitted, the completion status of the entire chapter will not be displayed within the book reader.
     root: Option<String>,
-    /// A completable Section within a Chapter, corresponding to a book section-id.
+    /// A completable ``Section`` within a chapter, corresponding to a book section-id.
     ///
     /// Sections should only be included when a section's completion is meaningful to progress within the overall course.
     sections: Vec<Vec<String>>,
 }
 
 impl Course {
-    /// Get a list of all files included in a Course
+    /// Get a list of all files included in a ``Course``
     fn get_resources(&self) -> Vec<&PathBuf> {
         let mut files = Vec::with_capacity(self.books.len());
 
@@ -319,7 +315,7 @@ impl Course {
     }
 }
 
-/// The raw data used to keep track of Course completion
+/// The raw data used to keep track of ``Course`` completion
 #[derive(Serialize, Deserialize, Debug, Default)]
 pub struct CourseCompletion {
     /// If the course has a manually marked completion status
@@ -336,7 +332,7 @@ impl CourseCompletion {
     }
 }
 
-/// The displayed progress through a course
+/// The displayed progress through a ``Course``
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CourseProgress {
     /// If a course should be considered completed
@@ -345,6 +341,7 @@ pub struct CourseProgress {
     completion: Vec<TextbookProgress>,
 }
 
+/// The displayed progress through a ``Textbook``
 #[derive(Serialize, Deserialize, Debug)]
 pub struct TextbookProgress {
     /// The completion (ranging between 0 and 1) of the entire book.
@@ -358,6 +355,7 @@ impl CourseProgress {
         let mut book_progress = Vec::with_capacity(course.books.len());
 
         for (book_index, book) in course.books.iter().enumerate() {
+            #[allow(clippy::cast_precision_loss)]
             book_progress.push(match completion.book_sections.get(&book_index) {
                 Some(book_completion) => {
                     let mut chapter_progress = Vec::with_capacity(book.chapters.len());
@@ -386,7 +384,7 @@ impl CourseProgress {
                             }
                         }
 
-                        chapter_progress.push(progress / chapter.sections.len() as f32)
+                        chapter_progress.push(progress / chapter.sections.len() as f32);
                     }
 
                     let mut total_progress = 0.0;
@@ -406,7 +404,7 @@ impl CourseProgress {
                     overall_completion: 0.0,
                     chapter_completion: Vec::new(),
                 },
-            })
+            });
         }
 
         let completed = match completion.completed {
