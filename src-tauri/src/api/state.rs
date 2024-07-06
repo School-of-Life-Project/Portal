@@ -11,11 +11,6 @@ use super::{
 
 use crate::data::{self, ConfigFile, DataManager, Error, ResourceManager, WritableConfigFile};
 
-// TODO:
-// - Find opportunities to improve overall performance
-// - Write unit tests
-// - Start working on frontend API bindings
-
 pub(super) struct State {
     pub(super) data_dir: PathBuf,
     course_maps: DataManager,
@@ -185,22 +180,22 @@ impl State {
     pub(super) async fn set_course_completion(
         &self,
         id: Uuid,
-        data: CourseCompletion,
+        data: &CourseCompletion,
     ) -> Result<(), Error> {
         let (course, old_completion) = try_join!(self.get_course_index(id), async {
             let completion_path = self.completion.get(id);
 
             let mut file = WritableConfigFile::new(&completion_path).await?;
             let old = file.read().await?;
-            file.write(&data).await?;
+            file.write(data).await?;
 
             Ok(old)
         })?;
 
         let old_progress = CourseProgress::calculate(&course, &old_completion);
-        let new_progress = CourseProgress::calculate(&course, &data);
+        let new_progress = CourseProgress::calculate(&course, data);
 
-        let time_change_secs = CourseCompletion::calculate_time_diff_secs(&old_completion, &data);
+        let time_change_secs = CourseCompletion::calculate_time_diff_secs(&old_completion, data);
         let chapter_change = CourseProgress::calculate_chapter_diff(&old_progress, &new_progress);
 
         let mut total_progress_file = self.overall_progress.lock().await;
@@ -213,9 +208,9 @@ impl State {
         let mut file = self.settings.lock().await;
         file.read().await
     }
-    pub(super) async fn set_settings(&self, data: Settings) -> Result<(), Error> {
+    pub(super) async fn set_settings(&self, data: &Settings) -> Result<(), Error> {
         let mut file = self.settings.lock().await;
-        file.write(&data).await
+        file.write(data).await
     }
     pub(super) async fn get_overall_progress(&self) -> Result<OverallProgress, Error> {
         let mut file = self.overall_progress.lock().await;

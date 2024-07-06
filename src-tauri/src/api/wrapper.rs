@@ -143,7 +143,7 @@ pub async fn set_course_completion(
     let state = state.state().await?;
 
     state
-        .set_course_completion(id, data)
+        .set_course_completion(id, &data)
         .await
         .map_err(|e| ErrorWrapper::new(format!("Unable to update completion for Course {id}"), &e))
 }
@@ -180,7 +180,7 @@ pub async fn set_settings(
     let state = state.state().await?;
 
     state
-        .set_settings(data)
+        .set_settings(&data)
         .await
         .map_err(|e| ErrorWrapper::new("Unable to update Settings".to_string(), &e))
 }
