@@ -12,7 +12,7 @@ use tokio::{fs, sync::OnceCell};
 use uuid::Uuid;
 
 use super::{
-    Course, CourseCompletion, CourseMap, CourseProgress, OverallProgress, Settings, State,
+    state::State, Course, CourseCompletion, CourseMap, CourseProgress, OverallProgress, Settings,
 };
 
 #[derive(Serialize, Deserialize, Debug)]

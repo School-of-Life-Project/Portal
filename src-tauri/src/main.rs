@@ -3,10 +3,10 @@
 
 use anyhow::{Context, Result};
 
+mod api;
 mod data;
-mod state;
 
-use state::wrapper;
+use api::wrapper;
 
 const IDENTIFIER: &str = "com.schoolOfLifeProject.Portal";
 
