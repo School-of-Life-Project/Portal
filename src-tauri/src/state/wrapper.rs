@@ -57,28 +57,15 @@ pub async fn open_data_dir(state: tauri::State<'_, StateWrapper>) -> Result<(), 
 }
 
 #[tauri::command]
-pub async fn get_course_map_list(
+pub async fn get_course_maps(
     state: tauri::State<'_, StateWrapper>,
-) -> Result<Vec<Uuid>, ErrorWrapper> {
+) -> Result<Vec<Result<CourseMap, ErrorWrapper>>, ErrorWrapper> {
     let state = state.state().await?;
 
     state
-        .get_course_map_list()
+        .get_course_maps()
         .await
         .map_err(|e| ErrorWrapper::new("Unable to get CourseMap list".to_string(), &e))
-}
-
-#[tauri::command]
-pub async fn get_course_map(
-    state: tauri::State<'_, StateWrapper>,
-    id: Uuid,
-) -> Result<CourseMap, ErrorWrapper> {
-    let state = state.state().await?;
-
-    state
-        .get_course_map(id)
-        .await
-        .map_err(|e| ErrorWrapper::new(format!("Unable to get CourseMap {}", id), &e))
 }
 
 #[tauri::command]
@@ -128,7 +115,7 @@ pub async fn get_course(
 }
 
 #[tauri::command]
-pub async fn set_course_progress(
+pub async fn update_course_progress(
     state: tauri::State<'_, StateWrapper>,
     id: Uuid,
     data: CourseProgress,
@@ -136,7 +123,7 @@ pub async fn set_course_progress(
     let state = state.state().await?;
 
     state
-        .set_course_progress(id, data)
+        .update_course_progress(id, data)
         .await
         .map_err(|e| ErrorWrapper::new(format!("Unable to update progress for Course {}", id), &e))
 }

@@ -1,10 +1,11 @@
 use std::{ffi::OsString, path::PathBuf};
 
-use futures::{future::try_join5, try_join};
+use futures::{future::join_all, try_join};
 use serde::{Deserialize, Serialize};
 use tauri::async_runtime::set;
 use tokio::{fs, sync::Mutex};
 use uuid::Uuid;
+use wrapper::ErrorWrapper;
 
 pub mod wrapper;
 
@@ -43,22 +44,27 @@ New API outline:
     list Course
     list CourseMap
 
-    get CourseMap {uuid}
-        returns CourseMap
-
-    get ActiveCourses
-        returns []Uuid
-    set ActiveCourses []Uuid
-
+    list CourseMap
+        returns []CourseMap
 
     get Course {id}
         returns (Course, CourseProgress)
+
+    get ActiveCourses
+        returns []Course
+
+    set ActiveCourses []Uuid
+
+
+
     set CourseProgress {id}
 
 
 
 
 */
+
+const MAX_FS_CONCURRENCY: usize = 6;
 
 impl State {
     async fn new() -> Result<Self, DataError> {
@@ -106,30 +112,74 @@ impl State {
             (index.read().await?, CourseProgress::default())
         };
 
+        course.uuid = Some(id);
+
         for book in course.books.iter_mut() {
             book.file = data::into_relative_path(&course_root, &book.file);
         }
 
         Ok((course, course_progress))
     }
-    async fn set_course_progress(&self, id: Uuid, data: CourseProgress) -> Result<(), DataError> {
+    async fn update_course_progress(
+        &self,
+        id: Uuid,
+        data: CourseProgress,
+    ) -> Result<(), DataError> {
         let path = self.progress.get(id);
 
         let mut file = WritableConfigFile::new(&path).await?;
         file.write(&data).await
     }
-    async fn get_course_map_list(&self) -> Result<Vec<Uuid>, DataError> {
-        self.course_maps.scan().await
+    async fn get_course_maps(&self) -> Result<Vec<Result<CourseMap, ErrorWrapper>>, DataError> {
+        let course_map_list = self.course_maps.scan().await?;
+
+        let mut course_maps = Vec::new();
+        let mut uuids = Vec::new();
+
+        for course_map_set in course_map_list.chunks(MAX_FS_CONCURRENCY) {
+            let mut future_set = Vec::new();
+
+            for course_map in course_map_set {
+                uuids.push(course_map);
+                future_set.push(self._get_course_map(*course_map));
+            }
+
+            let mut results = join_all(future_set).await;
+            course_maps.append(&mut results);
+        }
+
+        let mut combined_course_maps = Vec::new();
+
+        for (index, course_map) in course_maps.into_iter().enumerate() {
+            match course_map {
+                Ok(mut map) => {
+                    map.uuid = Some(*uuids[index]);
+                    combined_course_maps.push(Ok(map))
+                }
+                Err(err) => combined_course_maps.push(Err(ErrorWrapper::new(
+                    format!("Unable to get CourseMap {}", uuids[index]),
+                    &err,
+                ))),
+            }
+        }
+
+        Ok(combined_course_maps)
     }
-    async fn get_course_list(&self) -> Result<Vec<Uuid>, DataError> {
-        self.courses.scan().await
-    }
-    async fn get_course_map(&self, id: Uuid) -> Result<CourseMap, DataError> {
+    async fn _get_course_map(&self, id: Uuid) -> Result<CourseMap, DataError> {
         let path = self.course_maps.get(id);
 
         let mut file = ConfigFile::new(&path).await?;
-        file.read().await
+        let mut map: CourseMap = file.read().await?;
+
+        map.uuid = Some(id);
+
+        Ok(map)
     }
+
+    async fn get_course_list(&self) -> Result<Vec<Uuid>, DataError> {
+        self.courses.scan().await
+    }
+
     async fn get_active_courses(&self) -> Result<Vec<Uuid>, DataError> {
         let mut file = self.active_courses.lock().await;
 
@@ -159,10 +209,13 @@ impl State {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct CourseMap {}
+pub struct CourseMap {
+    uuid: Option<Uuid>,
+}
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Course {
+    uuid: Option<Uuid>,
     title: String,
     description: Option<String>,
     books: Vec<Textbook>,
@@ -181,7 +234,9 @@ impl Course {
 }
 
 #[derive(Serialize, Deserialize, Default, Debug)]
-pub struct CourseProgress {}
+pub struct CourseProgress {
+    completed_book_sections: Vec<Vec<String>>,
+}
 
 #[derive(Serialize, Deserialize, Debug)]
 struct Textbook {
