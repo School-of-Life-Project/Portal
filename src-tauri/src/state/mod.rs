@@ -15,7 +15,7 @@ struct State {
     data_dir: PathBuf,
     course_maps: DataManager,
     courses: ResourceManager,
-    progress: DataManager,
+    completion: DataManager,
     active_courses: Mutex<WritableConfigFile>,
     settings: Mutex<WritableConfigFile>,
 }
@@ -69,14 +69,14 @@ impl State {
         let extension = Some(OsString::from("toml"));
         let course_map_path = data_dir.join("Course Maps");
         let course_path = data_dir.join("Courses");
-        let progress_path = data_dir.join("Progress Data");
+        let completion_path = data_dir.join("Progress Data");
         let active_courses_path = data_dir.join("Active Courses.toml");
         let settings_path = data_dir.join("Settings.toml");
 
-        let (course_maps, courses, progress, active_courses, settings) = try_join!(
+        let (course_maps, courses, completion, active_courses, settings) = try_join!(
             DataManager::new(course_map_path, extension.clone()),
             ResourceManager::new(course_path),
-            DataManager::new(progress_path, extension),
+            DataManager::new(completion_path, extension),
             WritableConfigFile::new(&active_courses_path),
             WritableConfigFile::new(&settings_path),
         )?;
@@ -85,7 +85,7 @@ impl State {
             data_dir,
             course_maps,
             courses,
-            progress,
+            completion,
             active_courses: Mutex::new(active_courses),
             settings: Mutex::new(settings),
         })
@@ -105,34 +105,52 @@ impl State {
 
         Ok(course)
     }
-    async fn _get_course_progress(&self, id: Uuid) -> Result<CourseProgress, DataError> {
-        if !self.progress.has(id).await {
-            return Ok(CourseProgress::default());
+    async fn _get_course_completion(&self, id: Uuid) -> Result<CourseCompletion, DataError> {
+        if !self.completion.has(id).await {
+            return Ok(CourseCompletion::default());
         }
 
-        let path = self.progress.get(id);
+        let path = self.completion.get(id);
         let mut file = ConfigFile::new(&path).await?;
 
         file.read().await
     }
-    async fn get_course(&self, id: Uuid) -> Result<(Course, CourseProgress), DataError> {
-        try_join!(self._get_course_index(id), self._get_course_progress(id))
+    async fn get_course(&self, id: Uuid) -> Result<(Course, CourseCompletion), DataError> {
+        try_join!(self._get_course_index(id), self._get_course_completion(id))
     }
-    async fn update_course_progress(
+    /*async fn update_course_progress(
         &self,
         id: Uuid,
         data: CourseProgress,
     ) -> Result<(), DataError> {
-        let path = self.progress.get(id);
+        let path = self.completion.get(id);
 
         let mut file = WritableConfigFile::new(&path).await?;
         file.write(&data).await
-    }
+    }*/
     async fn get_courses(
         &self,
     ) -> Result<Vec<Result<(Course, CourseProgress), ErrorWrapper>>, DataError> {
         let course_list = self.courses.scan().await?;
+        self._get_courses(course_list).await
+    }
+    async fn get_courses_active(
+        &self,
+    ) -> Result<Vec<Result<(Course, CourseProgress), ErrorWrapper>>, DataError> {
+        let mut file = self.active_courses.lock().await;
 
+        let course_list: Vec<Uuid> = if file.is_empty().await? {
+            Vec::new()
+        } else {
+            file.read().await?
+        };
+
+        self._get_courses(course_list).await
+    }
+    async fn _get_courses(
+        &self,
+        course_list: Vec<Uuid>,
+    ) -> Result<Vec<Result<(Course, CourseProgress), ErrorWrapper>>, DataError> {
         let mut courses = Vec::new();
 
         for course_chunk in course_list.chunks(MAX_FS_CONCURRENCY / 2) {
@@ -145,12 +163,16 @@ impl State {
             let results = join_all(future_set).await;
 
             for (index, result) in results.into_iter().enumerate() {
-                courses.push(result.map_err(|err| {
-                    ErrorWrapper::new(
+                courses.push(match result {
+                    Ok((course, completion)) => {
+                        let progress = CourseProgress::calculate(&course, &completion);
+                        Ok((course, progress))
+                    }
+                    Err(err) => Err(ErrorWrapper::new(
                         format!("Unable to get Course {}", course_chunk[index]),
                         &err,
-                    )
-                }));
+                    )),
+                });
             }
         }
 
@@ -192,15 +214,7 @@ impl State {
 
         Ok(map)
     }
-    async fn get_active_courses(&self) -> Result<Vec<Uuid>, DataError> {
-        let mut file = self.active_courses.lock().await;
 
-        if file.is_empty().await? {
-            Ok(Vec::new())
-        } else {
-            file.read().await
-        }
-    }
     async fn set_active_courses(&self, data: Vec<Uuid>) -> Result<(), DataError> {
         let mut file = self.active_courses.lock().await;
         file.write(&data).await
@@ -246,8 +260,21 @@ impl Course {
 }
 
 #[derive(Serialize, Deserialize, Default, Debug)]
+pub struct CourseCompletion {
+    completed: Option<bool>,
+    sections_by_book: Vec<Vec<String>>,
+}
+
+#[derive(Serialize, Deserialize, Default, Debug)]
 pub struct CourseProgress {
-    completed_book_sections: Vec<Vec<String>>,
+    completed: bool,
+    book_chapter_completion: Vec<Vec<f32>>,
+}
+
+impl CourseProgress {
+    fn calculate(course: &Course, completion: &CourseCompletion) -> Self {
+        todo!()
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug)]

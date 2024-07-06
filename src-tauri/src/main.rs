@@ -15,10 +15,10 @@ fn main() -> Result<()> {
         .invoke_handler(tauri::generate_handler![
             wrapper::open_data_dir,
             wrapper::get_course,
-            wrapper::update_course_progress,
+            //wrapper::update_course_progress,
             wrapper::get_course_maps,
             wrapper::get_courses,
-            wrapper::get_active_courses,
+            wrapper::get_courses_active,
             wrapper::set_active_courses,
             wrapper::get_settings,
             wrapper::set_settings,

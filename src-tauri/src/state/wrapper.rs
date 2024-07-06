@@ -7,7 +7,7 @@ use tauri::Manager;
 use tokio::{fs, sync::OnceCell};
 use uuid::Uuid;
 
-use super::{Course, CourseMap, CourseProgress, Settings, State};
+use super::{Course, CourseCompletion, CourseMap, CourseProgress, Settings, State};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ErrorWrapper {
@@ -83,11 +83,23 @@ pub async fn get_courses(
 }
 
 #[tauri::command]
+pub async fn get_courses_active(
+    state: tauri::State<'_, StateWrapper>,
+) -> Result<Vec<Result<(Course, CourseProgress), ErrorWrapper>>, ErrorWrapper> {
+    let state = state.state().await?;
+
+    state
+        .get_courses_active()
+        .await
+        .map_err(|e| ErrorWrapper::new("Unable to get list of active Courses".to_string(), &e))
+}
+
+#[tauri::command]
 pub async fn get_course(
     app_handle: tauri::AppHandle,
     state: tauri::State<'_, StateWrapper>,
     id: Uuid,
-) -> Result<(Course, CourseProgress), ErrorWrapper> {
+) -> Result<(Course, CourseCompletion), ErrorWrapper> {
     let state: &State = state.state().await?;
 
     let (course, progress) = state
@@ -116,7 +128,7 @@ pub async fn get_course(
     Ok((course, progress))
 }
 
-#[tauri::command]
+/*#[tauri::command]
 pub async fn update_course_progress(
     state: tauri::State<'_, StateWrapper>,
     id: Uuid,
@@ -128,19 +140,7 @@ pub async fn update_course_progress(
         .update_course_progress(id, data)
         .await
         .map_err(|e| ErrorWrapper::new(format!("Unable to update progress for Course {}", id), &e))
-}
-
-#[tauri::command]
-pub async fn get_active_courses(
-    state: tauri::State<'_, StateWrapper>,
-) -> Result<Vec<Uuid>, ErrorWrapper> {
-    let state = state.state().await?;
-
-    state
-        .get_active_courses()
-        .await
-        .map_err(|e| ErrorWrapper::new("Unable to get list of active Courses".to_string(), &e))
-}
+}*/
 
 #[tauri::command]
 pub async fn set_active_courses(
