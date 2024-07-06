@@ -35,14 +35,14 @@ impl State {
         let overall_progress_path = completion_path.join("total.toml");
         let settings_path = data_dir.join("Settings.toml");
 
-        let (course_maps, courses, completion, active_courses, overall_progress, settings) = try_join!(
+        let (course_maps, courses, completion, active_courses, settings) = try_join!(
             DataManager::new(course_map_path, extension.clone()),
             ResourceManager::new(course_path),
             DataManager::new(completion_path, extension),
-            WritableConfigFile::new(&active_courses_path),
-            WritableConfigFile::new(&overall_progress_path),
-            WritableConfigFile::new(&settings_path),
+            WritableConfigFile::new(active_courses_path),
+            WritableConfigFile::new(settings_path),
         )?;
+        let overall_progress = WritableConfigFile::new(overall_progress_path).await?;
 
         Ok(Self {
             data_dir,
@@ -57,7 +57,7 @@ impl State {
     async fn get_course_index(&self, id: Uuid) -> Result<Course, Error> {
         let root = self.courses.get(id);
 
-        let mut file = ConfigFile::new(&root.join("course.toml")).await?;
+        let mut file = ConfigFile::new(root.join("course.toml")).await?;
 
         let mut course = file.read::<Course>().await?;
 
@@ -68,7 +68,7 @@ impl State {
     pub(super) async fn get_course(&self, id: Uuid) -> Result<(Course, CourseCompletion), Error> {
         try_join!(self.get_course_index(id), async {
             let path = self.completion.get(id);
-            match ConfigFile::new(&path).await {
+            match ConfigFile::new(path).await {
                 Ok(mut file) => file.read().await,
                 Err(err) => {
                     if err.is_not_found() {
@@ -158,7 +158,7 @@ impl State {
     async fn get_course_map(&self, id: Uuid) -> Result<CourseMap, Error> {
         let path = self.course_maps.get(id);
 
-        let mut file = ConfigFile::new(&path).await?;
+        let mut file = ConfigFile::new(path).await?;
         let mut map: CourseMap = file.read().await?;
         map.update_id(id);
 
@@ -185,7 +185,7 @@ impl State {
         let (course, old_completion) = try_join!(self.get_course_index(id), async {
             let completion_path = self.completion.get(id);
 
-            let mut file = WritableConfigFile::new(&completion_path).await?;
+            let mut file = WritableConfigFile::new(completion_path).await?;
             let old = file.read().await?;
             file.write(data).await?;
 

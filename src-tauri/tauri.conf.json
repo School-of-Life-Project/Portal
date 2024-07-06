@@ -1,8 +1,7 @@
 {
 	"build": {
 		"devPath": "http://127.0.0.1:3000/src",
-		"distDir": "../src",
-		"withGlobalTauri": true
+		"distDir": "../src"
 	},
 	"package": {
 		"productName": "school-of-life-portal"

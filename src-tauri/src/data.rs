@@ -4,7 +4,8 @@ use std::{
     collections::HashSet,
     env,
     ffi::{OsStr, OsString},
-    io::ErrorKind,
+    fs::{File, OpenOptions},
+    io::{ErrorKind, Read, Seek, SeekFrom, Write},
     path::{Component, Path, PathBuf},
 };
 
@@ -12,8 +13,8 @@ use advisory_lock::{AdvisoryFileLock, FileLockError, FileLockMode};
 use serde::{de::DeserializeOwned, Serialize};
 use thiserror::Error;
 use tokio::{
-    fs::{self, File, OpenOptions},
-    io::{self, AsyncReadExt, AsyncWriteExt},
+    fs,
+    io::{self},
     task::{self, JoinError},
 };
 use toml::{Deserializer, Serializer};
@@ -56,19 +57,19 @@ pub fn get_data_dir(dirname: &str) -> Result<PathBuf, Error> {
 }
 
 pub async fn ensure_folder_exists(path: &Path) -> Result<(), Error> {
-    let metadata = fs::metadata(path).await;
+    let metadata = fs::metadata(&path).await;
 
     match metadata {
         Ok(metadata) => {
             if !metadata.is_dir() {
-                fs::remove_file(path).await?;
-                fs::create_dir_all(path).await?;
+                fs::remove_file(&path).await?;
+                fs::create_dir_all(&path).await?;
             }
         }
         Err(_) => {
-            fs::create_dir_all(path).await?;
+            fs::create_dir_all(&path).await?;
         }
-    };
+    }
 
     Ok(())
 }
@@ -106,101 +107,111 @@ impl From<FileLockError> for Error {
     }
 }
 
-async fn lock_file(file: File, mode: FileLockMode) -> Result<File, Error> {
-    let std_file = file.into_std().await;
-
-    let file = task::spawn_blocking(move || -> Result<File, FileLockError> {
-        std_file.lock(mode)?;
-
-        Ok(File::from_std(std_file))
-    })
-    .await??;
-
-    Ok(file)
-}
-
 /// A read-only handle to a TOML configuration file.
 ///
 /// If the file does not yet exist, it will be created.
 /// If the file is blank when being read, the Default version of the object will be returned.
 pub struct ConfigFile {
-    pub file: File,
-    buffer: String,
+    file: File,
 }
 
 impl ConfigFile {
-    pub async fn new(path: &Path) -> Result<Self, Error> {
-        let file = File::open(path).await?;
-        let file = lock_file(file, FileLockMode::Shared).await?;
-        let metadata = file.metadata().await?;
+    pub async fn new(path: PathBuf) -> Result<Self, Error> {
+        let file = task::spawn_blocking(move || -> Result<_, Error> {
+            let file = File::open(path)?;
+            file.lock(FileLockMode::Shared)?;
 
-        Ok(Self {
-            file,
-            buffer: String::with_capacity(metadata.len().try_into().unwrap_or_default()),
+            Ok(file)
         })
+        .await??;
+
+        Ok(Self { file })
     }
     pub async fn read<T>(&mut self) -> Result<T, Error>
     where
-        T: DeserializeOwned,
+        T: DeserializeOwned + Send + 'static,
     {
-        self.buffer.clear();
-        self.file.read_to_string(&mut self.buffer).await?;
+        let mut file = self.file.try_clone()?;
+        task::spawn_blocking(move || -> Result<_, Error> {
+            let metadata = file.metadata()?;
+            let mut buffer = String::with_capacity(metadata.len().try_into().unwrap_or_default());
 
-        let deserializer = Deserializer::new(&self.buffer);
-        Ok(T::deserialize(deserializer)?)
+            file.seek(SeekFrom::Start(0))?;
+            file.read_to_string(&mut buffer)?;
+
+            let deserializer = Deserializer::new(&buffer);
+            Ok(T::deserialize(deserializer)?)
+        })
+        .await?
     }
 }
 
 /// A read-write handle to a TOML configuration file.
+///
+/// This is designed with the intention of the handle being long-lived.
 pub struct WritableConfigFile {
-    pub file: File,
+    file: File,
     buffer: String,
 }
 
 impl WritableConfigFile {
-    pub async fn new(path: &Path) -> Result<Self, Error> {
-        let file = OpenOptions::new()
-            .create(true)
-            .truncate(false)
-            .read(true)
-            .write(true)
-            .open(path)
-            .await?;
-        let file = lock_file(file, FileLockMode::Exclusive).await?;
-        let metadata = file.metadata().await?;
+    pub async fn new(path: PathBuf) -> Result<Self, Error> {
+        let (file, metadata) = task::spawn_blocking(move || -> Result<_, Error> {
+            let file = OpenOptions::new()
+                .create(true)
+                .truncate(false)
+                .read(true)
+                .write(true)
+                .open(path)?;
+            file.lock(FileLockMode::Exclusive)?;
+
+            let metadata = file.metadata()?;
+
+            Ok((file, metadata))
+        })
+        .await??;
 
         Ok(Self {
             file,
             buffer: String::with_capacity(metadata.len().try_into().unwrap_or_default()),
         })
     }
+    #[allow(clippy::unused_async)]
     pub async fn read<T>(&mut self) -> Result<T, Error>
     where
         T: DeserializeOwned + Default,
     {
-        self.buffer.clear();
-        self.file.read_to_string(&mut self.buffer).await?;
+        task::block_in_place(move || -> Result<_, Error> {
+            self.buffer.clear();
 
-        if self.buffer.is_empty() {
-            return Ok(T::default());
-        }
+            self.file.seek(SeekFrom::Start(0))?;
+            self.file.read_to_string(&mut self.buffer)?;
 
-        let deserializer = Deserializer::new(&self.buffer);
-        Ok(T::deserialize(deserializer)?)
+            if self.buffer.is_empty() {
+                return Ok(T::default());
+            }
+
+            let deserializer = Deserializer::new(&self.buffer);
+            Ok(T::deserialize(deserializer)?)
+        })
     }
+    #[allow(clippy::unused_async)]
     pub async fn write<T>(&mut self, data: &T) -> Result<(), Error>
     where
         T: Serialize,
     {
-        self.buffer.clear();
+        task::block_in_place(move || -> Result<_, Error> {
+            self.buffer.clear();
 
-        let serializer = Serializer::pretty(&mut self.buffer);
-        data.serialize(serializer)?;
+            let serializer = Serializer::pretty(&mut self.buffer);
+            data.serialize(serializer)?;
 
-        self.file.write_all(self.buffer.as_bytes()).await?;
-        self.file.set_len(self.buffer.len() as u64).await?;
+            self.file.seek(SeekFrom::Start(0))?;
+            self.file.write_all(self.buffer.as_bytes())?;
+            self.file.set_len(self.buffer.len() as u64)?;
 
-        Ok(())
+            Ok(())
+        })
     }
 }
 
