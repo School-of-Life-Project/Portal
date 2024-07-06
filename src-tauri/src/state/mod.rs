@@ -5,7 +5,7 @@ use std::{
     time::Duration,
 };
 
-use chrono::{Datelike, NaiveDate, Utc};
+use chrono::{NaiveDate, Utc};
 use futures::{future::join_all, try_join};
 use serde::{Deserialize, Serialize};
 use tokio::sync::Mutex;
@@ -112,10 +112,10 @@ impl State {
     ) -> Result<Vec<Result<(Course, CourseProgress), ErrorWrapper>>, DataError> {
         let course_list: Vec<_> = course_list.into_iter().collect();
 
-        let mut courses = Vec::new();
+        let mut courses = Vec::with_capacity(course_list.len());
 
         for course_chunk in course_list.chunks(MAX_FS_CONCURRENCY / 2) {
-            let mut future_set = Vec::new();
+            let mut future_set = Vec::with_capacity(MAX_FS_CONCURRENCY / 2);
 
             for course in course_chunk {
                 future_set.push(self.get_course(*course));
@@ -143,10 +143,10 @@ impl State {
         let course_map_list = self.course_maps.scan().await?;
         let course_map_list: Vec<_> = course_map_list.into_iter().collect();
 
-        let mut course_maps = Vec::new();
+        let mut course_maps = Vec::with_capacity(course_map_list.len());
 
         for course_map_chunk in course_map_list.chunks(MAX_FS_CONCURRENCY) {
-            let mut future_set = Vec::new();
+            let mut future_set = Vec::with_capacity(MAX_FS_CONCURRENCY);
 
             for course_map in course_map_chunk {
                 future_set.push(self._get_course_map(*course_map));
@@ -276,7 +276,7 @@ struct Chapter {
 impl Course {
     /// Get a list of all files included in a Course
     fn get_resources(&self) -> Vec<&PathBuf> {
-        let mut files = Vec::new();
+        let mut files = Vec::with_capacity(self.books.len());
 
         for book in &self.books {
             files.push(&book.file);
@@ -292,7 +292,15 @@ pub struct CourseCompletion {
     /// If the course has a manually marked completion status
     completed: Option<bool>,
     /// A list of all completed section-ids within each textbook within the course.
-    books: Vec<Vec<String>>,
+    book_sections: HashMap<usize, HashSet<String>>,
+    /// The total amount of time spent in this course, in seconds.
+    time_spent_secs: f32,
+}
+
+impl CourseCompletion {
+    fn calculate_time_diff_secs(before: &Self, after: &Self) -> f32 {
+        after.time_spent_secs - before.time_spent_secs
+    }
 }
 
 /// The displayed progress through a course
@@ -300,7 +308,7 @@ pub struct CourseCompletion {
 pub struct CourseProgress {
     /// If a course should be considered completed
     completed: bool,
-    /// The completion of textbooks within the course, in the order they are included in the course. Not included if the course has been manually marked as completed.
+    /// The completion of textbooks within the course, in the order they are included in the course.
     completion: Vec<TextbookProgress>,
 }
 
@@ -314,33 +322,113 @@ pub struct TextbookProgress {
 
 impl CourseProgress {
     fn calculate(course: &Course, completion: &CourseCompletion) -> Self {
-        if completion.completed == Some(true) {
-            return Self {
-                completed: true,
-                completion: Vec::new(),
-            };
+        let mut book_progress = Vec::with_capacity(course.books.len());
+
+        for (book_index, book) in course.books.iter().enumerate() {
+            book_progress.push(match completion.book_sections.get(&book_index) {
+                Some(book_completion) => {
+                    let mut chapter_progress = Vec::with_capacity(book.chapters.len());
+
+                    for chapter in &book.chapters {
+                        if let Some(root) = &chapter.root {
+                            if book_completion.contains(root) {
+                                chapter_progress.push(1.0);
+                                continue;
+                            }
+                        }
+
+                        let mut progress = 0.0;
+
+                        for section_group in &chapter.sections {
+                            let mut group_progress: usize = 0;
+
+                            for section in section_group {
+                                if book_completion.contains(section) {
+                                    group_progress += 1;
+                                }
+                            }
+
+                            if group_progress > 0 {
+                                progress += group_progress as f32 / section_group.len() as f32;
+                            }
+                        }
+
+                        chapter_progress.push(progress / chapter.sections.len() as f32)
+                    }
+
+                    let mut total_progress = 0.0;
+
+                    for chapter in &chapter_progress {
+                        total_progress += chapter;
+                    }
+
+                    total_progress /= chapter_progress.len() as f32;
+
+                    TextbookProgress {
+                        overall_completion: total_progress,
+                        chapter_completion: chapter_progress,
+                    }
+                }
+                None => TextbookProgress {
+                    overall_completion: 0.0,
+                    chapter_completion: Vec::new(),
+                },
+            })
         }
 
-        todo!()
+        let completed = match completion.completed {
+            Some(c) => c,
+            None => {
+                if book_progress.is_empty() {
+                    false
+                } else {
+                    let mut is_completed = true;
+
+                    for book in &book_progress {
+                        if 1.0 > book.overall_completion {
+                            is_completed = false;
+                        }
+                    }
+
+                    is_completed
+                }
+            }
+        };
+
+        Self {
+            completed,
+            completion: book_progress,
+        }
     }
-    fn calculate_diff(before: &Self, after: &Self) -> (f32, f32) {
-        todo!()
+    fn calculate_chapter_diff(before: &Self, after: &Self) -> f32 {
+        let mut before_total = 0.0;
+
+        for book in &before.completion {
+            before_total += book.overall_completion;
+        }
+
+        let mut after_total = 0.0;
+
+        for book in &after.completion {
+            after_total += book.overall_completion;
+        }
+
+        after_total - before_total
     }
 }
 
+/// The displayed total progress through all courses
 #[derive(Serialize, Deserialize, Debug, Default)]
 pub struct OverallProgress {
+    /// The total number of chapters completed by day
     chapters_completed: HashMap<NaiveDate, f32>,
+    /// The total amount of time spent in any course by day
     time_spent: HashMap<NaiveDate, Duration>,
 }
 
 impl OverallProgress {
     fn update(&mut self, chapter_change: f32, time_change_secs: f32) {
         let date = Utc::now().date_naive();
-
-        if date.year() < 2000 {
-            return;
-        }
 
         if chapter_change.is_normal() {
             match self.chapters_completed.entry(date) {
