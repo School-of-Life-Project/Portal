@@ -17,7 +17,19 @@ function get_courses_active() {
 }
 
 function get_course(uuid) {
-	return invoke('get_course', uuid);
+	return invoke('get_course', { id: uuid });
+}
+
+function set_course_completion(uuid, completion) {
+	return invoke('set_course_completion', { id: uuid, data: completion });
+}
+
+function set_course_active_status(uuid, active) {
+	return invoke('get_course_active_status', { id: uuid, data: active });
+}
+
+function get_overall_progress() {
+	return invoke('get_overall_progress');
 }
 
 function get_settings() {

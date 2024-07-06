@@ -163,6 +163,18 @@ pub async fn set_course_active_status(
 }
 
 #[tauri::command]
+pub async fn get_overall_progress(
+    state: tauri::State<'_, StateWrapper>,
+) -> Result<OverallProgress, ErrorWrapper> {
+    let state = state.state().await?;
+
+    state
+        .get_overall_progress()
+        .await
+        .map_err(|e| ErrorWrapper::new("Unable to get total progress data".to_string(), &e))
+}
+
+#[tauri::command]
 pub async fn get_settings(state: tauri::State<'_, StateWrapper>) -> Result<Settings, ErrorWrapper> {
     let state = state.state().await?;
 
@@ -183,16 +195,4 @@ pub async fn set_settings(
         .set_settings(&data)
         .await
         .map_err(|e| ErrorWrapper::new("Unable to update Settings".to_string(), &e))
-}
-
-#[tauri::command]
-pub async fn get_overall_progress(
-    state: tauri::State<'_, StateWrapper>,
-) -> Result<OverallProgress, ErrorWrapper> {
-    let state = state.state().await?;
-
-    state
-        .get_overall_progress()
-        .await
-        .map_err(|e| ErrorWrapper::new("Unable to get total progress data".to_string(), &e))
 }
