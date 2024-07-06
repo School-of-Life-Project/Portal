@@ -1,5 +1,11 @@
-use std::{collections::HashSet, ffi::OsString, path::PathBuf};
+use std::{
+    collections::{hash_map::Entry, HashMap, HashSet},
+    ffi::OsString,
+    path::PathBuf,
+    time::Duration,
+};
 
+use chrono::{Datelike, NaiveDate, Utc};
 use futures::{future::join_all, try_join};
 use serde::{Deserialize, Serialize};
 use tokio::sync::Mutex;
@@ -16,6 +22,7 @@ struct State {
     courses: ResourceManager,
     completion: DataManager,
     active_courses: Mutex<WritableConfigFile>,
+    overall_progress: Mutex<WritableConfigFile>,
     settings: Mutex<WritableConfigFile>,
 }
 
@@ -30,13 +37,15 @@ impl State {
         let course_path = data_dir.join("Courses");
         let completion_path = data_dir.join("Progress Data");
         let active_courses_path = data_dir.join("Active Courses.toml");
+        let overall_progress_path = completion_path.join("total.toml");
         let settings_path = data_dir.join("Settings.toml");
 
-        let (course_maps, courses, completion, active_courses, settings) = try_join!(
+        let (course_maps, courses, completion, active_courses, overall_progress, settings) = try_join!(
             DataManager::new(course_map_path, extension.clone()),
             ResourceManager::new(course_path),
             DataManager::new(completion_path, extension),
             WritableConfigFile::new(&active_courses_path),
+            WritableConfigFile::new(&overall_progress_path),
             WritableConfigFile::new(&settings_path),
         )?;
 
@@ -46,6 +55,7 @@ impl State {
             courses,
             completion,
             active_courses: Mutex::new(active_courses),
+            overall_progress: Mutex::new(overall_progress),
             settings: Mutex::new(settings),
         })
     }
@@ -295,7 +305,57 @@ pub struct TextbookProgress {
 
 impl CourseProgress {
     fn calculate(course: &Course, completion: &CourseCompletion) -> Self {
+        if completion.completed == Some(true) {
+            return Self {
+                completed: true,
+                completion: Vec::new(),
+            };
+        }
+
         todo!()
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, Default)]
+pub struct OverallProgress {
+    chapters_completed: HashMap<NaiveDate, f32>,
+    time_spent: HashMap<NaiveDate, Duration>,
+}
+
+impl OverallProgress {
+    fn update(&mut self, chapter_change: f32, time_change_secs: f32) {
+        let date = Utc::now().date_naive();
+
+        if date.year() < 2000 {
+            return;
+        }
+
+        if chapter_change.is_normal() {
+            match self.chapters_completed.entry(date) {
+                Entry::Occupied(mut entry) => {
+                    entry.insert((entry.get() - chapter_change).max(0.0));
+                }
+                Entry::Vacant(entry) => {
+                    if chapter_change.is_sign_positive() {
+                        entry.insert(chapter_change);
+                    }
+                }
+            }
+        }
+
+        if time_change_secs.is_normal() {
+            match self.time_spent.entry(date) {
+                Entry::Occupied(mut entry) => {
+                    let time_secs = (entry.get().as_secs_f32() - time_change_secs).max(0.0);
+                    entry.insert(Duration::from_secs_f32(time_secs));
+                }
+                Entry::Vacant(entry) => {
+                    if time_change_secs.is_sign_positive() {
+                        entry.insert(Duration::from_secs_f32(time_change_secs));
+                    }
+                }
+            }
+        }
     }
 }
 

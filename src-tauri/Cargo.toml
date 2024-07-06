@@ -12,7 +12,8 @@ tauri-build = { version = "1", features = [
 ] }
 
 [dependencies]
-tauri = { version = "1", features = [ "protocol-asset",
+tauri = { version = "1", features = [
+	"protocol-asset",
 ] }
 serde = { version = "1", features = [
 	"derive",
@@ -33,6 +34,9 @@ anyhow = "1.0.86"
 thiserror = "1.0.61"
 serde-error = "0.1.2"
 futures = "0.3.30"
+chrono = { version = "0.4.38", features = [
+	"serde",
+] }
 
 [features]
 custom-protocol = [

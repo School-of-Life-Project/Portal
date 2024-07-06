@@ -184,7 +184,7 @@ impl WritableConfigFile {
     {
         self.buffer.clear();
 
-        let serializer = Serializer::new(&mut self.buffer);
+        let serializer = Serializer::pretty(&mut self.buffer);
         data.serialize(serializer)?;
 
         self.file.write_all(self.buffer.as_bytes()).await?;
