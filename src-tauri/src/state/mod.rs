@@ -1,4 +1,4 @@
-use std::{ffi::OsString, path::PathBuf};
+use std::{collections::HashSet, ffi::OsString, path::PathBuf};
 
 use futures::{future::join_all, try_join};
 use serde::{Deserialize, Serialize};
@@ -18,46 +18,6 @@ struct State {
     active_courses: Mutex<WritableConfigFile>,
     settings: Mutex<WritableConfigFile>,
 }
-
-/*
-
-App flow:
-
-- Course viewer
-    - (get) Course (+resources)
-        - (get) CourseProgress
-    - (set) CourseProgress
-- Homepage
-    - (get) ActiveCourses
-    - (get) Course
-        - (get) CourseProgress
-
-- Course Map
-    - (get, list) CourseMap
-    - (get, list) Course
-        - (get, set) CourseProgress
-    - (get, set) ActiveCourses
-
-New API outline:
-    list CourseMap
-        returns []CourseMap
-
-    list Course
-        returns [](Course, CourseProgress)
-    get Course {id}
-        returns (Course, CourseProgres)
-
-    set Course active {bool}
-    set Course section_completed {book_index} {section_id} {bool}
-    set Course completed {bool}
-
-    list ActiveCourse
-        returns [](Course, CourseProgress)
-
-    get Settings
-    set Settings {Settings}
-
-*/
 
 const MAX_FS_CONCURRENCY: usize = 8;
 
@@ -104,20 +64,27 @@ impl State {
 
         Ok(course)
     }
-    async fn _get_course_completion(&self, id: Uuid) -> Result<CourseCompletion, DataError> {
+    async fn _get_course_completion(
+        &self,
+        id: Uuid,
+    ) -> Result<Option<CourseCompletion>, DataError> {
         if !self.completion.has(id).await {
-            return Ok(CourseCompletion::default());
+            return Ok(None);
         }
 
         let path = self.completion.get(id);
         let mut file = ConfigFile::new(&path).await?;
 
-        file.read().await
+        file.read().await.map(Some)
     }
     async fn get_course(&self, id: Uuid) -> Result<(Course, CourseCompletion), DataError> {
-        try_join!(self._get_course_index(id), self._get_course_completion(id))
-    }
+        let (course, completion) =
+            try_join!(self._get_course_index(id), self._get_course_completion(id))?;
 
+        let completion = completion.unwrap_or_else(|| CourseCompletion::new(&course));
+
+        Ok((course, completion))
+    }
     async fn get_courses(
         &self,
     ) -> Result<Vec<Result<(Course, CourseProgress), ErrorWrapper>>, DataError> {
@@ -129,8 +96,8 @@ impl State {
     ) -> Result<Vec<Result<(Course, CourseProgress), ErrorWrapper>>, DataError> {
         let mut file = self.active_courses.lock().await;
 
-        let course_list: Vec<Uuid> = if file.is_empty().await? {
-            Vec::new()
+        let course_list: HashSet<Uuid> = if file.is_empty().await? {
+            HashSet::new()
         } else {
             file.read().await?
         };
@@ -139,8 +106,10 @@ impl State {
     }
     async fn _get_courses(
         &self,
-        course_list: Vec<Uuid>,
+        course_list: HashSet<Uuid>,
     ) -> Result<Vec<Result<(Course, CourseProgress), ErrorWrapper>>, DataError> {
+        let course_list: Vec<_> = course_list.into_iter().collect();
+
         let mut courses = Vec::new();
 
         for course_chunk in course_list.chunks(MAX_FS_CONCURRENCY / 2) {
@@ -170,6 +139,7 @@ impl State {
     }
     async fn get_course_maps(&self) -> Result<Vec<Result<CourseMap, ErrorWrapper>>, DataError> {
         let course_map_list = self.course_maps.scan().await?;
+        let course_map_list: Vec<_> = course_map_list.into_iter().collect();
 
         let mut course_maps = Vec::new();
 
@@ -204,29 +174,31 @@ impl State {
 
         Ok(map)
     }
-    async fn update_course_active_status(&self, id: Uuid, data: bool) -> Result<(), DataError> {
-        todo!()
+    async fn set_course_active_status(&self, id: Uuid, data: bool) -> Result<(), DataError> {
+        let mut file = self.active_courses.lock().await;
+
+        let mut active_courses: HashSet<Uuid> = if file.is_empty().await? {
+            HashSet::new()
+        } else {
+            file.read().await?
+        };
+
+        if data {
+            active_courses.insert(id);
+        } else {
+            active_courses.remove(&id);
+        }
+
+        file.write(&active_courses).await
     }
-    async fn update_course_textbook_completion(
+    async fn set_course_completion(
         &self,
         id: Uuid,
-        data: TextbookCompletion,
-    ) -> Result<(), DataError> {
-        todo!()
-    }
-    /*async fn update_course_progress(
-        &self,
-        id: Uuid,
-        data: CourseProgress,
+        data: CourseCompletion,
     ) -> Result<(), DataError> {
         let path = self.completion.get(id);
 
         let mut file = WritableConfigFile::new(&path).await?;
-        file.write(&data).await
-    }*/
-
-    async fn set_active_courses(&self, data: Vec<Uuid>) -> Result<(), DataError> {
-        let mut file = self.active_courses.lock().await;
         file.write(&data).await
     }
     async fn get_settings(&self) -> Result<Settings, DataError> {
@@ -304,18 +276,18 @@ impl Course {
 }
 
 /// The raw data used to keep track of Course completion
-#[derive(Serialize, Deserialize, Default, Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct CourseCompletion {
     /// If the course has a manually marked completion status
     completed: Option<bool>,
-    books: Vec<TextbookCompletion>,
+    /// A list of all completed section-ids within each textbook within the course.
+    books: Vec<Vec<String>>,
 }
 
-/// The raw data used to keep track of Textbook completion
-#[derive(Serialize, Deserialize, Debug)]
-pub struct TextbookCompletion {
-    book_index: usize,
-    completed_sections: Vec<String>,
+impl CourseCompletion {
+    fn new(course: &Course) -> Self {
+        todo!()
+    }
 }
 
 /// The displayed progress through a course
@@ -323,7 +295,7 @@ pub struct TextbookCompletion {
 pub struct CourseProgress {
     /// If a course should be considered completed
     completed: bool,
-    /// The completion of textbooks within the course. Not included if the course has been manually marked as completed.
+    /// The completion of textbooks within the course, in the order they are included in the course. Not included if the course has been manually marked as completed.
     completion: Vec<TextbookProgress>,
 }
 

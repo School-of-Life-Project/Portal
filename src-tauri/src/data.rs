@@ -1,4 +1,5 @@
 use std::{
+    collections::HashSet,
     env,
     ffi::OsString,
     io::ErrorKind,
@@ -225,8 +226,8 @@ impl DataManager {
 
         path
     }
-    pub async fn scan(&self) -> Result<Vec<Uuid>, DataError> {
-        let mut items = Vec::new();
+    pub async fn scan(&self) -> Result<HashSet<Uuid>, DataError> {
+        let mut items = HashSet::new();
         let mut buffer = Uuid::encode_buffer();
 
         let mut entries = fs::read_dir(&self.root).await?;
@@ -257,7 +258,7 @@ impl DataManager {
                 fs::rename(&path, new_path).await?;
             }
 
-            items.push(uuid);
+            items.insert(uuid);
         }
 
         Ok(items)
@@ -289,8 +290,8 @@ impl ResourceManager {
             Err(err) => Err(DataError::Io(err)),
         }
     }
-    pub async fn scan(&self) -> Result<Vec<Uuid>, DataError> {
-        let mut items = Vec::new();
+    pub async fn scan(&self) -> Result<HashSet<Uuid>, DataError> {
+        let mut items = HashSet::new();
         let mut buffer = Uuid::encode_buffer();
 
         let mut entries = fs::read_dir(&self.root).await?;
@@ -315,7 +316,7 @@ impl ResourceManager {
                 fs::rename(&path, path.with_file_name(formatted)).await?;
             }
 
-            items.push(uuid);
+            items.insert(uuid);
         }
 
         Ok(items)

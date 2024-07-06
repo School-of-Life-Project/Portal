@@ -79,7 +79,7 @@ pub async fn get_courses(
     state
         .get_courses()
         .await
-        .map_err(|e| ErrorWrapper::new("Unable to get Course list".to_string(), &e))
+        .map_err(|e| ErrorWrapper::new("Unable to get list of Courses".to_string(), &e))
 }
 
 #[tauri::command]
@@ -128,31 +128,31 @@ pub async fn get_course(
     Ok((course, progress))
 }
 
-/*#[tauri::command]
-pub async fn update_course_progress(
+#[tauri::command]
+pub async fn set_course_completion(
     state: tauri::State<'_, StateWrapper>,
     id: Uuid,
-    data: CourseProgress,
+    data: CourseCompletion,
 ) -> Result<(), ErrorWrapper> {
     let state = state.state().await?;
 
-    state
-        .update_course_progress(id, data)
-        .await
-        .map_err(|e| ErrorWrapper::new(format!("Unable to update progress for Course {}", id), &e))
-}*/
+    state.set_course_completion(id, data).await.map_err(|e| {
+        ErrorWrapper::new(format!("Unable to update completion for Course {}", id), &e)
+    })
+}
 
 #[tauri::command]
-pub async fn set_active_courses(
+pub async fn set_course_active_status(
     state: tauri::State<'_, StateWrapper>,
-    data: Vec<Uuid>,
+    id: Uuid,
+    data: bool,
 ) -> Result<(), ErrorWrapper> {
     let state = state.state().await?;
 
     state
-        .set_active_courses(data)
+        .set_course_active_status(id, data)
         .await
-        .map_err(|e| ErrorWrapper::new("Unable to update list of active Courses".to_string(), &e))
+        .map_err(|e| ErrorWrapper::new("Unable to update active Courses".to_string(), &e))
 }
 
 #[tauri::command]
