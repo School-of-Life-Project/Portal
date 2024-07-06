@@ -40,31 +40,27 @@ App flow:
     - (get, set) ActiveCourses
 
 New API outline:
-
-    list Course
-    list CourseMap
-
     list CourseMap
         returns []CourseMap
 
+    list Course
+        returns [](Course, CourseProgress)
     get Course {id}
-        returns (Course, CourseProgress)
+        returns (Course, CourseProgres)
 
-    get ActiveCourses
-        returns []Course
+    set Course active {bool}
+    set Course section_completed {book_index} {section_id} {bool}
+    set Course completed {bool}
 
-    set ActiveCourses []Uuid
+    list ActiveCourse
+        returns [](Course, CourseProgress)
 
-
-
-    set CourseProgress {id}
-
-
-
+    get Settings
+    set Settings {Settings}
 
 */
 
-const MAX_FS_CONCURRENCY: usize = 6;
+const MAX_FS_CONCURRENCY: usize = 8;
 
 impl State {
     async fn new() -> Result<Self, DataError> {
@@ -94,31 +90,33 @@ impl State {
             settings: Mutex::new(settings),
         })
     }
-    async fn get_course(&self, id: Uuid) -> Result<(Course, CourseProgress), DataError> {
-        let course_root = self.courses.get(id).await?;
-        let course_index_path = course_root.join("course.toml");
-        let course_progress_path = self.progress.get(id);
+    async fn _get_course_index(&self, id: Uuid) -> Result<Course, DataError> {
+        let root = self.courses.get(id).await?;
 
-        let (mut course, course_progress) = if self.progress.has(id).await {
-            let (mut index, mut progress) = try_join!(
-                ConfigFile::new(&course_index_path),
-                ConfigFile::new(&course_progress_path)
-            )?;
+        let mut index = ConfigFile::new(&root.join("course.toml")).await?;
 
-            try_join!(index.read::<Course>(), progress.read())?
-        } else {
-            let mut index = ConfigFile::new(&course_index_path).await?;
-
-            (index.read().await?, CourseProgress::default())
-        };
+        let mut course = index.read::<Course>().await?;
 
         course.uuid = Some(id);
 
         for book in course.books.iter_mut() {
-            book.file = data::into_relative_path(&course_root, &book.file);
+            book.file = data::into_relative_path(&root, &book.file);
         }
 
-        Ok((course, course_progress))
+        Ok(course)
+    }
+    async fn _get_course_progress(&self, id: Uuid) -> Result<CourseProgress, DataError> {
+        if !self.progress.has(id).await {
+            return Ok(CourseProgress::default());
+        }
+
+        let path = self.progress.get(id);
+        let mut file = ConfigFile::new(&path).await?;
+
+        file.read().await
+    }
+    async fn get_course(&self, id: Uuid) -> Result<(Course, CourseProgress), DataError> {
+        try_join!(self._get_course_index(id), self._get_course_progress(id))
     }
     async fn update_course_progress(
         &self,
@@ -130,40 +128,59 @@ impl State {
         let mut file = WritableConfigFile::new(&path).await?;
         file.write(&data).await
     }
+    async fn get_courses(
+        &self,
+    ) -> Result<Vec<Result<(Course, CourseProgress), ErrorWrapper>>, DataError> {
+        let course_list = self.courses.scan().await?;
+
+        let mut courses = Vec::new();
+
+        for course_chunk in course_list.chunks(MAX_FS_CONCURRENCY / 2) {
+            let mut future_set = Vec::new();
+
+            for course in course_chunk {
+                future_set.push(self.get_course(*course));
+            }
+
+            let results = join_all(future_set).await;
+
+            for (index, result) in results.into_iter().enumerate() {
+                courses.push(result.map_err(|err| {
+                    ErrorWrapper::new(
+                        format!("Unable to get Course {}", course_chunk[index]),
+                        &err,
+                    )
+                }));
+            }
+        }
+
+        Ok(courses)
+    }
     async fn get_course_maps(&self) -> Result<Vec<Result<CourseMap, ErrorWrapper>>, DataError> {
         let course_map_list = self.course_maps.scan().await?;
 
         let mut course_maps = Vec::new();
-        let mut uuids = Vec::new();
 
-        for course_map_set in course_map_list.chunks(MAX_FS_CONCURRENCY) {
+        for course_map_chunk in course_map_list.chunks(MAX_FS_CONCURRENCY) {
             let mut future_set = Vec::new();
 
-            for course_map in course_map_set {
-                uuids.push(course_map);
+            for course_map in course_map_chunk {
                 future_set.push(self._get_course_map(*course_map));
             }
 
-            let mut results = join_all(future_set).await;
-            course_maps.append(&mut results);
-        }
+            let results = join_all(future_set).await;
 
-        let mut combined_course_maps = Vec::new();
-
-        for (index, course_map) in course_maps.into_iter().enumerate() {
-            match course_map {
-                Ok(mut map) => {
-                    map.uuid = Some(*uuids[index]);
-                    combined_course_maps.push(Ok(map))
-                }
-                Err(err) => combined_course_maps.push(Err(ErrorWrapper::new(
-                    format!("Unable to get CourseMap {}", uuids[index]),
-                    &err,
-                ))),
+            for (index, result) in results.into_iter().enumerate() {
+                course_maps.push(result.map_err(|err| {
+                    ErrorWrapper::new(
+                        format!("Unable to get CourseMap {}", course_map_chunk[index]),
+                        &err,
+                    )
+                }));
             }
         }
 
-        Ok(combined_course_maps)
+        Ok(course_maps)
     }
     async fn _get_course_map(&self, id: Uuid) -> Result<CourseMap, DataError> {
         let path = self.course_maps.get(id);
@@ -175,11 +192,6 @@ impl State {
 
         Ok(map)
     }
-
-    async fn get_course_list(&self) -> Result<Vec<Uuid>, DataError> {
-        self.courses.scan().await
-    }
-
     async fn get_active_courses(&self) -> Result<Vec<Uuid>, DataError> {
         let mut file = self.active_courses.lock().await;
 

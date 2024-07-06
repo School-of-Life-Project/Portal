@@ -1,3 +1,5 @@
+#![allow(clippy::type_complexity)]
+
 use std::sync::Arc;
 
 use serde::{Deserialize, Serialize};
@@ -69,13 +71,13 @@ pub async fn get_course_maps(
 }
 
 #[tauri::command]
-pub async fn get_course_list(
+pub async fn get_courses(
     state: tauri::State<'_, StateWrapper>,
-) -> Result<Vec<Uuid>, ErrorWrapper> {
+) -> Result<Vec<Result<(Course, CourseProgress), ErrorWrapper>>, ErrorWrapper> {
     let state = state.state().await?;
 
     state
-        .get_course_list()
+        .get_courses()
         .await
         .map_err(|e| ErrorWrapper::new("Unable to get Course list".to_string(), &e))
 }
