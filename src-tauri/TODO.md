@@ -7,6 +7,5 @@
 
 ## full-stack TODOs
 
-- [ ] Write front-end API bindings
 - [ ] Design Course Map object
 - [ ] Design Settings object
