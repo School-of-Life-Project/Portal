@@ -1,7 +1,9 @@
 {
 	"build": {
-		"devPath": "http://127.0.0.1:3000/src",
-		"distDir": "../src"
+		"beforeBuildCommand": "npm run build",
+		"beforeDevCommand": "npm run dev",
+		"devPath": "http://localhost:5173",
+		"distDir": "../dist"
 	},
 	"package": {
 		"productName": "school-of-life-portal"
