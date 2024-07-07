@@ -1,4 +1,7 @@
 import { defineConfig } from 'vite';
+import legacy from '@vitejs/plugin-legacy';
+import browserslist from 'browserslist';
+import { browserslistToTargets } from 'lightningcss';
 
 export default defineConfig({
 	// prevent vite from obscuring rust errors
@@ -14,7 +17,19 @@ export default defineConfig({
 		target: process.env.TAURI_PLATFORM == 'windows' ? 'chrome105' : 'safari13',
 		// don't minify for debug builds
 		minify: !process.env.TAURI_DEBUG ? 'esbuild' : false,
+		cssMinify: "lightningcss",
 		// produce sourcemaps for debug builds
 		sourcemap: !!process.env.TAURI_DEBUG,
 	},
+	css: {
+		transformer: "lightningcss",
+		lightningcss: {
+			targets: browserslistToTargets(browserslist('since 2020, Safari >= 11.0, Edge >= 79')), // Oldest webview versions supported by tauri
+		}
+	},
+	plugins: [
+		legacy({
+			targets: ["since 2020, Safari >= 11.0, Edge >= 79"] // Oldest webview versions supported by tauri
+		})
+	]
 });
