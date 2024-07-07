@@ -1,4 +1,4 @@
-import { openDataDir, getCourseMaps, getCourses, getCoursesActive, getCourse, setCourseCompletion, setCourseActiveStatus, getOverallProgress, getSettings, setSettings } from "./modules/bindings.js";
+import { openDataDir, getCourseMaps, getCourses, getCoursesActive, getCourse, setCourseCompletion, setCourseActiveStatus, getOverallProgress, getSettings, setSettings } from "./bindings.js";
 
 console.log("courseMaps:", getCourseMaps());
 
