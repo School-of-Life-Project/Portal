@@ -6,63 +6,63 @@ import { invoke, convertFileSrc } from '@tauri-apps/api/tauri';
 
 // TODO: Need to check types for correctness
 
-interface CourseMap {
+export interface CourseMap {
 	uuid: string,
 	// TODO
 }
 
-interface Course {
+export interface Course {
 	uuid: string,
 	title: string,
 	description?: string,
 	books: Textbook[],
 }
 
-interface Textbook {
+export interface Textbook {
 	label: string,
 	file: string,
 	chapters: Chapter[],
 }
 
-interface Chapter {
+export interface Chapter {
 	root?: string,
 	sections: Array<Array<string>>,
 }
 
-interface CourseCompletionData {
+export interface CourseCompletionData {
 	completed?: boolean,
 	book_sections: Record<number, string[]>,
 	time_spent_secs: number,
 }
 
-interface CourseProgress {
+export interface CourseProgress {
 	completed: boolean,
 	completion: TextbookProgress[],
 }
 
-interface TextbookProgress {
+export interface TextbookProgress {
 	overall_completion: number,
 	chapter_completion: number[],
 }
 
-interface OverallProgress {
+export interface OverallProgress {
 	chapters_completed: Record<string, number>,
 	time_spent: Record<string, number>,
 }
 
-interface Settings {
+export interface Settings {
 	// TODO
 }
 
-interface Result<Type> {
+export interface Result<Type> {
 	Ok: Type,
 	Err: Error,
 }
 
-type FlatResult<Type> = Type | Error;
+export type FlatResult<Type> = Type | Error;
 type PromiseResult<Type> = Promise<FlatResult<Type>>;
 
-interface Error {
+export interface Error {
 	message: string,
 	cause: string,
 }
