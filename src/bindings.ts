@@ -4,7 +4,7 @@ import { invoke, convertFileSrc } from '@tauri-apps/api/tauri';
 // - src/api/mod.rs
 // - src/api/wrapper.rs
 
-// TODO: Need to check types for correctness
+// TODO: Need to test API bindings for bugs
 
 export interface CourseMap {
 	uuid: string,
@@ -100,7 +100,7 @@ export async function getCourses(): PromiseResult<Array<Result<[Course, CoursePr
 		if (Array.isArray(courses)) {
 			for (const course of courses) {
 				if (course.Ok) {
-					normalizeCourse(course.Ok[0]);
+					fixCourseURLs(course.Ok[0]);
 				}
 			}
 		}
@@ -116,7 +116,7 @@ export async function getCoursesActive(): PromiseResult<Array<Result<[Course, Co
 		if (Array.isArray(courses)) {
 			for (const course of courses) {
 				if (course.Ok) {
-					normalizeCourse(course.Ok[0]);
+					fixCourseURLs(course.Ok[0]);
 				}
 			}
 		}
@@ -130,7 +130,7 @@ export async function getCourse(uuid: string): PromiseResult<[Course, CourseComp
 	try {
 		const course: FlatResult<[Course, CourseCompletionData]> = await invoke("get_course", { id: uuid });
 		if (Array.isArray(course)) {
-			normalizeCourse(course[0]);
+			fixCourseURLs(course[0]);
 		}
 		return course;
 	} catch (error) {
@@ -138,7 +138,7 @@ export async function getCourse(uuid: string): PromiseResult<[Course, CourseComp
 	}
 }
 
-function normalizeCourse(course: Course) {
+function fixCourseURLs(course: Course) {
 	if (course.books) {
 		for (const book of course.books) {
 			book.file = convertFileSrc(book.file);
