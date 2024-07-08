@@ -18,17 +18,17 @@ use super::{
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ErrorWrapper {
     pub(super) message: String,
-    pub(super) cause: serde_error::Error,
+    pub(super) cause: String,
 }
 
 impl ErrorWrapper {
     pub(super) fn new<T>(message: String, inner: &T) -> Self
     where
-        T: ?Sized + std::error::Error,
+        T: std::error::Error,
     {
         Self {
             message,
-            cause: serde_error::Error::new(inner),
+            cause: format!("{inner}"),
         }
     }
 }
