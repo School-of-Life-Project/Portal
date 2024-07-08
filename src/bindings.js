@@ -9,8 +9,10 @@ export function getCourseMaps() {
 export function getCourses() {
 	return window.__TAURI_INVOKE__("get_courses").then((courses) => {
 		if (Array.isArray(courses)) {
-			for (const course in courses) {
-				normalizeCourse(course);
+			for (const course of courses) {
+				if (course.Ok) {
+					normalizeCourse(course.Ok[0]);
+				}
 			}
 		}
 		return courses;
@@ -20,8 +22,10 @@ export function getCourses() {
 export function getCoursesActive() {
 	return window.__TAURI_INVOKE__("get_courses_active").then((courses) => {
 		if (Array.isArray(courses)) {
-			for (const course in courses) {
-				normalizeCourse(course);
+			for (const course of courses) {
+				if (course.Ok) {
+					normalizeCourse(course.Ok[0]);
+				}
 			}
 		}
 		return courses;
@@ -34,14 +38,16 @@ export function getCourse(uuid) {
 			id: uuid
 		})
 		.then((course) => {
-			normalizeCourse(course);
+			if (Array.isArray(course)) {
+				normalizeCourse(course[0]);
+			}
 			return course;
 		});
 }
 
 function normalizeCourse(course) {
 	if (course.books) {
-		for (const book in course.books) {
+		for (const book of course.books) {
 			book.file = window.__TAURI__.convertFileSrc(book.file);
 		}
 	}
