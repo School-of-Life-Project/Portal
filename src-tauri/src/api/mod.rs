@@ -66,6 +66,7 @@ struct Textbook {
     /// The path of the textbook's corresponding ePub/PDF file, relative to the course's root directory.
     file: PathBuf,
     /// A list of *completable* ``Chapter`` items within the textbook.
+    #[serde(default)]
     chapters: Vec<Chapter>,
 }
 
@@ -81,11 +82,13 @@ struct Chapter {
     /// A completable ``Section`` within a chapter, corresponding to a book section-id.
     ///
     /// Sections should only be included when a section's completion is meaningful to progress within the overall course.
+    #[serde(default)]
     sections: Vec<Vec<String>>,
 }
 
 /// The raw data used to keep track of ``Course`` completion
 #[derive(Serialize, Deserialize, Debug, Default)]
+#[serde(default)]
 pub struct CourseCompletion {
     /// If the course has a manually marked completion status
     completed: Option<bool>,
@@ -102,7 +105,7 @@ impl CourseCompletion {
 }
 
 /// The displayed progress through a ``Course``
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Debug)]
 pub struct CourseProgress {
     /// If a course should be considered completed
     completed: bool,
@@ -111,7 +114,7 @@ pub struct CourseProgress {
 }
 
 /// The displayed progress through a ``Textbook``
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Debug)]
 pub struct TextbookProgress {
     /// The completion (ranging between 0 and 1) of the entire book.
     overall_completion: f32,
@@ -219,6 +222,7 @@ impl CourseProgress {
 
 /// The displayed total progress through all courses
 #[derive(Serialize, Deserialize, Debug, Default)]
+#[serde(default)]
 pub struct OverallProgress {
     /// The total number of chapters completed by day
     chapters_completed: HashMap<NaiveDate, f32>,
