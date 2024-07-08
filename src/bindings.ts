@@ -55,8 +55,8 @@ export interface Settings {
 }
 
 export interface Result<Type> {
-	Ok: Type,
-	Err: Error,
+	Ok?: Type,
+	Err?: Error,
 }
 
 export type FlatResult<Type> = Type | Error;
@@ -67,19 +67,36 @@ export interface Error {
 	cause: string,
 }
 
-export function openDataDir(): PromiseResult<null> {
-	return invoke("open_data_dir");
+function convertBackendAsyncError(error: Error | string | any): Error {
+	if (typeof error === "object") {
+		return error;
+	} else {
+		return {
+			message: "Unable to perform internal API call",
+			cause: error,
+		};
+	}
 }
 
-
-export function getCourseMaps(): PromiseResult<Array<Result<CourseMap>>> {
-	return invoke("get_course_maps");
+export async function openDataDir(): PromiseResult<null> {
+	try {
+		return await invoke("open_data_dir");
+	} catch (error) {
+		return convertBackendAsyncError(error);
+	}
 }
 
-export function getCourses(): PromiseResult<Array<Result<[Course, CourseProgress]>>> {
-	let result: PromiseResult<Array<Result<[Course, CourseProgress]>>> = invoke("get_courses");
+export async function getCourseMaps(): PromiseResult<Array<Result<CourseMap>>> {
+	try {
+		return await invoke("get_course_maps");
+	} catch (error) {
+		return convertBackendAsyncError(error);
+	}
+}
 
-	return result.then((courses) => {
+export async function getCourses(): PromiseResult<Array<Result<[Course, CourseProgress]>>> {
+	try {
+		const courses: FlatResult<Array<Result<[Course, CourseProgress]>>> = await invoke("get_courses");
 		if (Array.isArray(courses)) {
 			for (const course of courses) {
 				if (course.Ok) {
@@ -88,13 +105,14 @@ export function getCourses(): PromiseResult<Array<Result<[Course, CourseProgress
 			}
 		}
 		return courses;
-	});
+	} catch (error) {
+		return convertBackendAsyncError(error);
+	}
 }
 
-export function getCoursesActive(): PromiseResult<Array<Result<[Course, CourseProgress]>>> {
-	let result: PromiseResult<Array<Result<[Course, CourseProgress]>>> = invoke("get_courses_active");
-
-	return result.then((courses) => {
+export async function getCoursesActive(): PromiseResult<Array<Result<[Course, CourseProgress]>>> {
+	try {
+		const courses: FlatResult<Array<Result<[Course, CourseProgress]>>> = await invoke("get_courses_active");
 		if (Array.isArray(courses)) {
 			for (const course of courses) {
 				if (course.Ok) {
@@ -103,18 +121,21 @@ export function getCoursesActive(): PromiseResult<Array<Result<[Course, CoursePr
 			}
 		}
 		return courses;
-	});
+	} catch (error) {
+		return convertBackendAsyncError(error);
+	}
 }
 
-export function getCourse(uuid: string): PromiseResult<[Course, CourseCompletionData]> {
-	let result: PromiseResult<[Course, CourseCompletionData]> = invoke("get_course", { id: uuid });
-
-	return result.then((course) => {
+export async function getCourse(uuid: string): PromiseResult<[Course, CourseCompletionData]> {
+	try {
+		const course: FlatResult<[Course, CourseCompletionData]> = await invoke("get_course", { id: uuid });
 		if (Array.isArray(course)) {
 			normalizeCourse(course[0]);
 		}
 		return course;
-	});
+	} catch (error) {
+		return convertBackendAsyncError(error);
+	}
 }
 
 function normalizeCourse(course: Course) {
@@ -125,30 +146,50 @@ function normalizeCourse(course: Course) {
 	}
 }
 
-export function setCourseCompletion(uuid: string, completion: CourseCompletionData): PromiseResult<null> {
-	return invoke("set_course_completion", {
-		id: uuid,
-		data: completion
-	});
+export async function setCourseCompletion(uuid: string, completion: CourseCompletionData): PromiseResult<null> {
+	try {
+		return await invoke("set_course_completion", {
+			id: uuid,
+			data: completion
+		});
+	} catch (error) {
+		return convertBackendAsyncError(error);
+	}
 }
 
-export function setCourseActiveStatus(uuid: string, active: boolean): PromiseResult<null> {
-	return invoke("set_course_active_status", {
-		id: uuid,
-		data: active
-	});
+export async function setCourseActiveStatus(uuid: string, active: boolean): PromiseResult<null> {
+	try {
+		return await invoke("set_course_active_status", {
+			id: uuid,
+			data: active
+		});
+	} catch (error) {
+		return convertBackendAsyncError(error);
+	}
 }
 
-export function getOverallProgress(): PromiseResult<OverallProgress> {
-	return invoke("get_overall_progress");
+export async function getOverallProgress(): PromiseResult<OverallProgress> {
+	try {
+		return await invoke("get_overall_progress");
+	} catch (error) {
+		return convertBackendAsyncError(error);
+	}
 }
 
-export function getSettings(): PromiseResult<Settings> {
-	return invoke("get_settings");
+export async function getSettings(): PromiseResult<Settings> {
+	try {
+		return await invoke("get_settings");
+	} catch (error) {
+		return convertBackendAsyncError(error);
+	}
 }
 
-export function setSettings(settings: Settings): PromiseResult<null> {
-	return invoke("set_settings", {
-		data: settings
-	});
+export async function setSettings(settings: Settings): PromiseResult<null> {
+	try {
+		return await invoke("set_settings", {
+			data: settings
+		});
+	} catch (error) {
+		return convertBackendAsyncError(error);
+	}
 }
