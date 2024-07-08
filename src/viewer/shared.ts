@@ -4,7 +4,7 @@ export interface ListingItem {
 	subitems?: ListingItem[],
 }
 
-type ListingCallback = (identifier: string) => void;
+export type ListingCallback = (identifier: string) => void;
 
 export class ViewManager {
 	titleContainer: HTMLElement;
@@ -117,4 +117,12 @@ export class ViewManager {
 			}
 		}
 	}
+}
+
+export interface DocumentViewer {
+	new(url: string, options?: object): Promise<DocumentViewer>;
+	render(manager: ViewManager, options?: object, location?: string): Promise<null>;
+	get location(): string;
+	set location(value: string);
+	destroy(): Promise<null>;
 }
