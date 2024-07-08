@@ -34,6 +34,7 @@ pub struct Course {
     /// Optional description for the course
     description: Option<String>,
     /// The textbooks which are a part of this course.
+    #[serde(default)]
     books: Vec<Textbook>,
 }
 
