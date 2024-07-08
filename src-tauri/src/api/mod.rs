@@ -46,6 +46,11 @@ impl Course {
             book.file = data::into_relative_path(root, &book.file);
         }
     }
+    fn remove_resources(&mut self) {
+        for book in &mut self.books {
+            book.file = PathBuf::from("hidden");
+        }
+    }
     /// Get a list of all files included in a ``Course``
     fn get_resources(&self) -> Vec<&PathBuf> {
         let mut files = Vec::with_capacity(self.books.len());

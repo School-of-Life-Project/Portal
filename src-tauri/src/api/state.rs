@@ -113,7 +113,8 @@ impl State {
 
             for (index, result) in results.into_iter().enumerate() {
                 courses.push(match result {
-                    Ok((course, completion)) => {
+                    Ok((mut course, completion)) => {
+                        course.remove_resources();
                         let progress = CourseProgress::calculate(&course, &completion);
                         Ok((course, progress))
                     }

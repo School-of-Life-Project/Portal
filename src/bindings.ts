@@ -96,15 +96,7 @@ export async function getCourseMaps(): PromiseResult<Array<Result<CourseMap>>> {
 
 export async function getCourses(): PromiseResult<Array<Result<[Course, CourseProgress]>>> {
 	try {
-		const courses: FlatResult<Array<Result<[Course, CourseProgress]>>> = await invoke("get_courses");
-		if (Array.isArray(courses)) {
-			for (const course of courses) {
-				if (course.Ok) {
-					fixCourseURLs(course.Ok[0]);
-				}
-			}
-		}
-		return courses;
+		return await invoke("get_courses");
 	} catch (error) {
 		return convertBackendAsyncError(error);
 	}
@@ -112,15 +104,7 @@ export async function getCourses(): PromiseResult<Array<Result<[Course, CoursePr
 
 export async function getCoursesActive(): PromiseResult<Array<Result<[Course, CourseProgress]>>> {
 	try {
-		const courses: FlatResult<Array<Result<[Course, CourseProgress]>>> = await invoke("get_courses_active");
-		if (Array.isArray(courses)) {
-			for (const course of courses) {
-				if (course.Ok) {
-					fixCourseURLs(course.Ok[0]);
-				}
-			}
-		}
-		return courses;
+		return await invoke("get_courses_active");
 	} catch (error) {
 		return convertBackendAsyncError(error);
 	}
@@ -130,19 +114,15 @@ export async function getCourse(uuid: string): PromiseResult<[Course, CourseComp
 	try {
 		const course: FlatResult<[Course, CourseCompletionData]> = await invoke("get_course", { id: uuid });
 		if (Array.isArray(course)) {
-			fixCourseURLs(course[0]);
+			if (course[0].books) {
+				for (const book of course[0].books) {
+					book.file = convertFileSrc(book.file);
+				}
+			}
 		}
 		return course;
 	} catch (error) {
 		return convertBackendAsyncError(error);
-	}
-}
-
-function fixCourseURLs(course: Course) {
-	if (course.books) {
-		for (const book of course.books) {
-			book.file = convertFileSrc(book.file);
-		}
 	}
 }
 
