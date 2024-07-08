@@ -1,7 +1,6 @@
 use std::{
     collections::{hash_map::Entry, HashMap, HashSet},
     path::{Path, PathBuf},
-    time::Duration,
 };
 
 use chrono::{NaiveDate, Utc};
@@ -224,7 +223,7 @@ pub struct OverallProgress {
     /// The total number of chapters completed by day
     chapters_completed: HashMap<NaiveDate, f32>,
     /// The total amount of time spent in any course by day
-    time_spent: HashMap<NaiveDate, Duration>,
+    time_spent: HashMap<NaiveDate, f32>,
 }
 
 impl OverallProgress {
@@ -247,12 +246,11 @@ impl OverallProgress {
         if time_change_secs.is_normal() {
             match self.time_spent.entry(date) {
                 Entry::Occupied(mut entry) => {
-                    let time_secs = (entry.get().as_secs_f32() - time_change_secs).max(0.0);
-                    entry.insert(Duration::from_secs_f32(time_secs));
+                    entry.insert((entry.get() - time_change_secs).max(0.0));
                 }
                 Entry::Vacant(entry) => {
                     if time_change_secs.is_sign_positive() {
-                        entry.insert(Duration::from_secs_f32(time_change_secs));
+                        entry.insert(time_change_secs);
                     }
                 }
             }
