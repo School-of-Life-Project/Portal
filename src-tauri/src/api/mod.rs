@@ -103,13 +103,13 @@ pub struct CourseCompletion {
     /// A list of all completed section-ids within each textbook within the course.
     book_sections: HashMap<usize, HashSet<String>>,
     /// The total amount of time spent in this course, in seconds.
-    time_spent_secs: f32,
+    time_spent_secs: i64,
     /// The raw data used to keep track of the viewer's current position within a textbook.
     position: HashMap<usize, String>,
 }
 
 impl CourseCompletion {
-    fn calculate_time_diff_secs(before: &Self, after: &Self) -> f32 {
+    fn calculate_time_diff_secs(before: &Self, after: &Self) -> i64 {
         after.time_spent_secs - before.time_spent_secs
     }
 }
@@ -237,11 +237,11 @@ pub struct OverallProgress {
     /// The total number of chapters completed by day
     chapters_completed: HashMap<NaiveDate, f32>,
     /// The total amount of time spent in any course by day
-    time_spent: HashMap<NaiveDate, f32>,
+    time_spent: HashMap<NaiveDate, i64>,
 }
 
 impl OverallProgress {
-    fn update(&mut self, chapter_change: f32, time_change_secs: f32) {
+    fn update(&mut self, chapter_change: f32, time_change_secs: i64) {
         let date = Utc::now().date_naive();
 
         if chapter_change.is_normal() {
@@ -257,15 +257,13 @@ impl OverallProgress {
             }
         }
 
-        if time_change_secs.is_normal() {
-            match self.time_spent.entry(date) {
-                Entry::Occupied(mut entry) => {
-                    entry.insert((entry.get() - time_change_secs).max(0.0));
-                }
-                Entry::Vacant(entry) => {
-                    if time_change_secs.is_sign_positive() {
-                        entry.insert(time_change_secs);
-                    }
+        match self.time_spent.entry(date) {
+            Entry::Occupied(mut entry) => {
+                entry.insert((entry.get() - time_change_secs).max(0));
+            }
+            Entry::Vacant(entry) => {
+                if time_change_secs.is_positive() {
+                    entry.insert(time_change_secs);
                 }
             }
         }
