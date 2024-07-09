@@ -1,3 +1,5 @@
+import { Course, Textbook, CourseCompletionData } from "../bindings.ts";
+
 export interface ListingItem {
 	label: string,
 	identifier?: string,
@@ -20,7 +22,7 @@ export class ViewManager {
 		this.#styleContainer = document.createElement("style");
 		window.document.head.appendChild(this.#styleContainer);
 	}
-	prepare(listing?: ListingItem[], callback?: ListingCallback, title?: string, language?: string) {
+	render(listing?: ListingItem[], callback?: ListingCallback, title?: string, language?: string) {
 		if (language) {
 			this.titleContainer.setAttribute("lang", language);
 			this.listingContainer.setAttribute("lang", language);
@@ -119,10 +121,40 @@ export class ViewManager {
 	}
 }
 
+export class ProgressManager {
+	#lastTimestamp: DOMHighResTimeStamp | undefined = undefined;
+	manager: ViewManager;
+	timerContainer: HTMLElement;
+	rendered = false;
+	constructor (view: ViewManager, timerContainer: HTMLElement) {
+		this.manager = view;
+		this.timerContainer = timerContainer;
+	}
+	render(course: Course, document_index: number) {
+		if (!this.manager.rendered) {
+			return;
+		}
+
+		this.#lastTimestamp = performance.now();
+		this.#buildListingProgressTracker(course, document_index);
+
+		this.rendered = true;
+	}
+	reset() {
+		if (this.manager.rendered) {
+			return;
+		}
+
+		this.#lastTimestamp = undefined;
+		this.rendered = false;
+	}
+	#buildListingProgressTracker(course: Course, document_index: number) {
+		// TODO: Progress tracking, time display
+	}
+}
+
 export interface DocumentViewer {
-	new(url: string, options?: object): Promise<DocumentViewer>;
-	render(manager: ViewManager, options?: object, location?: string): Promise<null>;
-	get location(): string;
-	set location(value: string);
+	new(course: Course, document_index: number): Promise<DocumentViewer>;
+	render(view: ViewManager, progress: ProgressManager): Promise<null>;
 	destroy(): Promise<null>;
 }
