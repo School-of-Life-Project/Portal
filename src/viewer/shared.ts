@@ -304,17 +304,23 @@ export class ProgressManager {
 			this.#updateListingItemVisibility(element, false);
 		}
 	}
-	#updateListingItemVisibility(element: HTMLElement, showItem: boolean, showItemList?: boolean, scroll?: boolean) {
+	#updateListingItemVisibility(element: HTMLElement, showItem?: boolean, showItemList?: boolean, scroll?: boolean) {
 		let itemContainer = element?.parentElement?.parentElement;
 
-		if (itemContainer && itemContainer.tagName == "DETAILS") {
-			(<HTMLDetailsElement>itemContainer).open = showItem;
+		if (showItem !== undefined) {
+			if (itemContainer && itemContainer.tagName == "DETAILS") {
+				(<HTMLDetailsElement>itemContainer).open = showItem;
+			}
 		}
 
 		if (showItemList !== undefined) {
-			let listContainer = element?.parentElement?.parentElement?.parentElement?.parentElement?.parentElement;
-			if (listContainer && listContainer.tagName == "DETAILS") {
-				(<HTMLDetailsElement>listContainer).open = showItemList;
+			let currentElement = element?.parentElement?.parentElement?.parentElement;
+			while (currentElement && currentElement.parentElement && currentElement.parentElement != this.manager.listingContainer) {
+				currentElement = currentElement.parentElement;
+
+				if (currentElement.tagName == "DETAILS") {
+					(<HTMLDetailsElement>currentElement).open = showItemList;
+				}
 			}
 		}
 
@@ -322,7 +328,7 @@ export class ProgressManager {
 			if (itemContainer && itemContainer.tagName == "DETAILS") {
 				itemContainer.scrollIntoView({ block: "center" });
 			} else {
-				element.scrollIntoView({ block: "start" });
+				element.parentElement?.scrollIntoView({ block: "start" });
 			}
 		}
 	}
