@@ -102,6 +102,8 @@ pub struct CourseCompletion {
     book_sections: HashMap<usize, HashSet<String>>,
     /// The total amount of time spent in this course, in seconds.
     time_spent_secs: f32,
+    /// The raw data used to keep track of the viewer's current position within a textbook.
+    position: HashMap<usize, String>,
 }
 
 impl CourseCompletion {
