@@ -140,6 +140,7 @@ export class ProgressManager {
 		this.#completion = course[1];
 		this.#completedSections = new Set(course[1].book_sections[document_index]);
 		this.#buildListingProgressTracker({ course: course[0], progress: this.#completion }, document_index);
+		// TODO: build time display
 		this.#intervalId = window.setInterval(() => {
 			if (this.#completion && this.#completion.time_spent_secs) {
 				this.#completion.time_spent_secs += this.#completion?.time_spent_secs + 1;
@@ -182,32 +183,32 @@ export class ProgressManager {
 						}
 					}));
 				}
-			} else {
-				for (const sectionGroup of chapter.sections) {
-					for (const section of sectionGroup) {
-						const element = document.getElementById(section);
-
-						if (element && element.parentElement) {
-							element.parentElement.appendChild(this.#buildCheckbox(this.#completedSections.has(section), (event) => {
-								if (this.#completion && event.target) {
-									if ((<HTMLInputElement>event.target).checked) {
-										this.#completedSections.add(section);
-									} else {
-										this.#completedSections.delete(section);
-									}
-									this.#completion.book_sections[document_index] = Array.from(this.#completedSections);
-									this.#updateChapterCompletion(textbook, chapter, (<HTMLInputElement>event.target).checked);
-								}
-							}));
-						}
-					}
-				}
 			}
+			this.#buildSectionProgressTracker(textbook, chapter, document_index);
 		}
 
 		this.#showNextChapter(textbook, undefined, true);
+	}
+	#buildSectionProgressTracker(textbook: Textbook, chapter: Chapter, document_index: number) {
+		for (const sectionGroup of chapter.sections) {
+			for (const section of sectionGroup) {
+				const element = document.getElementById(section);
 
-		// TODO: add time display
+				if (element && element.parentElement) {
+					element.parentElement.appendChild(this.#buildCheckbox(this.#completedSections.has(section), (event) => {
+						if (this.#completion && event.target) {
+							if ((<HTMLInputElement>event.target).checked) {
+								this.#completedSections.add(section);
+							} else {
+								this.#completedSections.delete(section);
+							}
+							this.#completion.book_sections[document_index] = Array.from(this.#completedSections);
+							this.#updateChapterCompletion(textbook, chapter, (<HTMLInputElement>event.target).checked);
+						}
+					}));
+				}
+			}
+		}
 	}
 	#buildCheckbox(checked: boolean, listener: (event: Event) => void) {
 		const checkbox = document.createElement("input");
