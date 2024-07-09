@@ -113,9 +113,8 @@ export class BookChapterGraph {
 			element.style.cssText = ""; // Ugly hack
 		}
 	}
-
 }
 
 class LongTermProgressGraph {
-
+	// TODO
 }

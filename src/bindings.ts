@@ -4,8 +4,6 @@ import { invoke, convertFileSrc } from '@tauri-apps/api/tauri';
 // - src/api/mod.rs
 // - src/api/wrapper.rs
 
-// TODO: Need to test API bindings for bugs
-
 export interface CourseMap {
 	uuid: string,
 	// TODO
