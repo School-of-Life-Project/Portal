@@ -1,4 +1,4 @@
-import { Course, setCourseCompletion, CourseCompletionData } from "../bindings.ts";
+import { Course, Textbook, setCourseCompletion, CourseCompletionData, Chapter } from "../bindings.ts";
 
 export interface ListingItem {
 	label: string,
@@ -122,8 +122,9 @@ export class ViewManager {
 }
 
 export class ProgressManager {
-	#lastTimestamp: DOMHighResTimeStamp | undefined = undefined;
 	#intervalId: number | undefined = undefined;
+	#completion: CourseCompletionData | undefined = undefined;
+	#completedSections: Set<string> = new Set();
 	manager: ViewManager;
 	timerContainer: HTMLElement;
 	rendered = false;
@@ -136,8 +137,15 @@ export class ProgressManager {
 			return;
 		}
 
-		this.#lastTimestamp = performance.now();
-		this.#buildListingProgressTracker({ course: course[0], progress: course[1] }, document_index);
+		this.#completion = course[1];
+		this.#completedSections = new Set(course[1].book_sections[document_index]);
+		this.#buildListingProgressTracker({ course: course[0], progress: this.#completion }, document_index);
+		this.#intervalId = window.setInterval(() => {
+			if (this.#completion && this.#completion.time_spent_secs) {
+				this.#completion.time_spent_secs += this.#completion?.time_spent_secs + 1;
+				setCourseCompletion(course[0].uuid, this.#completion);
+			}
+		}, 1000);
 
 		this.rendered = true;
 	}
@@ -146,48 +154,62 @@ export class ProgressManager {
 			return;
 		}
 
+		this.#completion = undefined;
+		this.#completedSections = new Set();
 		if (this.#intervalId) {
 			window.clearInterval(this.#intervalId);
 			this.#intervalId = undefined;
 		}
-		this.#lastTimestamp = undefined;
 		this.rendered = false;
 	}
 	#buildListingProgressTracker(course: { course: Course, progress: CourseCompletionData; }, document_index: number) {
 		const textbook = course.course.books[document_index];
-
-		const completedSections = course.progress.book_sections[document_index];
 
 		for (const chapter of textbook.chapters) {
 			if (chapter.root) {
 				const element = document.getElementById(chapter.root);
 
 				if (element && element.parentElement) {
-					element.parentElement.appendChild(this.#buildCheckbox(completedSections.includes(chapter.root), (event) => {
-						// TODO: update progress data and displayed sections
+					element.parentElement.appendChild(this.#buildCheckbox(this.#completedSections.has(chapter.root), (event) => {
+						if (chapter.root && this.#completion && event.target) {
+							if ((<HTMLInputElement>event.target).checked) {
+								this.#completedSections.add(chapter.root);
+							} else {
+								this.#completedSections.delete(chapter.root);
+							}
+							this.#completion.book_sections[document_index] = Array.from(this.#completedSections);
+							this.#showNextChapter(textbook, chapter.root);
+						}
 					}));
 				}
 			} else {
-				this.#buildSectionProgressTracker({ course: course.course, document_index }, chapter.sections, completedSections);
-			}
-		}
+				for (const sectionGroup of chapter.sections) {
+					for (const section of sectionGroup) {
+						const element = document.getElementById(section);
 
-		// TODO: add time display
-	}
-	#buildSectionProgressTracker(root: { course: Course, document_index: number; }, sectionGroups: string[][], completedSections: string[]) {
-		for (const sectionGroup of sectionGroups) {
-			for (const section of sectionGroup) {
-				const element = document.getElementById(section);
-
-				if (element && element.parentElement) {
-					element.parentElement.appendChild(this.#buildCheckbox(completedSections.includes(section), (event) => {
-						// TODO: update progress data and displayed sections
-					}));
+						if (element && element.parentElement) {
+							element.parentElement.appendChild(this.#buildCheckbox(this.#completedSections.has(section), (event) => {
+								if (this.#completion && event.target) {
+									if ((<HTMLInputElement>event.target).checked) {
+										this.#completedSections.add(section);
+									} else {
+										this.#completedSections.delete(section);
+									}
+									this.#completion.book_sections[document_index] = Array.from(this.#completedSections);
+									this.#updateChapterCompletion(textbook, chapter, (<HTMLInputElement>event.target).checked);
+								}
+							}));
+						}
+					}
 				}
 			}
 		}
+
+		this.#showNextChapter(textbook, undefined, true);
+
+		// TODO: add time display
 	}
-	#buildCheckbox(checked: boolean, listener: (this: HTMLInputElement, event: Event) => void) {
+	#buildCheckbox(checked: boolean, listener: (event: Event) => void) {
 		const checkbox = document.createElement("input");
 		checkbox.setAttribute("type", "checkbox");
 
@@ -197,6 +219,14 @@ export class ProgressManager {
 		checkbox.addEventListener("change", listener);
 
 		return checkbox;
+	}
+	#updateChapterCompletion(textbook: Textbook, chapter: Chapter, checked: boolean) {
+		// TODO
+
+		this.#showNextChapter(textbook);
+	}
+	#showNextChapter(textbook: Textbook, chapterId?: string, autoscroll = false) {
+		// TODO
 	}
 }
 
