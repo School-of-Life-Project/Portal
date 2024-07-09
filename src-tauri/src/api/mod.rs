@@ -1,5 +1,3 @@
-// TODO! : Separate CourseCompletion.time_spent_secs by day
-
 use std::{
     collections::{hash_map::Entry, HashMap, HashSet},
     path::{Path, PathBuf},
@@ -103,14 +101,14 @@ pub struct CourseCompletion {
     /// A list of all completed section-ids within each textbook within the course.
     book_sections: HashMap<usize, HashSet<String>>,
     /// The total amount of time spent in this course, in seconds.
-    time_spent_secs: i64,
+    time_spent: i64,
     /// The raw data used to keep track of the viewer's current position within a textbook.
     position: HashMap<usize, String>,
 }
 
 impl CourseCompletion {
     fn calculate_time_diff_secs(before: &Self, after: &Self) -> i64 {
-        after.time_spent_secs - before.time_spent_secs
+        after.time_spent - before.time_spent
     }
 }
 
@@ -121,6 +119,8 @@ pub struct CourseProgress {
     completed: bool,
     /// The completion of textbooks within the course, in the order they are included in the course.
     completion: Vec<TextbookProgress>,
+    /// The amount of time spent on this course today.
+    time_spent_today: i64,
 }
 
 /// The displayed progress through a ``Textbook``
@@ -133,7 +133,11 @@ pub struct TextbookProgress {
 }
 
 impl CourseProgress {
-    fn calculate(course: &Course, completion: &CourseCompletion) -> Self {
+    fn calculate(
+        course: &Course,
+        completion: &CourseCompletion,
+        offsets: &mut CourseTimeOffsets,
+    ) -> Self {
         let mut book_progress = Vec::with_capacity(course.books.len());
 
         for (book_index, book) in course.books.iter().enumerate() {
@@ -211,6 +215,7 @@ impl CourseProgress {
         Self {
             completed,
             completion: book_progress,
+            time_spent_today: completion.time_spent - offsets.today(course, completion),
         }
     }
     fn calculate_chapter_diff(before: &Self, after: &Self) -> f32 {
@@ -265,6 +270,33 @@ impl OverallProgress {
                 if time_change_secs.is_positive() {
                     entry.insert(time_change_secs);
                 }
+            }
+        }
+    }
+}
+
+/// The per-course time offsets used to separate progress by day
+#[derive(Serialize, Deserialize, Debug, Default)]
+#[serde(default)]
+pub struct CourseTimeOffsets {
+    date: Option<NaiveDate>,
+    offset: HashMap<Uuid, i64>,
+}
+
+impl CourseTimeOffsets {
+    fn today(&mut self, course: &Course, completion: &CourseCompletion) -> i64 {
+        let current_date = Utc::now().date_naive();
+
+        if self.date != Some(current_date) {
+            self.date = Some(current_date);
+            self.offset = HashMap::new();
+        }
+
+        match self.offset.entry(course.uuid.unwrap()) {
+            Entry::Occupied(entry) => *entry.get(),
+            Entry::Vacant(entry) => {
+                entry.insert(completion.time_spent);
+                completion.time_spent
             }
         }
     }

@@ -32,13 +32,14 @@ export interface Chapter {
 export interface CourseCompletionData {
 	completed?: boolean,
 	book_sections: Record<number, string[]>,
-	time_spent_secs: number,
+	time_spent: number,
 	position: Record<number, string>,
 }
 
 export interface CourseProgress {
 	completed: boolean,
 	completion: TextbookProgress[],
+	time_spent_today: number,
 }
 
 export interface TextbookProgress {
