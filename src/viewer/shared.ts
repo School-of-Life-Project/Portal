@@ -1,4 +1,4 @@
-import { Course, Textbook, CourseCompletionData } from "../bindings.ts";
+import { Course, setCourseCompletion, CourseCompletionData } from "../bindings.ts";
 
 export interface ListingItem {
 	label: string,
@@ -123,6 +123,7 @@ export class ViewManager {
 
 export class ProgressManager {
 	#lastTimestamp: DOMHighResTimeStamp | undefined = undefined;
+	#intervalId: number | undefined = undefined;
 	manager: ViewManager;
 	timerContainer: HTMLElement;
 	rendered = false;
@@ -130,13 +131,13 @@ export class ProgressManager {
 		this.manager = view;
 		this.timerContainer = timerContainer;
 	}
-	render(course: Course, document_index: number) {
+	render(course: [Course, CourseCompletionData], document_index: number) {
 		if (!this.manager.rendered) {
 			return;
 		}
 
 		this.#lastTimestamp = performance.now();
-		this.#buildListingProgressTracker(course, document_index);
+		this.#buildListingProgressTracker({ course: course[0], progress: course[1] }, document_index);
 
 		this.rendered = true;
 	}
@@ -145,16 +146,62 @@ export class ProgressManager {
 			return;
 		}
 
+		if (this.#intervalId) {
+			window.clearInterval(this.#intervalId);
+			this.#intervalId = undefined;
+		}
 		this.#lastTimestamp = undefined;
 		this.rendered = false;
 	}
-	#buildListingProgressTracker(course: Course, document_index: number) {
-		// TODO: Progress tracking, time display
+	#buildListingProgressTracker(course: { course: Course, progress: CourseCompletionData; }, document_index: number) {
+		const textbook = course.course.books[document_index];
+
+		const completedSections = course.progress.book_sections[document_index];
+
+		for (const chapter of textbook.chapters) {
+			if (chapter.root) {
+				const element = document.getElementById(chapter.root);
+
+				if (element && element.parentElement) {
+					element.parentElement.appendChild(this.#buildCheckbox(completedSections.includes(chapter.root), (event) => {
+						// TODO: update progress data and displayed sections
+					}));
+				}
+			} else {
+				this.#buildSectionProgressTracker({ course: course.course, document_index }, chapter.sections, completedSections);
+			}
+		}
+
+		// TODO: add time display
+	}
+	#buildSectionProgressTracker(root: { course: Course, document_index: number; }, sectionGroups: string[][], completedSections: string[]) {
+		for (const sectionGroup of sectionGroups) {
+			for (const section of sectionGroup) {
+				const element = document.getElementById(section);
+
+				if (element && element.parentElement) {
+					element.parentElement.appendChild(this.#buildCheckbox(completedSections.includes(section), (event) => {
+						// TODO: update progress data and displayed sections
+					}));
+				}
+			}
+		}
+	}
+	#buildCheckbox(checked: boolean, listener: (this: HTMLInputElement, event: Event) => void) {
+		const checkbox = document.createElement("input");
+		checkbox.setAttribute("type", "checkbox");
+
+		if (checked) {
+			checkbox.setAttribute("checked", "");
+		}
+		checkbox.addEventListener("change", listener);
+
+		return checkbox;
 	}
 }
 
 export interface DocumentViewer {
-	new(course: Course, document_index: number): Promise<DocumentViewer>;
+	new(course: Course, document_index: number, initialProgress: CourseCompletionData): Promise<DocumentViewer>;
 	render(view: ViewManager, progress: ProgressManager): Promise<null>;
 	destroy(): Promise<null>;
 }
