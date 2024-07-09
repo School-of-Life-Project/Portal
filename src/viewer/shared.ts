@@ -222,43 +222,103 @@ export class ProgressManager {
 		return checkbox;
 	}
 	#updateChapterCompletion(textbook: Textbook, chapter: Chapter) {
-		if (this.#completedSections) {
-			for (const sectionGroup of chapter.sections) {
-				for (const section of sectionGroup) {
-					if (!this.#completedSections.has(section)) {
-						if (chapter.root) {
-							this.#updateChapterCheckbox(chapter.root);
-						}
-						return;
-					}
-				}
-			}
-
-			if (chapter.root) {
-				this.#completedSections.add(chapter.root);
-				this.#updateChapterCheckbox(chapter.root);
-			}
-
-			this.#showNextChapter(textbook);
+		if (!this.#completedSections) {
+			return;
 		}
 
+		for (const sectionGroup of chapter.sections) {
+			for (const section of sectionGroup) {
+				if (!this.#completedSections.has(section)) {
+					if (chapter.root) {
+						this.#updateChapterCheckbox(chapter.root);
+					}
+					return;
+				}
+			}
+		}
+
+		if (chapter.root) {
+			this.#completedSections.add(chapter.root);
+			this.#updateChapterCheckbox(chapter.root);
+		}
+
+		this.#showNextChapter(textbook);
 	}
 	#updateChapterCheckbox(identifier: string) {
-		if (this.#completedSections) {
-			const element = document.getElementById(identifier);
-			if (element && element.parentElement) {
-				const inputElements = element.parentElement.getElementsByTagName("input");
+		if (!this.#completedSections) {
+			return;
+		}
 
-				for (const inputElement of inputElements) {
-					if (inputElement.getAttribute("type") == "checkbox") {
-						inputElement.checked = this.#completedSections.has(identifier);
-					}
+		const element = document.getElementById(identifier);
+		if (element && element.parentElement) {
+			const inputElements = element.parentElement.getElementsByTagName("input");
+
+			for (const inputElement of inputElements) {
+				if (inputElement.getAttribute("type") == "checkbox") {
+					inputElement.checked = this.#completedSections.has(identifier);
 				}
 			}
 		}
 	}
 	#showNextChapter(textbook: Textbook, chapterId?: string, autoscroll = false) {
-		// TODO
+		let firstIncomplete = true;
+
+		for (const chapter of textbook.chapters) {
+			if (chapter.root) {
+				const element = document.getElementById(chapter.root);
+				if (element) {
+					this.#handleListingItemVisibility(element, this.#completedSections.has(chapter.root), firstIncomplete, chapterId == chapter.root, autoscroll);
+				}
+
+				if (!this.#completedSections.has(chapter.root)) {
+					firstIncomplete = true;
+				}
+			} else {
+				// If the chapter has no root, treat individual sections as if they were chapters
+
+				for (const sectionGroup of chapter.sections) {
+					for (const section of sectionGroup) {
+						const element = document.getElementById(section);
+						if (element) {
+							this.#handleListingItemVisibility(element, this.#completedSections.has(section), firstIncomplete, chapterId == section, autoscroll);
+						}
+
+						if (!this.#completedSections.has(section)) {
+							firstIncomplete = false;
+						}
+					}
+				}
+			}
+		}
+	}
+	#handleListingItemVisibility(element: HTMLElement, completed: boolean, firstIncomplete: boolean, currentItem: boolean, scroll: boolean) {
+		if (firstIncomplete) {
+			this.#updateListingItemVisibility(element, !completed, !completed, !completed && scroll);
+		} else if (!(currentItem && !completed)) {
+			this.#updateListingItemVisibility(element, false);
+		}
+	}
+	#updateListingItemVisibility(element: HTMLElement, showItem: boolean, showItemList?: boolean, scroll?: boolean) {
+		let itemContainer = element?.parentElement?.parentElement;
+
+		if (itemContainer && itemContainer.tagName == "DETAILS") {
+			(<HTMLDetailsElement>itemContainer).open = showItem;
+		}
+
+		if (showItemList !== undefined) {
+			let listContainer = element?.parentElement?.parentElement?.parentElement?.parentElement?.parentElement;
+			if (listContainer && listContainer.tagName == "DETAILS") {
+				(<HTMLDetailsElement>listContainer).open = showItemList;
+			}
+		}
+
+		if (scroll) {
+			if (itemContainer && itemContainer.tagName == "DETAILS") {
+				itemContainer.scrollIntoView({ block: "center" });
+			} else {
+				element.scrollIntoView({ block: "start" });
+			}
+		}
 	}
 }
 
