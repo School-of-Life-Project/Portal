@@ -280,7 +280,7 @@ impl OverallProgress {
 #[serde(default)]
 pub struct CourseTimeOffsets {
     date: Option<NaiveDate>,
-    offset: HashMap<Uuid, i64>,
+    offsets: HashMap<Uuid, i64>,
 }
 
 impl CourseTimeOffsets {
@@ -289,10 +289,10 @@ impl CourseTimeOffsets {
 
         if self.date != Some(current_date) {
             self.date = Some(current_date);
-            self.offset = HashMap::new();
+            self.offsets = HashMap::new();
         }
 
-        match self.offset.entry(course.uuid.unwrap()) {
+        match self.offsets.entry(course.uuid.unwrap()) {
             Entry::Occupied(entry) => *entry.get(),
             Entry::Vacant(entry) => {
                 entry.insert(completion.time_spent);
