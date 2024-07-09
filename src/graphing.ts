@@ -50,7 +50,69 @@ export class TimeProgressMeter {
 
 }
 
-class BookChapterGraph {
+export class BookChapterGraph {
+	title: string | undefined;
+	chapters: number;
+	width: number;
+	element: HTMLTableElement;
+	#dataElements: HTMLTableCellElement[] = [];
+	constructor (chapters: number, title?: string, width = 10) {
+		this.title = title;
+		this.chapters = chapters;
+		this.width = width;
+
+		const root = document.createElement("table");
+		root.setAttribute("class", "progress-map chapter-progress-map");
+		if (this.title) {
+			const caption = document.createElement("caption");
+			caption.innerText = "📖 " + this.title;
+			root.appendChild(caption);
+		}
+
+		const body = document.createElement("tbody");
+
+		let height = Math.ceil(this.chapters / this.width);
+
+		for (let ii = 0; ii < height; ii++) {
+			const row = document.createElement("tr");
+			for (let i = 0; i < this.width; i++) {
+				const dataElement = document.createElement("td");
+				this.#dataElements.push(dataElement);
+				row.appendChild(dataElement);
+				if (this.#dataElements.length >= this.chapters) {
+					break;
+				}
+			}
+			body.appendChild(row);
+		}
+		root.appendChild(body);
+
+		this.element = root;
+	}
+	update(progress = []) {
+		for (let i = 0; i < this.#dataElements.length; i++) {
+			const element = this.#dataElements[i];
+
+			if (i >= progress.length) {
+				element.className = "";
+				element.style.cssText = "color: transparent"; // Ugly hack
+				element.style.cssText = ""; // Ugly hack
+				continue;
+			}
+
+			const value = Number(progress[i]);
+
+			if (value >= 1) {
+				element.className = "finished";
+			} else if (value > 0) {
+				element.className = "in-progress";
+			} else {
+				element.className = "";
+			}
+			element.style.cssText = "color: transparent"; // Ugly hack
+			element.style.cssText = ""; // Ugly hack
+		}
+	}
 
 }
 
