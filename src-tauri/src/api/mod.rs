@@ -1,3 +1,5 @@
+// TODO! : Separate CourseCompletion.time_spent_secs by day
+
 use std::{
     collections::{hash_map::Entry, HashMap, HashSet},
     path::{Path, PathBuf},

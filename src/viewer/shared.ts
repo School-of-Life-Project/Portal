@@ -1,4 +1,5 @@
 import { Course, Textbook, setCourseCompletion, CourseCompletionData, Chapter } from "../bindings.ts";
+import { TimeProgressMeter } from "../graphing.ts";
 
 export interface ListingItem {
 	label: string,
@@ -140,11 +141,15 @@ export class ProgressManager {
 		this.#completion = course[1];
 		this.#completedSections = new Set(course[1].book_sections[document_index]);
 		this.#buildListingProgressTracker({ course: course[0], progress: this.#completion }, document_index);
-		// TODO: build time display
+
+		const timeDisplay = new TimeProgressMeter();
+		this.timerContainer.appendChild(timeDisplay.element);
+
 		this.#intervalId = window.setInterval(() => {
 			if (this.#completion && this.#completion.time_spent_secs) {
 				this.#completion.time_spent_secs += this.#completion?.time_spent_secs + 1;
 				setCourseCompletion(course[0].uuid, this.#completion);
+				timeDisplay.update(this.#completion.time_spent_secs);
 			}
 		}, 1000);
 
@@ -161,6 +166,7 @@ export class ProgressManager {
 			window.clearInterval(this.#intervalId);
 			this.#intervalId = undefined;
 		}
+		this.timerContainer.innerHTML = "";
 		this.rendered = false;
 	}
 	#buildListingProgressTracker(course: { course: Course, progress: CourseCompletionData; }, document_index: number) {
