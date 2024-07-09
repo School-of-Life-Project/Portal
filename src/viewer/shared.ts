@@ -202,8 +202,8 @@ export class ProgressManager {
 							} else {
 								this.#completedSections.delete(section);
 							}
+							this.#updateChapterCompletion(textbook, chapter);
 							this.#completion.book_sections[document_index] = Array.from(this.#completedSections);
-							this.#updateChapterCompletion(textbook, chapter, (<HTMLInputElement>event.target).checked);
 						}
 					}));
 				}
@@ -221,10 +221,41 @@ export class ProgressManager {
 
 		return checkbox;
 	}
-	#updateChapterCompletion(textbook: Textbook, chapter: Chapter, checked: boolean) {
-		// TODO
+	#updateChapterCompletion(textbook: Textbook, chapter: Chapter) {
+		if (this.#completedSections) {
+			for (const sectionGroup of chapter.sections) {
+				for (const section of sectionGroup) {
+					if (!this.#completedSections.has(section)) {
+						if (chapter.root) {
+							this.#updateChapterCheckbox(chapter.root);
+						}
+						return;
+					}
+				}
+			}
 
-		this.#showNextChapter(textbook);
+			if (chapter.root) {
+				this.#completedSections.add(chapter.root);
+				this.#updateChapterCheckbox(chapter.root);
+			}
+
+			this.#showNextChapter(textbook);
+		}
+
+	}
+	#updateChapterCheckbox(identifier: string) {
+		if (this.#completedSections) {
+			const element = document.getElementById(identifier);
+			if (element && element.parentElement) {
+				const inputElements = element.parentElement.getElementsByTagName("input");
+
+				for (const inputElement of inputElements) {
+					if (inputElement.getAttribute("type") == "checkbox") {
+						inputElement.checked = this.#completedSections.has(identifier);
+					}
+				}
+			}
+		}
 	}
 	#showNextChapter(textbook: Textbook, chapterId?: string, autoscroll = false) {
 		// TODO
