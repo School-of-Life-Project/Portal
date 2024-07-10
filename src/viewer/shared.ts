@@ -124,6 +124,12 @@ export class ViewManager {
 	}
 }
 
+function updateCompletion(uuid: string, completion: CourseCompletionData) {
+	setCourseCompletion(uuid, completion);
+
+	// TODO: Error handling
+}
+
 export class ProgressManager {
 	#intervalId: number | undefined = undefined;
 	#completion: CourseCompletionData | undefined = undefined;
@@ -150,11 +156,11 @@ export class ProgressManager {
 
 		this.#intervalId = window.setInterval(() => {
 			if (this.#completion && typeof this.#completion.time_spent == "number") {
-				this.#completion.time_spent += 1;
-				setCourseCompletion(course[0].uuid, this.#completion);
+				this.#completion.time_spent += 15;
+				updateCompletion(course[0].uuid, this.#completion);
 				timeDisplay.update(this.#completion.time_spent);
 			}
-		}, 1000);
+		}, 15000);
 
 		this.rendered = true;
 	}
@@ -189,16 +195,17 @@ export class ProgressManager {
 							}
 							this.#completion.book_sections[document_index] = Array.from(this.#completedSections);
 							this.#showNextChapter(textbook, chapter.root);
+							updateCompletion(course.course.uuid, this.#completion);
 						}
 					}));
 				}
 			}
-			this.#buildSectionProgressTracker(textbook, chapter, document_index);
+			this.#buildSectionProgressTracker(course.course.uuid, textbook, chapter, document_index);
 		}
 
 		this.#showNextChapter(textbook, undefined, true);
 	}
-	#buildSectionProgressTracker(textbook: Textbook, chapter: Chapter, document_index: number) {
+	#buildSectionProgressTracker(uuid: string, textbook: Textbook, chapter: Chapter, document_index: number) {
 		for (const sectionGroup of chapter.sections) {
 			for (const section of sectionGroup) {
 				const element = document.getElementById(section);
@@ -213,6 +220,7 @@ export class ProgressManager {
 							}
 							this.#updateChapterCompletion(textbook, chapter);
 							this.#completion.book_sections[document_index] = Array.from(this.#completedSections);
+							updateCompletion(uuid, this.#completion);
 						}
 					}));
 				}
