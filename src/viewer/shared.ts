@@ -156,12 +156,12 @@ export class ProgressManager {
 		this.timerContainer.appendChild(timeDisplay.element);
 		this.#completion.time_spent = course[1].time_spent;
 
-		timeDisplay.update(this.#completion.time_spent);
+		timeDisplay.update(this.#completion.time_spent / 60);
 		this.#intervalId = window.setInterval(() => {
 			if (this.#completion && typeof this.#completion.time_spent == "number") {
 				this.#completion.time_spent += 5;
 				updateCompletion(course[0].uuid, this.#completion);
-				timeDisplay.update(this.#completion.time_spent);
+				timeDisplay.update(this.#completion.time_spent / 60);
 			}
 		}, 5000);
 
