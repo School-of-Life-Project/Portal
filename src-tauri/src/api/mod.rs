@@ -174,7 +174,11 @@ impl CourseProgress {
                             }
                         }
 
-                        chapter_progress.push(progress / chapter.sections.len() as f32);
+                        if progress > 0.0 {
+                            chapter_progress.push(progress / chapter.sections.len() as f32);
+                        } else {
+                            chapter_progress.push(0.0);
+                        }
                     }
 
                     let mut total_progress = 0.0;
@@ -226,13 +230,17 @@ impl CourseProgress {
         let mut before_total = 0.0;
 
         for book in &before.completion {
-            before_total += book.overall_completion;
+            for chapter_completion in &book.chapter_completion {
+                before_total += chapter_completion;
+            }
         }
 
         let mut after_total = 0.0;
 
         for book in &after.completion {
-            after_total += book.overall_completion;
+            for chapter_completion in &book.chapter_completion {
+                after_total += chapter_completion;
+            }
         }
 
         after_total - before_total
@@ -256,7 +264,7 @@ impl OverallProgress {
         if chapter_change.is_normal() {
             match self.chapters_completed.entry(date) {
                 Entry::Occupied(mut entry) => {
-                    entry.insert((entry.get() - chapter_change).max(0.0));
+                    entry.insert((entry.get() + chapter_change).max(0.0));
                 }
                 Entry::Vacant(entry) => {
                     if chapter_change.is_sign_positive() {
@@ -268,7 +276,7 @@ impl OverallProgress {
 
         match self.time_spent.entry(date) {
             Entry::Occupied(mut entry) => {
-                entry.insert((entry.get() - time_change_secs).max(0));
+                entry.insert((entry.get() + time_change_secs).max(0));
             }
             Entry::Vacant(entry) => {
                 if time_change_secs.is_positive() {
