@@ -1,3 +1,4 @@
+import { resolve } from 'path';
 import { defineConfig } from 'vite';
 import legacy from '@vitejs/plugin-legacy';
 import browserslist from 'browserslist';
@@ -20,6 +21,12 @@ export default defineConfig({
 		cssMinify: "lightningcss",
 		// produce sourcemaps for debug builds
 		sourcemap: !!process.env.TAURI_DEBUG,
+		rollupOptions: {
+			input: {
+				main: resolve(__dirname, 'index.html'),
+				epub: resolve(__dirname, 'epub.html'),
+			}
+		}
 	},
 	css: {
 		transformer: "lightningcss",

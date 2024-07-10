@@ -40,24 +40,20 @@ function convertNavItems(items: NavItem[]): ListingItem[] {
 	let convertedItems: ListingItem[] = [];
 
 	for (const item of items) {
-		let subitems: ListingItem[] = [];
+		let subitems: ListingItem[] | undefined = undefined;
 
-		if (item.subitems) {
-			subitems.push.apply([], convertNavItems(item.subitems));
+		if (item.subitems && item.subitems.length > 0) {
+			subitems = convertNavItems(item.subitems);
 		}
 
 		convertedItems.push({
 			label: item.label,
-			identifier: item.id,
+			identifier: item.href,
 			subitems,
 		});
 	}
 
 	return convertedItems;
-}
-
-function retrieveListingItem(book: Book, identifier: string): NavItem {
-	return book.navigation.get("#" + identifier);
 }
 
 interface InnerData {
@@ -111,7 +107,7 @@ export class ePubViewer implements DocumentViewer {
 					});
 
 					view.render(convertNavItems(navigation.toc), (identifier) => {
-						rendition.display(retrieveListingItem(book, identifier).href);
+						rendition.display(identifier);
 					}, metadata.title, metadata.language);
 					progress.render([this.course, initialProgress], this.document_index);
 

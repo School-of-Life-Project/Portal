@@ -146,10 +146,11 @@ export class ProgressManager {
 
 		const timeDisplay = new TimeProgressMeter();
 		this.timerContainer.appendChild(timeDisplay.element);
+		this.#completion.time_spent = course[1].time_spent;
 
 		this.#intervalId = window.setInterval(() => {
-			if (this.#completion && this.#completion.time_spent) {
-				this.#completion.time_spent += this.#completion?.time_spent + 1;
+			if (this.#completion && typeof this.#completion.time_spent == "number") {
+				this.#completion.time_spent += 1;
 				setCourseCompletion(course[0].uuid, this.#completion);
 				timeDisplay.update(this.#completion.time_spent);
 			}
@@ -279,7 +280,7 @@ export class ProgressManager {
 				}
 
 				if (!this.#completedSections.has(chapter.root)) {
-					firstIncomplete = true;
+					firstIncomplete = false;
 				}
 			} else {
 				// If the chapter has no root, treat individual sections as if they were chapters
