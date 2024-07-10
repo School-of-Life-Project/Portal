@@ -22,6 +22,8 @@ export class ViewManager {
 
 		this.#styleContainer = document.createElement("style");
 		window.document.head.appendChild(this.#styleContainer);
+
+		this.reset();
 	}
 	render(listing?: ListingItem[], callback?: ListingCallback, title?: string, language?: string) {
 		if (language) {
@@ -335,7 +337,14 @@ export class ProgressManager {
 }
 
 export interface DocumentViewer {
-	new(course: Course, document_index: number, initialProgress: CourseCompletionData): Promise<DocumentViewer>;
-	render(view: ViewManager, progress: ProgressManager): Promise<null>;
-	destroy(): Promise<null>;
+	course: Course,
+	document_index: number,
+	rendered: boolean,
+	destroyed: boolean,
+	render(view: ViewManager, progress: ProgressManager, initialProgress: CourseCompletionData): Promise<null | void>;
+	destroy(view: ViewManager, progress: ProgressManager): Promise<null | void>;
+}
+
+export interface DocumentViewerConstructor {
+	new(course: Course, document_index: number): DocumentViewer;
 }
