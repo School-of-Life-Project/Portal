@@ -1,4 +1,4 @@
-import { getCourse } from "./bindings.ts";
+import { displayError, getCourse } from "./bindings.ts";
 import { ePubViewer } from "./viewer/epub";
 import { DocumentViewer, ProgressManager, ViewManager } from "./viewer/shared.ts";
 
@@ -25,6 +25,8 @@ function loadCourse(view: ViewManager, progress: ProgressManager, uuid: string) 
 			if (Array.isArray(result)) {
 				viewer = new ePubViewer(result[0], 0);
 				viewer.render(view, progress, result[1]);
+			} else {
+				displayError(result);
 			}
 		});
 	}

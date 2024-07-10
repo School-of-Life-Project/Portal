@@ -86,6 +86,15 @@ export async function openDataDir(): PromiseResult<null> {
 	}
 }
 
+export function displayError(error: Error) {
+	const params = new URLSearchParams();
+
+	params.set("message", error.message);
+	params.set("cause", error.cause);
+
+	window.location.assign("/error.html?" + params.toString());
+}
+
 export async function getCourseMaps(): PromiseResult<Array<Result<CourseMap>>> {
 	try {
 		return await invoke("get_course_maps");
