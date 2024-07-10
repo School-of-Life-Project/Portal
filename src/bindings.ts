@@ -60,9 +60,6 @@ export interface Result<Type> {
 	Err?: Error,
 }
 
-export type FlatResult<Type> = Type | Error;
-type PromiseResult<Type> = Promise<FlatResult<Type>>;
-
 export interface Error {
 	message: string,
 	cause: string,
@@ -70,20 +67,32 @@ export interface Error {
 
 function convertBackendAsyncError(error: Error | string | any): Error {
 	if (typeof error === "object") {
-		return error;
-	} else {
+		if (error.message && error.cause) {
+			return error;
+		} else {
+			return {
+				message: "Unable to perform internal API call",
+				cause: JSON.stringify(error),
+			};
+		}
+	} else if (typeof error === "string") {
 		return {
 			message: "Unable to perform internal API call",
 			cause: error,
 		};
+	} else {
+		return {
+			message: "Unable to perform internal API call",
+			cause: JSON.stringify(error),
+		};
 	}
 }
 
-export async function openDataDir(): PromiseResult<null> {
+export async function openDataDir(): Promise<null> {
 	try {
 		return await invoke("open_data_dir");
 	} catch (error) {
-		return convertBackendAsyncError(error);
+		throw convertBackendAsyncError(error);
 	}
 }
 
@@ -96,33 +105,33 @@ export function displayError(error: Error) {
 	window.location.assign("/error.html?" + params.toString());
 }
 
-export async function getCourseMaps(): PromiseResult<Array<Result<CourseMap>>> {
+export async function getCourseMaps(): Promise<Array<Result<CourseMap>>> {
 	try {
 		return await invoke("get_course_maps");
 	} catch (error) {
-		return convertBackendAsyncError(error);
+		throw convertBackendAsyncError(error);
 	}
 }
 
-export async function getCourses(): PromiseResult<Array<Result<[Course, CourseProgress]>>> {
+export async function getCourses(): Promise<Array<Result<[Course, CourseProgress]>>> {
 	try {
 		return await invoke("get_courses");
 	} catch (error) {
-		return convertBackendAsyncError(error);
+		throw convertBackendAsyncError(error);
 	}
 }
 
-export async function getCoursesActive(): PromiseResult<Array<Result<[Course, CourseProgress]>>> {
+export async function getCoursesActive(): Promise<Array<Result<[Course, CourseProgress]>>> {
 	try {
 		return await invoke("get_courses_active");
 	} catch (error) {
-		return convertBackendAsyncError(error);
+		throw convertBackendAsyncError(error);
 	}
 }
 
-export async function getCourse(uuid: string): PromiseResult<[Course, CourseCompletionData]> {
+export async function getCourse(uuid: string): Promise<[Course, CourseCompletionData]> {
 	try {
-		const course: FlatResult<[Course, CourseCompletionData]> = await invoke("get_course", { id: uuid });
+		const course: [Course, CourseCompletionData] = await invoke("get_course", { id: uuid });
 		if (Array.isArray(course)) {
 			if (course[0].books) {
 				for (const book of course[0].books) {
@@ -132,54 +141,54 @@ export async function getCourse(uuid: string): PromiseResult<[Course, CourseComp
 		}
 		return course;
 	} catch (error) {
-		return convertBackendAsyncError(error);
+		throw convertBackendAsyncError(error);
 	}
 }
 
-export async function setCourseCompletion(uuid: string, completion: CourseCompletionData): PromiseResult<null> {
+export async function setCourseCompletion(uuid: string, completion: CourseCompletionData): Promise<null> {
 	try {
 		return await invoke("set_course_completion", {
 			id: uuid,
 			data: completion
 		});
 	} catch (error) {
-		return convertBackendAsyncError(error);
+		throw convertBackendAsyncError(error);
 	}
 }
 
-export async function setCourseActiveStatus(uuid: string, active: boolean): PromiseResult<null> {
+export async function setCourseActiveStatus(uuid: string, active: boolean): Promise<null> {
 	try {
 		return await invoke("set_course_active_status", {
 			id: uuid,
 			data: active
 		});
 	} catch (error) {
-		return convertBackendAsyncError(error);
+		throw convertBackendAsyncError(error);
 	}
 }
 
-export async function getOverallProgress(): PromiseResult<OverallProgress> {
+export async function getOverallProgress(): Promise<OverallProgress> {
 	try {
 		return await invoke("get_overall_progress");
 	} catch (error) {
-		return convertBackendAsyncError(error);
+		throw convertBackendAsyncError(error);
 	}
 }
 
-export async function getSettings(): PromiseResult<Settings> {
+export async function getSettings(): Promise<Settings> {
 	try {
 		return await invoke("get_settings");
 	} catch (error) {
-		return convertBackendAsyncError(error);
+		throw convertBackendAsyncError(error);
 	}
 }
 
-export async function setSettings(settings: Settings): PromiseResult<null> {
+export async function setSettings(settings: Settings): Promise<null> {
 	try {
 		return await invoke("set_settings", {
 			data: settings
 		});
 	} catch (error) {
-		return convertBackendAsyncError(error);
+		throw convertBackendAsyncError(error);
 	}
 }

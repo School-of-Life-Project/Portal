@@ -1,4 +1,4 @@
-import { displayError, getCourse } from "./bindings.ts";
+import { displayError, Error, getCourse } from "./bindings.ts";
 import { ePubViewer } from "./viewer/epub";
 import { DocumentViewer, ProgressManager, ViewManager } from "./viewer/shared.ts";
 
@@ -22,12 +22,16 @@ function loadCourse(view: ViewManager, progress: ProgressManager, uuid: string) 
 		viewer = null;
 	} else {
 		return getCourse(uuid).then((result) => {
-			if (Array.isArray(result)) {
-				viewer = new ePubViewer(result[0], 0);
-				viewer.render(view, progress, result[1]);
-			} else {
-				displayError(result);
-			}
+
+			viewer = new ePubViewer(result[0], 0);
+			viewer.render(view, progress, result[1]).catch((error) => {
+				displayError({
+					message: "Unable to display document",
+					cause: JSON.stringify(error),
+				});
+			});
+		}).catch((error: Error) => {
+			displayError(error);
 		});
 	}
 }

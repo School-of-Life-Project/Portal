@@ -1,4 +1,4 @@
-import { Course, Textbook, setCourseCompletion, CourseCompletionData, Chapter, displayError } from "../bindings.ts";
+import { Course, Textbook, setCourseCompletion, CourseCompletionData, Chapter, displayError, Error } from "../bindings.ts";
 import { TimeProgressMeter } from "../graphing.ts";
 
 export interface ListingItem {
@@ -125,10 +125,8 @@ export class ViewManager {
 }
 
 function updateCompletion(uuid: string, completion: CourseCompletionData) {
-	setCourseCompletion(uuid, completion).then((result) => {
-		if (result) {
-			displayError(result);
-		}
+	setCourseCompletion(uuid, completion).catch((error: Error) => {
+		displayError(error);
 	});
 }
 
