@@ -1,0 +1,29 @@
+body {
+	margin: 2em;
+	background-color: slategray;
+}
+
+h1 {
+	margin-top: 0;
+}
+
+a {
+	color: darkblue;
+}
+
+section {
+	font: 1em monospace;
+	background-color: lightcoral;
+	border: 0.15em solid black;
+	border-radius: 0.5em;
+	box-sizing: border-box;
+	padding: 2em;
+	max-width: 60em;
+	margin-bottom: 4em;
+	margin: auto;
+}
+
+section footer {
+	margin-top: 2em;
+	border-top: 0.2em solid black;
+}

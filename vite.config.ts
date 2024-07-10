@@ -25,6 +25,7 @@ export default defineConfig({
 			input: {
 				main: resolve(__dirname, 'index.html'),
 				epub: resolve(__dirname, 'epub.html'),
+				error: resolve(__dirname, 'error.html'),
 			}
 		}
 	},

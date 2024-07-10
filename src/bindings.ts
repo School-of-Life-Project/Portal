@@ -1,8 +1,9 @@
 import { invoke, convertFileSrc } from '@tauri-apps/api/tauri';
 
-// Relevant backend source files:
-// - src/api/mod.rs
-// - src/api/wrapper.rs
+// Relevant source files:
+// - /src-tauri/src/api/mod.rs
+// - /src-tauri/src/api/wrapper.rs
+// - /error.html
 
 export interface CourseMap {
 	uuid: string,
