@@ -154,6 +154,7 @@ export class ProgressManager {
 		this.timerContainer.appendChild(timeDisplay.element);
 		this.#completion.time_spent = course[1].time_spent;
 
+		timeDisplay.update(this.#completion.time_spent);
 		this.#intervalId = window.setInterval(() => {
 			if (this.#completion && typeof this.#completion.time_spent == "number") {
 				this.#completion.time_spent += 15;
