@@ -5,6 +5,7 @@ use std::{
 
 use chrono::{NaiveDate, Utc};
 use serde::{Deserialize, Serialize};
+use serde_with::{serde_as, DisplayFromStr};
 use uuid::Uuid;
 
 mod state;
@@ -93,16 +94,19 @@ struct Chapter {
 }
 
 /// The raw data used to keep track of ``Course`` completion
+#[serde_as]
 #[derive(Serialize, Deserialize, Debug, Default)]
 #[serde(default)]
 pub struct CourseCompletion {
     /// If the course has a manually marked completion status
     completed: Option<bool>,
     /// A list of all completed section-ids within each textbook within the course.
+    #[serde_as(as = "HashMap<DisplayFromStr, _>")]
     book_sections: HashMap<usize, HashSet<String>>,
     /// The total amount of time spent in this course, in seconds.
     time_spent: i64,
     /// The raw data used to keep track of the viewer's current position within a textbook.
+    #[serde_as(as = "HashMap<DisplayFromStr, _>")]
     position: HashMap<usize, String>,
 }
 
