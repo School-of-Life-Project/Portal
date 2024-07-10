@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<style>
+			body {
+				margin: 2em;
+				background-color: slategray;
+			}
+
+			h1 {
+				margin-top: 0;
+			}
+
+			a {
+				color: darkblue;
+			}
+
+			section {
+				font: 1em monospace;
+				background-color: lightcoral;
+				border: 0.15em solid black;
+				border-radius: 0.5em;
+				box-sizing: border-box;
+				padding: 2em;
+				max-width: 60em;
+				margin-bottom: 4em;
+				margin: auto;
+			}
+
+			section footer {
+				border-top: 0.2em solid black;
+			}
+
+		</style>
+	</head>
+
+	<body>
+		<section>
+			<h1>🛑 Error: <span id="message">Unspecified</span></h1>
+			<p>Cause: <span id="cause">unknown</span></p>
+			<footer>
+				<p>It is recommended (but not required) that you restart the application.</p>
+				<p>If you believe this error was caused by a bug in the application, please <a
+						href="javascript:window.__TAURI_INVOKE__('open_project_issue_tracker', {data: true})">file an
+						issue</a>.</p>
+				<p>Other useful links:</p>
+				<ul>
+					<li><a href="/index.html">🚪 Return to application homepage</a></li>
+					<li><a href="javascript:history.back()">🔙 Return to previous page (not recommended)</a></li>
+					<li><a href="javascript:window.__TAURI_INVOKE__('open_data_dir')">📂 Open application data
+							folder</a></li>
+					<li><a href="javascript:window.__TAURI_INVOKE__('open_project_repo')">🔗 View the application's
+							source code</a></li>
+					<li><a href="javascript:window.__TAURI_INVOKE__('open_project_issue_tracker', {data: false})">🔗
+							View the
+							application's issue tracker</a></li>
+				</ul>
+			</footer>
+		</section>
+		<script>
+			const params = new URLSearchParams(window.location.search);
+			const message = params.get("message");
+			const cause = params.get("cause");
+
+			if (message) {
+				document.getElementById("message").innerText = message;
+			}
+
+			if (cause) {
+				document.getElementById("cause").innerText = cause;
+			}
+		</script>
+	</body>
+
+</html>

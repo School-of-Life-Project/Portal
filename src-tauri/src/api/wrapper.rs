@@ -65,6 +65,42 @@ pub async fn open_data_dir(state: tauri::State<'_, StateWrapper>) -> Result<(), 
 }
 
 #[tauri::command]
+pub async fn open_project_issue_tracker(
+    state: tauri::State<'_, StateWrapper>,
+    data: bool,
+) -> Result<(), ErrorWrapper> {
+    let state = state.state().await?;
+
+    #[allow(clippy::match_bool)]
+    let url = match data {
+        true => crate::PROJECT_ISSUE_TRACKER_NEW,
+        false => crate::PROJECT_ISSUE_TRACKER,
+    };
+    open::that_detached(url).map_err(|e| {
+        ErrorWrapper::new(
+            format!("Unable to launch OS opener for {:?}", &state.data_dir),
+            &e,
+        )
+    })?;
+
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn open_project_repo(state: tauri::State<'_, StateWrapper>) -> Result<(), ErrorWrapper> {
+    let state = state.state().await?;
+
+    open::that_detached(crate::PROJECT_SOURCE_REPO).map_err(|e| {
+        ErrorWrapper::new(
+            format!("Unable to launch OS opener for {:?}", &state.data_dir),
+            &e,
+        )
+    })?;
+
+    Ok(())
+}
+
+#[tauri::command]
 pub async fn get_course_maps(
     state: tauri::State<'_, StateWrapper>,
 ) -> Result<Vec<Result<CourseMap, ErrorWrapper>>, ErrorWrapper> {

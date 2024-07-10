@@ -10,11 +10,18 @@ use api::wrapper;
 
 const IDENTIFIER: &str = "com.schoolOfLifeProject.Portal";
 
+const PROJECT_ISSUE_TRACKER: &str = "https://github.com/School-of-Life-Project/Portal-App/issues";
+const PROJECT_ISSUE_TRACKER_NEW: &str =
+    "https://github.com/School-of-Life-Project/Portal-App/issues/new";
+const PROJECT_SOURCE_REPO: &str = "https://github.com/School-of-Life-Project/Portal-App";
+
 fn main() -> Result<()> {
     tauri::Builder::default()
         .manage(wrapper::StateWrapper::new())
         .invoke_handler(tauri::generate_handler![
             wrapper::open_data_dir,
+            wrapper::open_project_issue_tracker,
+            wrapper::open_project_repo,
             wrapper::get_course_maps,
             wrapper::get_courses,
             wrapper::get_courses_active,
