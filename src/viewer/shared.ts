@@ -159,11 +159,11 @@ export class ProgressManager {
 		timeDisplay.update(this.#completion.time_spent);
 		this.#intervalId = window.setInterval(() => {
 			if (this.#completion && typeof this.#completion.time_spent == "number") {
-				this.#completion.time_spent += 15;
+				this.#completion.time_spent += 5;
 				updateCompletion(course[0].uuid, this.#completion);
 				timeDisplay.update(this.#completion.time_spent);
 			}
-		}, 15000);
+		}, 5000);
 
 		this.rendered = true;
 	}
@@ -344,6 +344,11 @@ export class ProgressManager {
 			} else {
 				element.parentElement?.scrollIntoView({ block: "start" });
 			}
+		}
+	}
+	savePosition(document_index: number, position: string) {
+		if (this.#completion && this.rendered) {
+			this.#completion.position[document_index] = position;
 		}
 	}
 }

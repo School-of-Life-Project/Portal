@@ -93,7 +93,7 @@ export class ePubViewer implements DocumentViewer {
 					allowScriptedContent: true
 				});
 
-				return rendition.display().then(() => {
+				return rendition.display(initialProgress.position[this.document_index]).then(() => {
 					rendition.on('locationChanged', (location: any) => {
 						if (location.start) {
 							if (location.href) {
@@ -102,6 +102,8 @@ export class ePubViewer implements DocumentViewer {
 								if (chapter) {
 									view.highlightListingItem(chapter.id);
 								}
+
+								progress.savePosition(this.document_index, location.start);
 							}
 						}
 					});
