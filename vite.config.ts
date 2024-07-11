@@ -1,5 +1,6 @@
 import { resolve } from "path";
 import { defineConfig } from "vite";
+import eslint from "vite-plugin-eslint";
 
 export default defineConfig({
 	// prevent vite from obscuring rust errors
@@ -30,11 +31,14 @@ export default defineConfig({
 			input: {
 				main: resolve(__dirname, "index.html"),
 				epub: resolve(__dirname, "epub.html"),
+				pdf: resolve(__dirname, "pdf.html"),
 				error: resolve(__dirname, "error.html"),
 			},
 		},
+		chunkSizeWarningLimit: 600,
 	},
 	css: {
 		transformer: "lightningcss",
 	},
+	plugins: [eslint()],
 });
