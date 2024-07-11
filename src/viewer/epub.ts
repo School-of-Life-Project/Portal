@@ -46,7 +46,7 @@ function getChapter(
 				.canonical(chapter.href)
 				.includes(book.canonical(locationHref));
 		}, null)
-		.reduce((result: any, chapter) => {
+		.reduce((result: NavItem | null, chapter) => {
 			const locationAfterChapter =
 				EpubCFI.prototype.compare(
 					location_cfi,
@@ -58,8 +58,16 @@ function getChapter(
 	return match;
 }
 
+interface EventLocation {
+	index: number;
+	href: string;
+	start: string;
+	end: string;
+	percentage: number;
+}
+
 function convertNavItems(items: NavItem[]): ListingItem[] {
-	let convertedItems: ListingItem[] = [];
+	const convertedItems: ListingItem[] = [];
 
 	for (const item of items) {
 		let subitems: ListingItem[] | undefined = undefined;
@@ -127,7 +135,7 @@ export class ePubViewer implements DocumentViewer {
 					return rendition
 						.display(initialProgress.position[this.document_index])
 						.then(() => {
-							rendition.on("locationChanged", (location: any) => {
+							rendition.on("locationChanged", (location: EventLocation) => {
 								if (location.start) {
 									if (location.href) {
 										const chapter = getChapter(book, {
@@ -159,7 +167,7 @@ export class ePubViewer implements DocumentViewer {
 
 							if (this.#inner) {
 								this.#inner.resizeObserver = new ResizeObserver((_event) => {
-									// @ts-ignore
+									// @ts-expect-error need to call rendition.resize() with zero arguments to resize without providing a specific length and height
 									rendition.resize();
 								});
 								this.#inner.resizeObserver.observe(view.contentContainer);

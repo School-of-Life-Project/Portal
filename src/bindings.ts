@@ -65,16 +65,9 @@ export interface Error {
 	cause: string;
 }
 
-function convertBackendAsyncError(error: Error | string | any): Error {
-	if (typeof error === "object") {
-		if (error.message && error.cause) {
-			return error;
-		} else {
-			return {
-				message: "Unable to perform internal API call",
-				cause: JSON.stringify(error),
-			};
-		}
+function convertBackendAsyncError(error: Error | string | unknown): Error {
+	if (error instanceof Error) {
+		return error as Error;
 	} else if (typeof error === "string") {
 		return {
 			message: "Unable to perform internal API call",
