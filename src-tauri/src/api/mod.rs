@@ -52,16 +52,6 @@ impl Course {
             book.file = PathBuf::from("hidden");
         }
     }
-    /// Get a list of all files included in a ``Course``
-    fn get_resources(&self) -> Vec<&PathBuf> {
-        let mut files = Vec::with_capacity(self.books.len());
-
-        for book in &self.books {
-            files.push(&book.file);
-        }
-
-        files
-    }
 }
 
 /// A Textbook within a ``Course``

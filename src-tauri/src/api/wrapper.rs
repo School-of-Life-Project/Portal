@@ -144,23 +144,27 @@ pub async fn get_course(
 ) -> Result<(Course, CourseCompletion), ErrorWrapper> {
     let state: &State = state.state().await?;
 
-    let (course, progress) = state
+    let (mut course, progress) = state
         .get_course(id)
         .await
         .map_err(|e| ErrorWrapper::new(format!("Unable to get Course {id}"), &e))?;
 
     let scope = app_handle.asset_protocol_scope();
 
-    for path in course.get_resources() {
-        if let Ok(metadata) = fs::metadata(path).await {
+    for book in &mut course.books {
+        if let Ok(metadata) = fs::metadata(&book.file).await {
             if metadata.is_dir() {
-                scope.allow_directory(path, true)
+                book.file.push("");
+                scope.allow_directory(&book.file, true)
             } else {
-                scope.allow_file(path)
+                scope.allow_file(&book.file)
             }
             .map_err(|e| {
                 ErrorWrapper::new(
-                    format!("Unable to update renderer permissions for path {path:?}"),
+                    format!(
+                        "Unable to update renderer permissions for path {:?}",
+                        &book.file
+                    ),
                     &e,
                 )
             })?;

@@ -135,7 +135,11 @@ export async function getCourse(uuid: string): Promise<[Course, CourseCompletion
 		if (Array.isArray(course)) {
 			if (course[0].books) {
 				for (const book of course[0].books) {
-					book.file = convertFileSrc(book.file);
+					if (book.file.endsWith("/")) {
+						book.file = convertFileSrc(book.file.slice(undefined, book.file.length - 1)) + "/";
+					} else {
+						book.file = convertFileSrc(book.file);
+					}
 				}
 			}
 		}
