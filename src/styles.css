@@ -22,8 +22,12 @@
 	--primary-border: 0.1em solid var(--primary-border-color);
 	--secondary-border: 0.1em solid var(--secondary-border-color);
 
+	--primary-shadow: 0.04lh 0.04lh 0.12lh var(--primary-border-color);
+	--secondary-shadow: 0.03lh 0.03lh 0.09lh var(--primary-border-color);
+	--tertiary-shadow: 0.02lh 0.02lh 0.06lh var(--primary-border-color);
+
 	--time-progress-color: oklch(50% 0.16 140);
-	--chapter-progress-color: oklch(50% 0.16 calc(140 - (360/3)));
+	--chapter-progress-color: oklch(50% 0.16 calc(140 - (360 / 3)));
 
 	--form-card-color: oklch(95% 0.03 75);
 	--form-card-title-color: oklch(92.5% 0.03 calc(360 - 75));
@@ -84,7 +88,6 @@
 		}
 
 		@layer {
-
 			:scope.hourly-progress-map tbody td,
 			:scope.daily-time-progress-map tbody td {
 				background-color: oklch(from var(--time-progress-color) 2.5% c h / 0.1);
@@ -92,7 +95,9 @@
 
 			:scope.chapter-progress-map tbody td,
 			:scope.daily-chapter-progress-map tbody td {
-				background-color: oklch(from var(--chapter-progress-color) 2.5% c h / 0.1);
+				background-color: oklch(
+					from var(--chapter-progress-color) 2.5% c h / 0.1
+				);
 			}
 
 			:scope.hourly-progress-map .in-progress {
@@ -121,7 +126,9 @@
 			}
 
 			:scope.chapter-progress-map .in-progress {
-				background-color: oklch(from var(--chapter-progress-color) l c h / 0.55);
+				background-color: oklch(
+					from var(--chapter-progress-color) l c h / 0.55
+				);
 			}
 
 			:scope.daily-chapter-progress-map .level-1 {
@@ -129,7 +136,9 @@
 			}
 
 			:scope.daily-chapter-progress-map .level-2 {
-				background-color: oklch(from var(--chapter-progress-color) l c h / 0.75);
+				background-color: oklch(
+					from var(--chapter-progress-color) l c h / 0.75
+				);
 			}
 
 			:scope.daily-chapter-progress-map .level-3,
@@ -156,7 +165,6 @@
 	}
 
 	@scope (.app-page) to (#contentViewer > *) {
-
 		header,
 		#contentListing,
 		#contentViewer {
@@ -259,7 +267,7 @@
 				}
 
 				li {
-					margin: calc((1lh - 1ch)/2) 0;
+					margin: calc((1lh - 1ch) / 2) 0;
 				}
 
 				footer {
@@ -358,6 +366,15 @@
 			white-space: nowrap;
 		}
 
+		section,
+		nav.related a {
+			box-shadow: var(--primary-shadow);
+		}
+
+		.subsection {
+			box-shadow: var(--secondary-shadow);
+		}
+
 		@media (max-width: calc(692px + 3lh)) {
 			.progress-map .expanded-data {
 				display: none;
@@ -373,6 +390,11 @@
 			font-size: 0.8em;
 			padding: var(--button-padding);
 			cursor: pointer;
+			box-shadow: var(--tertiary-shadow);
+		}
+
+		input {
+			box-shadow: inset var(--tertiary-shadow);
 		}
 
 		svg button[type="button"],
@@ -403,6 +425,7 @@
 			padding: var(--button-padding);
 			margin-left: 0.5lh;
 			text-decoration: none;
+			box-shadow: var(--primary-shadow);
 			white-space: nowrap;
 		}
 
@@ -412,11 +435,13 @@
 			border-radius: var(--card-border-radius);
 			background-color: var(--form-card-color);
 			margin: 1lh 0;
+			box-shadow: var(--primary-shadow);
 		}
 
 		fieldset legend {
 			background-color: var(--form-card-title-color);
 			padding: 0.15lh 0.3lh;
+			box-shadow: var(--secondary-shadow);
 		}
 
 		textarea {
@@ -426,6 +451,11 @@
 			border-radius: var(--card-border-radius);
 			font: 1em monospace;
 			box-sizing: border-box;
+		}
+
+		input,
+		textarea {
+			box-shadow: inset var(--tertiary-shadow);
 		}
 	}
 }

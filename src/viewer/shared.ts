@@ -1,10 +1,18 @@
-import { Course, Textbook, setCourseCompletion, CourseCompletionData, Chapter, displayError, Error } from "../bindings.ts";
+import {
+	Course,
+	Textbook,
+	setCourseCompletion,
+	CourseCompletionData,
+	Chapter,
+	displayError,
+	Error,
+} from "../bindings.ts";
 import { TimeProgressMeter } from "../graphing.ts";
 
 export interface ListingItem {
-	label: string,
-	identifier?: string,
-	subitems?: ListingItem[],
+	label: string;
+	identifier?: string;
+	subitems?: ListingItem[];
 }
 
 export type ListingCallback = (identifier: string) => void;
@@ -15,7 +23,11 @@ export class ViewManager {
 	contentContainer: HTMLElement;
 	#styleContainer: HTMLStyleElement;
 	rendered = false;
-	constructor (titleContainer: HTMLElement, listingContainer: HTMLElement, contentContainer: HTMLElement) {
+	constructor(
+		titleContainer: HTMLElement,
+		listingContainer: HTMLElement,
+		contentContainer: HTMLElement,
+	) {
 		this.titleContainer = titleContainer;
 		this.listingContainer = listingContainer;
 		this.contentContainer = contentContainer;
@@ -25,7 +37,12 @@ export class ViewManager {
 
 		this.reset();
 	}
-	render(listing?: ListingItem[], callback?: ListingCallback, title?: string, language?: string) {
+	render(
+		listing?: ListingItem[],
+		callback?: ListingCallback,
+		title?: string,
+		language?: string,
+	) {
 		if (language) {
 			this.titleContainer.setAttribute("lang", language);
 			this.listingContainer.setAttribute("lang", language);
@@ -41,7 +58,7 @@ export class ViewManager {
 		}
 
 		this.rendered = true;
-	};
+	}
 	reset() {
 		this.titleContainer.innerHTML = "";
 		this.listingContainer.innerHTML = "";
@@ -54,7 +71,10 @@ export class ViewManager {
 
 		this.rendered = false;
 	}
-	#buildListingLabel(item: ListingItem, callback: ListingCallback): HTMLAnchorElement | HTMLSpanElement {
+	#buildListingLabel(
+		item: ListingItem,
+		callback: ListingCallback,
+	): HTMLAnchorElement | HTMLSpanElement {
 		let element;
 		if (item.identifier) {
 			element = document.createElement("a");
@@ -80,7 +100,10 @@ export class ViewManager {
 
 		return element;
 	}
-	#buildListing(listing: ListingItem[], callback: ListingCallback): HTMLOListElement {
+	#buildListing(
+		listing: ListingItem[],
+		callback: ListingCallback,
+	): HTMLOListElement {
 		const root = document.createElement("ol");
 
 		for (const item of listing) {
@@ -111,10 +134,16 @@ export class ViewManager {
 			return;
 		}
 
-		this.#styleContainer.innerHTML = "#" + CSS.escape(identifier) + " {font-weight: bold}";
+		this.#styleContainer.innerHTML =
+			"#" + CSS.escape(identifier) + " {font-weight: bold}";
 
-		let currentElement = window.document.getElementById(identifier)?.parentElement?.parentElement;
-		while (currentElement && currentElement.parentElement && currentElement.parentElement != this.listingContainer) {
+		let currentElement =
+			window.document.getElementById(identifier)?.parentElement?.parentElement;
+		while (
+			currentElement &&
+			currentElement.parentElement &&
+			currentElement.parentElement != this.listingContainer
+		) {
 			currentElement = currentElement.parentElement;
 
 			if (currentElement.tagName == "DETAILS") {
@@ -137,7 +166,7 @@ export class ProgressManager {
 	manager: ViewManager;
 	timerContainer: HTMLElement;
 	rendered = false;
-	constructor (view: ViewManager, timerContainer: HTMLElement) {
+	constructor(view: ViewManager, timerContainer: HTMLElement) {
 		this.manager = view;
 		this.timerContainer = timerContainer;
 	}
@@ -148,7 +177,10 @@ export class ProgressManager {
 
 		this.#completion = course[1];
 		this.#completedSections = new Set(course[1].book_sections[document_index]);
-		this.#buildListingProgressTracker({ course: course[0], progress: this.#completion }, document_index);
+		this.#buildListingProgressTracker(
+			{ course: course[0], progress: this.#completion },
+			document_index,
+		);
 
 		const timeDisplay = new TimeProgressMeter();
 		this.timerContainer.appendChild(timeDisplay.element);
@@ -179,7 +211,10 @@ export class ProgressManager {
 		this.timerContainer.innerHTML = "";
 		this.rendered = false;
 	}
-	#buildListingProgressTracker(course: { course: Course, progress: CourseCompletionData; }, document_index: number) {
+	#buildListingProgressTracker(
+		course: { course: Course; progress: CourseCompletionData },
+		document_index: number,
+	) {
 		const textbook = course.course.books[document_index];
 
 		for (const chapter of textbook.chapters) {
@@ -187,43 +222,67 @@ export class ProgressManager {
 				const element = document.getElementById(chapter.root);
 
 				if (element && element.parentElement) {
-					element.parentElement.appendChild(this.#buildCheckbox(this.#completedSections.has(chapter.root), (event) => {
-						if (chapter.root && this.#completion && event.target) {
-							if ((<HTMLInputElement>event.target).checked) {
-								this.#completedSections.add(chapter.root);
-							} else {
-								this.#completedSections.delete(chapter.root);
-							}
-							this.#completion.book_sections[document_index] = Array.from(this.#completedSections);
-							this.#showNextChapter(textbook, chapter.root);
-							updateCompletion(course.course.uuid, this.#completion);
-						}
-					}));
+					element.parentElement.appendChild(
+						this.#buildCheckbox(
+							this.#completedSections.has(chapter.root),
+							(event) => {
+								if (chapter.root && this.#completion && event.target) {
+									if ((<HTMLInputElement>event.target).checked) {
+										this.#completedSections.add(chapter.root);
+									} else {
+										this.#completedSections.delete(chapter.root);
+									}
+									this.#completion.book_sections[document_index] = Array.from(
+										this.#completedSections,
+									);
+									this.#showNextChapter(textbook, chapter.root);
+									updateCompletion(course.course.uuid, this.#completion);
+								}
+							},
+						),
+					);
 				}
 			}
-			this.#buildSectionProgressTracker(course.course.uuid, textbook, chapter, document_index);
+			this.#buildSectionProgressTracker(
+				course.course.uuid,
+				textbook,
+				chapter,
+				document_index,
+			);
 		}
 
 		this.#showNextChapter(textbook, undefined, true);
 	}
-	#buildSectionProgressTracker(uuid: string, textbook: Textbook, chapter: Chapter, document_index: number) {
+	#buildSectionProgressTracker(
+		uuid: string,
+		textbook: Textbook,
+		chapter: Chapter,
+		document_index: number,
+	) {
 		for (const sectionGroup of chapter.sections) {
 			for (const section of sectionGroup) {
 				const element = document.getElementById(section);
 
 				if (element && element.parentElement) {
-					element.parentElement.appendChild(this.#buildCheckbox(this.#completedSections.has(section), (event) => {
-						if (this.#completion && event.target) {
-							if ((<HTMLInputElement>event.target).checked) {
-								this.#completedSections.add(section);
-							} else {
-								this.#completedSections.delete(section);
-							}
-							this.#updateChapterCompletion(textbook, chapter);
-							this.#completion.book_sections[document_index] = Array.from(this.#completedSections);
-							updateCompletion(uuid, this.#completion);
-						}
-					}));
+					element.parentElement.appendChild(
+						this.#buildCheckbox(
+							this.#completedSections.has(section),
+							(event) => {
+								if (this.#completion && event.target) {
+									if ((<HTMLInputElement>event.target).checked) {
+										this.#completedSections.add(section);
+									} else {
+										this.#completedSections.delete(section);
+									}
+									this.#updateChapterCompletion(textbook, chapter);
+									this.#completion.book_sections[document_index] = Array.from(
+										this.#completedSections,
+									);
+									updateCompletion(uuid, this.#completion);
+								}
+							},
+						),
+					);
 				}
 			}
 		}
@@ -285,7 +344,13 @@ export class ProgressManager {
 			if (chapter.root) {
 				const element = document.getElementById(chapter.root);
 				if (element) {
-					this.#handleListingItemVisibility(element, this.#completedSections.has(chapter.root), firstIncomplete, chapterId == chapter.root, autoscroll);
+					this.#handleListingItemVisibility(
+						element,
+						this.#completedSections.has(chapter.root),
+						firstIncomplete,
+						chapterId == chapter.root,
+						autoscroll,
+					);
 				}
 
 				if (!this.#completedSections.has(chapter.root)) {
@@ -298,7 +363,13 @@ export class ProgressManager {
 					for (const section of sectionGroup) {
 						const element = document.getElementById(section);
 						if (element) {
-							this.#handleListingItemVisibility(element, this.#completedSections.has(section), firstIncomplete, chapterId == section, autoscroll);
+							this.#handleListingItemVisibility(
+								element,
+								this.#completedSections.has(section),
+								firstIncomplete,
+								chapterId == section,
+								autoscroll,
+							);
 						}
 
 						if (!this.#completedSections.has(section)) {
@@ -309,14 +380,30 @@ export class ProgressManager {
 			}
 		}
 	}
-	#handleListingItemVisibility(element: HTMLElement, completed: boolean, firstIncomplete: boolean, currentItem: boolean, scroll: boolean) {
+	#handleListingItemVisibility(
+		element: HTMLElement,
+		completed: boolean,
+		firstIncomplete: boolean,
+		currentItem: boolean,
+		scroll: boolean,
+	) {
 		if (firstIncomplete) {
-			this.#updateListingItemVisibility(element, !completed, !completed, !completed && scroll);
+			this.#updateListingItemVisibility(
+				element,
+				!completed,
+				!completed,
+				!completed && scroll,
+			);
 		} else if (!(currentItem && !completed)) {
 			this.#updateListingItemVisibility(element, false);
 		}
 	}
-	#updateListingItemVisibility(element: HTMLElement, showItem?: boolean, showItemList?: boolean, scroll?: boolean) {
+	#updateListingItemVisibility(
+		element: HTMLElement,
+		showItem?: boolean,
+		showItemList?: boolean,
+		scroll?: boolean,
+	) {
 		let itemContainer = element?.parentElement?.parentElement;
 
 		if (showItem !== undefined) {
@@ -327,7 +414,11 @@ export class ProgressManager {
 
 		if (showItemList !== undefined) {
 			let currentElement = element?.parentElement?.parentElement?.parentElement;
-			while (currentElement && currentElement.parentElement && currentElement.parentElement != this.manager.listingContainer) {
+			while (
+				currentElement &&
+				currentElement.parentElement &&
+				currentElement.parentElement != this.manager.listingContainer
+			) {
 				currentElement = currentElement.parentElement;
 
 				if (currentElement.tagName == "DETAILS") {
@@ -352,14 +443,18 @@ export class ProgressManager {
 }
 
 export interface DocumentViewer {
-	course: Course,
-	document_index: number,
-	rendered: boolean,
-	destroyed: boolean,
-	render(view: ViewManager, progress: ProgressManager, initialProgress: CourseCompletionData): Promise<null | void>;
+	course: Course;
+	document_index: number;
+	rendered: boolean;
+	destroyed: boolean;
+	render(
+		view: ViewManager,
+		progress: ProgressManager,
+		initialProgress: CourseCompletionData,
+	): Promise<null | void>;
 	destroy(view: ViewManager, progress: ProgressManager): Promise<null | void>;
 }
 
 export interface DocumentViewerConstructor {
-	new(course: Course, document_index: number): DocumentViewer;
+	new (course: Course, document_index: number): DocumentViewer;
 }

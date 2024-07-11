@@ -4,7 +4,7 @@ export class TimeProgressMeter {
 	size: number;
 	element: HTMLTableElement;
 	#dataElements: HTMLTableCellElement[] = [];
-	constructor (min = 0, max = 150, size = 5) {
+	constructor(min = 0, max = 150, size = 5) {
 		this.min = min;
 		this.max = max;
 		this.size = size;
@@ -30,7 +30,8 @@ export class TimeProgressMeter {
 		this.element = root;
 	}
 	update(value = this.min) {
-		const normalizedValue = (value - this.min) / ((this.max - this.min) / this.size);
+		const normalizedValue =
+			(value - this.min) / ((this.max - this.min) / this.size);
 
 		const lowerBound = Math.floor(normalizedValue);
 		const upperBound = Math.floor(normalizedValue + 0.5);
@@ -47,7 +48,6 @@ export class TimeProgressMeter {
 			element.style.cssText = ""; // Ugly hack
 		});
 	}
-
 }
 
 export class BookChapterGraph {
@@ -56,7 +56,7 @@ export class BookChapterGraph {
 	width: number;
 	element: HTMLTableElement;
 	#dataElements: HTMLTableCellElement[] = [];
-	constructor (chapters: number, title?: string, width = 10) {
+	constructor(chapters: number, title?: string, width = 10) {
 		this.title = title;
 		this.chapters = chapters;
 		this.width = width;
@@ -115,6 +115,7 @@ export class BookChapterGraph {
 	}
 }
 
-class LongTermProgressGraph {
+/*class LongTermProgressGraph {
 	// TODO
 }
+*/

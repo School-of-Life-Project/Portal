@@ -1,4 +1,4 @@
-import { invoke, convertFileSrc } from '@tauri-apps/api/tauri';
+import { invoke, convertFileSrc } from "@tauri-apps/api/tauri";
 
 // Relevant source files:
 // - /src-tauri/src/api/mod.rs
@@ -6,49 +6,49 @@ import { invoke, convertFileSrc } from '@tauri-apps/api/tauri';
 // - /error.html
 
 export interface CourseMap {
-	uuid: string,
+	uuid: string;
 	// TODO
 }
 
 export interface Course {
-	uuid: string,
-	title: string,
-	description?: string,
-	books: Textbook[],
+	uuid: string;
+	title: string;
+	description?: string;
+	books: Textbook[];
 }
 
 export interface Textbook {
-	label: string,
-	file: string,
-	chapters: Chapter[],
+	label: string;
+	file: string;
+	chapters: Chapter[];
 }
 
 export interface Chapter {
-	root?: string,
-	sections: Array<Array<string>>,
+	root?: string;
+	sections: Array<Array<string>>;
 }
 
 export interface CourseCompletionData {
-	completed?: boolean,
-	book_sections: Record<number, string[]>,
-	time_spent: number,
-	position: Record<number, string>,
+	completed?: boolean;
+	book_sections: Record<number, string[]>;
+	time_spent: number;
+	position: Record<number, string>;
 }
 
 export interface CourseProgress {
-	completed: boolean,
-	completion: TextbookProgress[],
-	time_spent_today: number,
+	completed: boolean;
+	completion: TextbookProgress[];
+	time_spent_today: number;
 }
 
 export interface TextbookProgress {
-	overall_completion: number,
-	chapter_completion: number[],
+	overall_completion: number;
+	chapter_completion: number[];
 }
 
 export interface OverallProgress {
-	chapters_completed: Record<string, number>,
-	time_spent: Record<string, number>,
+	chapters_completed: Record<string, number>;
+	time_spent: Record<string, number>;
 }
 
 export interface Settings {
@@ -56,13 +56,13 @@ export interface Settings {
 }
 
 export interface Result<Type> {
-	Ok?: Type,
-	Err?: Error,
+	Ok?: Type;
+	Err?: Error;
 }
 
 export interface Error {
-	message: string,
-	cause: string,
+	message: string;
+	cause: string;
 }
 
 function convertBackendAsyncError(error: Error | string | any): Error {
@@ -113,7 +113,9 @@ export async function getCourseMaps(): Promise<Array<Result<CourseMap>>> {
 	}
 }
 
-export async function getCourses(): Promise<Array<Result<[Course, CourseProgress]>>> {
+export async function getCourses(): Promise<
+	Array<Result<[Course, CourseProgress]>>
+> {
 	try {
 		return await invoke("get_courses");
 	} catch (error) {
@@ -121,7 +123,9 @@ export async function getCourses(): Promise<Array<Result<[Course, CourseProgress
 	}
 }
 
-export async function getCoursesActive(): Promise<Array<Result<[Course, CourseProgress]>>> {
+export async function getCoursesActive(): Promise<
+	Array<Result<[Course, CourseProgress]>>
+> {
 	try {
 		return await invoke("get_courses_active");
 	} catch (error) {
@@ -129,14 +133,20 @@ export async function getCoursesActive(): Promise<Array<Result<[Course, CoursePr
 	}
 }
 
-export async function getCourse(uuid: string): Promise<[Course, CourseCompletionData]> {
+export async function getCourse(
+	uuid: string,
+): Promise<[Course, CourseCompletionData]> {
 	try {
-		const course: [Course, CourseCompletionData] = await invoke("get_course", { id: uuid });
+		const course: [Course, CourseCompletionData] = await invoke("get_course", {
+			id: uuid,
+		});
 		if (Array.isArray(course)) {
 			if (course[0].books) {
 				for (const book of course[0].books) {
 					if (book.file.endsWith("/")) {
-						book.file = convertFileSrc(book.file.slice(undefined, book.file.length - 1)) + "/";
+						book.file =
+							convertFileSrc(book.file.slice(undefined, book.file.length - 1)) +
+							"/";
 					} else {
 						book.file = convertFileSrc(book.file);
 					}
@@ -149,22 +159,28 @@ export async function getCourse(uuid: string): Promise<[Course, CourseCompletion
 	}
 }
 
-export async function setCourseCompletion(uuid: string, completion: CourseCompletionData): Promise<null> {
+export async function setCourseCompletion(
+	uuid: string,
+	completion: CourseCompletionData,
+): Promise<null> {
 	try {
 		return await invoke("set_course_completion", {
 			id: uuid,
-			data: completion
+			data: completion,
 		});
 	} catch (error) {
 		throw convertBackendAsyncError(error);
 	}
 }
 
-export async function setCourseActiveStatus(uuid: string, active: boolean): Promise<null> {
+export async function setCourseActiveStatus(
+	uuid: string,
+	active: boolean,
+): Promise<null> {
 	try {
 		return await invoke("set_course_active_status", {
 			id: uuid,
-			data: active
+			data: active,
 		});
 	} catch (error) {
 		throw convertBackendAsyncError(error);
@@ -190,7 +206,7 @@ export async function getSettings(): Promise<Settings> {
 export async function setSettings(settings: Settings): Promise<null> {
 	try {
 		return await invoke("set_settings", {
-			data: settings
+			data: settings,
 		});
 	} catch (error) {
 		throw convertBackendAsyncError(error);
