@@ -71,7 +71,7 @@ export class BookChapterGraph {
 
 		const body = document.createElement("tbody");
 
-		let height = Math.ceil(this.chapters / this.width);
+		const height = Math.ceil(this.chapters / this.width);
 
 		for (let ii = 0; ii < height; ii++) {
 			const row = document.createElement("tr");

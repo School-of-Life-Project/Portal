@@ -404,7 +404,7 @@ export class ProgressManager {
 		showItemList?: boolean,
 		scroll?: boolean,
 	) {
-		let itemContainer = element?.parentElement?.parentElement;
+		const itemContainer = element?.parentElement?.parentElement;
 
 		if (showItem !== undefined) {
 			if (itemContainer && itemContainer.tagName == "DETAILS") {

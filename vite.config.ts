@@ -1,6 +1,7 @@
 import { resolve } from "path";
 import { defineConfig } from "vite";
 import eslint from "vite-plugin-eslint";
+import legacy from "@vitejs/plugin-legacy";
 
 export default defineConfig({
 	// prevent vite from obscuring rust errors
@@ -40,5 +41,5 @@ export default defineConfig({
 	css: {
 		transformer: "lightningcss",
 	},
-	plugins: [eslint()],
+	plugins: [eslint(), legacy({ renderLegacyChunks: false })],
 });

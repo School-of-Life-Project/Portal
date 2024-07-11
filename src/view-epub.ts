@@ -8,18 +8,18 @@ import {
 
 let viewer: DocumentViewer | null;
 
-let titleContainer = document.getElementById("contentTitle");
-let listingContainer = document.getElementById("contentListing");
-let contentContainer = document.getElementById("contentViewer");
-let timerContainer = document.getElementById("contentTimer");
+const titleContainer = document.getElementById("contentTitle");
+const listingContainer = document.getElementById("contentListing");
+const contentContainer = document.getElementById("contentViewer");
+const timerContainer = document.getElementById("contentTimer");
 
 if (titleContainer && listingContainer && contentContainer && timerContainer) {
-	let viewManager = new ViewManager(
+	const viewManager = new ViewManager(
 		titleContainer,
 		listingContainer,
 		contentContainer,
 	);
-	let progressManager = new ProgressManager(viewManager, timerContainer);
+	const progressManager = new ProgressManager(viewManager, timerContainer);
 
 	loadCourse(viewManager, progressManager, "495da27d107745d5b68d171919bffe9c");
 }
