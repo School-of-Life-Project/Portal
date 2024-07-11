@@ -1,7 +1,9 @@
-# project TODOs
+# short-term project TODOs
 
 ## front-end TODOs
+
 - [ ] Get code from [frontend-test](https://github.com/transkatgirl/frontend-test) working as frontend
+- [ ] Write unit tests with vitest
 
 ## full-stack TODOs
 

@@ -67,6 +67,7 @@ export interface Error {
 
 function isError(error: unknown): error is Error {
 	return (
+		error !== null &&
 		typeof error === "object" &&
 		(error as Error).message !== undefined &&
 		(error as Error).cause !== undefined &&
