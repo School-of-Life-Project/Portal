@@ -23,7 +23,6 @@
 	},
 	"dependencies": {
 		"@tauri-apps/api": "^1.6.0",
-		"@vitejs/plugin-legacy": "^5.4.1",
 		"epubjs": "^0.3.93",
 		"mermaid": "^10.9.1",
 		"panzoom": "^9.4.3",
