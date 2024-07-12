@@ -22,40 +22,43 @@ GlobalWorkerOptions.workerSrc = new URL(
 	import.meta.url,
 ).href;
 
-const container = document.createElement("div");
-const innerContainer = document.createElement("div");
-innerContainer.setAttribute("id", "viewer");
-innerContainer.setAttribute("class", "pdfViewer");
-container.appendChild(innerContainer);
+let pdfViewer: BasicPDFViewer | undefined;
+let linkService: PDFLinkService | undefined;
 
-const eventBus = new EventBus();
-const linkService = new PDFLinkService({ eventBus });
-const scriptingManager = new PDFScriptingManager({
-	eventBus,
-	sandboxBundleSrc: new URL(
-		"pdfjs-dist/legacy/build/pdf.sandbox.mjs",
-		import.meta.url,
-	).href,
-});
-const pdfViewer = new BasicPDFViewer({
-	container,
-	eventBus,
-	linkService,
-	scriptingManager,
-});
-linkService.setViewer(pdfViewer);
-scriptingManager.setViewer(pdfViewer);
+function initalizePdfViewer(
+	container: HTMLDivElement,
+): [BasicPDFViewer, PDFLinkService] {
+	const eventBus = new EventBus();
+	const linkService = new PDFLinkService({ eventBus });
+	const scriptingManager = new PDFScriptingManager({
+		eventBus,
+		sandboxBundleSrc: new URL(
+			"pdfjs-dist/legacy/build/pdf.sandbox.mjs",
+			import.meta.url,
+		).href,
+	});
+	const pdfViewer = new BasicPDFViewer({
+		container,
+		eventBus,
+		linkService,
+		scriptingManager,
+	});
+	linkService.setViewer(pdfViewer);
+	scriptingManager.setViewer(pdfViewer);
 
-eventBus.on("pagesinit", () => {
-	pdfViewer.currentScaleValue = "page-width";
-});
-const resizeObserver = new ResizeObserver((_event) => {
-	if (pdfViewer.pdfDocument) {
+	eventBus.on("pagesinit", () => {
 		pdfViewer.currentScaleValue = "page-width";
-		pdfViewer.update();
-	}
-});
-resizeObserver.observe(container);
+	});
+	const resizeObserver = new ResizeObserver((_event) => {
+		if (pdfViewer.pdfDocument) {
+			pdfViewer.currentScaleValue = "page-width";
+			pdfViewer.update();
+		}
+	});
+	resizeObserver.observe(container);
+
+	return [pdfViewer, linkService];
+}
 
 type Dest = string | RefProxy[] | null;
 interface OutlineItem {
@@ -90,6 +93,10 @@ function convertOutlineItems(items: OutlineItem[]): ListingItem[] {
 }
 
 async function displayDest(dest: Dest) {
+	if (!pdfViewer) {
+		return;
+	}
+
 	const document = pdfViewer.pdfDocument;
 
 	if (!document) {
@@ -100,6 +107,10 @@ async function displayDest(dest: Dest) {
 		const destArray = await document.getDestination(dest);
 		if (destArray) {
 			return document.getPageIndex(destArray[0]).then((pageNumber) => {
+				if (!pdfViewer) {
+					return;
+				}
+
 				pdfViewer.scrollPageIntoView({
 					pageNumber: pageNumber + 1,
 					destArray,
@@ -134,6 +145,11 @@ export class PDFViewer implements DocumentViewer {
 		progress: ProgressManager,
 		initialProgress: CourseCompletionData,
 	): Promise<null | void> {
+		const innerContainer = document.createElement("div");
+		innerContainer.setAttribute("id", "viewer");
+		innerContainer.setAttribute("class", "pdfViewer");
+		view.contentContainer.appendChild(innerContainer);
+
 		return getDocument({
 			url: this.course.books[this.document_index].file,
 			cMapUrl: "cmaps/",
@@ -142,7 +158,11 @@ export class PDFViewer implements DocumentViewer {
 		}).promise.then((document) => {
 			return Promise.all([document.getMetadata(), document.getOutline()]).then(
 				([metadata, outline]) => {
-					view.contentContainer.appendChild(container);
+					if (!pdfViewer || !linkService) {
+						[pdfViewer, linkService] = initalizePdfViewer(
+							<HTMLDivElement>view.contentContainer,
+						);
+					}
 
 					pdfViewer.setDocument(document);
 					linkService.setDocument(document, null);
@@ -162,11 +182,13 @@ export class PDFViewer implements DocumentViewer {
 		});
 	}
 	destroy(view: ViewManager, progress: ProgressManager): Promise<null | void> {
-		// @ts-expect-error setting the pdfViewer document to null is necessary to reset it
-		pdfViewer.setDocument(null);
-		linkService.setDocument(null);
-
-		view.contentContainer.removeChild(container);
+		if (pdfViewer) {
+			// @ts-expect-error setting the pdfViewer document to null is necessary to reset it
+			pdfViewer.setDocument(null);
+		}
+		if (linkService) {
+			linkService.setDocument(null);
+		}
 
 		view.reset();
 		progress.reset();
