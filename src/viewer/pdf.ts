@@ -12,8 +12,6 @@ import {
 } from "pdfjs-dist/legacy/build/pdf.mjs";
 import {
 	EventBus,
-	PDFLinkService,
-	PDFScriptingManager,
 	PDFViewer as BasicPDFViewer,
 } from "pdfjs-dist/legacy/web/pdf_viewer.mjs";
 
@@ -23,28 +21,13 @@ GlobalWorkerOptions.workerSrc = new URL(
 ).href;
 
 let pdfViewer: BasicPDFViewer | undefined;
-let linkService: PDFLinkService | undefined;
 
-function initalizePdfViewer(
-	container: HTMLDivElement,
-): [BasicPDFViewer, PDFLinkService] {
+function initalizePdfViewer(container: HTMLDivElement): BasicPDFViewer {
 	const eventBus = new EventBus();
-	const linkService = new PDFLinkService({ eventBus });
-	const scriptingManager = new PDFScriptingManager({
-		eventBus,
-		sandboxBundleSrc: new URL(
-			"pdfjs-dist/legacy/build/pdf.sandbox.mjs",
-			import.meta.url,
-		).href,
-	});
 	const pdfViewer = new BasicPDFViewer({
 		container,
 		eventBus,
-		linkService,
-		scriptingManager,
 	});
-	linkService.setViewer(pdfViewer);
-	scriptingManager.setViewer(pdfViewer);
 
 	eventBus.on("pagesinit", () => {
 		pdfViewer.currentScaleValue = "page-width";
@@ -57,7 +40,7 @@ function initalizePdfViewer(
 	});
 	resizeObserver.observe(container);
 
-	return [pdfViewer, linkService];
+	return pdfViewer;
 }
 
 type Dest = string | RefProxy[] | null;
@@ -146,26 +129,20 @@ export class PDFViewer implements DocumentViewer {
 		initialProgress: CourseCompletionData,
 	): Promise<null | void> {
 		const innerContainer = document.createElement("div");
-		innerContainer.setAttribute("id", "viewer");
-		innerContainer.setAttribute("class", "pdfViewer");
+		innerContainer.id = "viewer";
+		innerContainer.classList.add("pdfViewer");
 		view.contentContainer.appendChild(innerContainer);
 
 		return getDocument({
 			url: this.course.books[this.document_index].file,
-			cMapUrl: "cmaps/",
-			cMapPacked: true,
-			enableXfa: true,
 		}).promise.then((document) => {
 			return Promise.all([document.getMetadata(), document.getOutline()]).then(
 				([metadata, outline]) => {
-					if (!pdfViewer || !linkService) {
-						[pdfViewer, linkService] = initalizePdfViewer(
+					if (!pdfViewer) {
+						pdfViewer = initalizePdfViewer(
 							<HTMLDivElement>view.contentContainer,
 						);
 					}
-
-					pdfViewer.setDocument(document);
-					linkService.setDocument(document, null);
 
 					view.render(
 						convertOutlineItems(outline),
@@ -178,6 +155,8 @@ export class PDFViewer implements DocumentViewer {
 
 					progress.render([this.course, initialProgress], this.document_index);
 
+					pdfViewer.setDocument(document);
+
 					this.rendered = true;
 				},
 			);
@@ -187,9 +166,6 @@ export class PDFViewer implements DocumentViewer {
 		if (pdfViewer) {
 			// @ts-expect-error setting the pdfViewer document to null is necessary to reset it
 			pdfViewer.setDocument(null);
-		}
-		if (linkService) {
-			linkService.setDocument(null);
 		}
 
 		view.reset();
