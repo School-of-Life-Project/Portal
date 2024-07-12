@@ -3,10 +3,8 @@
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<!-- <link rel="stylesheet" href="pdfjs-dist/legacy/web/pdf_viewer.css" /> -->
-		<!-- LightningCSS currently fails to handle pdf.js CSS files properly, so disabled for now -->
 		<link rel="stylesheet" href="src/styles.css" />
-		<script type="module" src="src/view-pdf.ts"></script>
+		<script type="module" src="src/viewer.ts"></script>
 	</head>
 
 	<body class="course-viewer app-page">
@@ -18,8 +16,10 @@
 			</nav>
 		</header>
 		<nav class="table-of-contents" id="contentListing"></nav>
-		<div id="contentViewer">
-			<div id="viewer" class="pdfViewer"></div>
-		</div>
+		<article>
+			<div id="contentViewer">
+				<div id="viewer" class="pdfViewer"></div>
+			</div>
+		</article>
 	</body>
 </html>

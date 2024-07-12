@@ -1,5 +1,4 @@
 import { displayError, Error, getCourse } from "./bindings.ts";
-import { PDFViewer } from "./viewer/pdf";
 import {
 	DocumentViewer,
 	ProgressManager,
@@ -24,14 +23,19 @@ if (titleContainer && listingContainer && contentContainer && timerContainer) {
 	loadCourse(
 		viewManager,
 		progressManager,
-		"164e0270-a987-4234-85a5-66180b735a43",
+		"495da27d107745d5b68d171919bffe9c",
+		0,
 	);
 }
+
+// PDF: 164e0270-a987-4234-85a5-66180b735a43
+// ePUB: 495da27d107745d5b68d171919bffe9c
 
 function loadCourse(
 	view: ViewManager,
 	progress: ProgressManager,
 	uuid: string,
+	document_index: number,
 ) {
 	if (viewer) {
 		viewer.destroy(view, progress);
@@ -39,13 +43,27 @@ function loadCourse(
 	} else {
 		return getCourse(uuid)
 			.then((result) => {
-				viewer = new PDFViewer(result[0], 0);
-				viewer.render(view, progress, result[1]).catch((error) => {
-					displayError({
-						message: "Unable to display document",
-						cause: JSON.stringify(error),
+				if (result[0].books[document_index].file.endsWith(".pdf")) {
+					return import("./viewer/pdf.ts").then((module) => {
+						viewer = new module.PDFViewer(result[0], document_index);
+						return viewer.render(view, progress, result[1]).catch((error) => {
+							displayError({
+								message: "Unable to display document",
+								cause: JSON.stringify(error),
+							});
+						});
 					});
-				});
+				} else {
+					return import("./viewer/epub.ts").then((module) => {
+						viewer = new module.ePubViewer(result[0], document_index);
+						return viewer.render(view, progress, result[1]).catch((error) => {
+							displayError({
+								message: "Unable to display document",
+								cause: JSON.stringify(error),
+							});
+						});
+					});
+				}
 			})
 			.catch((error: Error) => {
 				displayError(error);
