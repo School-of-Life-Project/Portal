@@ -344,7 +344,7 @@ impl ResourceManager {
 
             let is_dir = match entry.metadata().await {
                 Ok(metadata) => metadata.is_dir(),
-                Err(_) => false,
+                Err(_) => continue,
             };
 
             let extension = path.extension().map(OsStr::to_ascii_lowercase);
@@ -363,13 +363,14 @@ impl ResourceManager {
                     continue;
                 }
 
-                let new_path = path.with_extension(&temp_ext_os_string);
+                let tmp_path = path.with_extension(&temp_ext_os_string);
+                let result_path = path.with_extension("");
 
-                unzip(path.clone(), new_path.clone()).await?;
+                unzip(path.clone(), tmp_path.clone()).await?;
+                fs::rename(tmp_path, &result_path).await?;
                 fs::remove_file(&path).await?;
 
-                path = path.with_extension("");
-                fs::rename(new_path, &path).await?;
+                path = result_path;
             }
 
             let filename = path.file_name().unwrap_or_default().to_string_lossy();
