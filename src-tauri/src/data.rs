@@ -74,6 +74,22 @@ pub async fn ensure_folder_exists(path: &Path) -> Result<(), Error> {
     Ok(())
 }
 
+pub async fn write_readme(path: PathBuf, data: &'static str) -> Result<(), Error> {
+    task::spawn_blocking(move || -> Result<_, Error> {
+        let mut file = OpenOptions::new()
+            .create(true)
+            .truncate(true)
+            .write(true)
+            .open(path)?;
+        file.lock(FileLockMode::Exclusive)?;
+
+        file.write_all(data.as_bytes())?;
+
+        Ok(())
+    })
+    .await?
+}
+
 #[derive(Error, Debug)]
 pub enum Error {
     #[error("File is already locked by another process")]

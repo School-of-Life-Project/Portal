@@ -32,17 +32,19 @@ impl State {
         let course_map_path = data_dir.join("Course Maps");
         let course_path = data_dir.join("Courses");
         let completion_path = data_dir.join("Progress Data");
-        let active_courses_path = data_dir.join("Active Courses.toml");
         let overall_progress_path = completion_path.join("total.toml");
-        let settings_path = data_dir.join("Settings.toml");
         let progress_offset_path = completion_path.join("offsets.toml");
+        let active_courses_path = data_dir.join("Active Courses.toml");
+        let settings_path = data_dir.join("Settings.toml");
+        let readme_path = data_dir.join("README.md");
 
-        let (course_maps, courses, completion, active_courses, settings) = try_join!(
+        let (course_maps, courses, completion, active_courses, settings, ()) = try_join!(
             DataManager::new(course_map_path, extension.clone()),
             ResourceManager::new(course_path),
             DataManager::new(completion_path, extension),
             WritableConfigFile::new(active_courses_path),
             WritableConfigFile::new(settings_path),
+            data::write_readme(readme_path, include_str!("data_dir_readme.md")),
         )?;
         let (overall_progress, offsets) = try_join!(
             WritableConfigFile::new(overall_progress_path),
