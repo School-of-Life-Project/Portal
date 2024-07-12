@@ -44,11 +44,13 @@ export default defineConfig({
 	plugins: [
 		eslint(),
 		legacy({
-			modernTargets:
+			targets:
 				process.env.TAURI_PLATFORM == "windows" ? "edge>=79" : "safari>=12",
-			modernPolyfills: true,
-			additionalModernPolyfills: [],
-			renderLegacyChunks: false,
+			additionalLegacyPolyfills: [],
+			modernTargets:
+				process.env.TAURI_PLATFORM == "windows"
+					? "last 10 Edge versions"
+					: "safari>=15",
 		}),
 	],
 });
