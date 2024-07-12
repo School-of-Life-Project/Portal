@@ -52,7 +52,7 @@ table.progress-map.time-map .level-1 {
 	background-color: oklch(from var(--time-progress-color) l c h / 0.4);
 }
 
-table.progress-map.time-map.level-2 {
+table.progress-map.time-map .level-2 {
 	background-color: oklch(from var(--time-progress-color) l c h / 0.55);
 }
 

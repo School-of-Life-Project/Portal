@@ -7,7 +7,7 @@ import {
 	displayError,
 	Error,
 } from "../bindings.ts";
-import { TimeProgressMeter } from "../graphing/graphing.ts";
+import { TimeProgressMeter } from "../graphing/main.ts";
 
 export interface ListingItem {
 	label: string;
