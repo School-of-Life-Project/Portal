@@ -177,6 +177,8 @@ export class PDFViewer implements DocumentViewer {
 					);
 
 					progress.render([this.course, initialProgress], this.document_index);
+
+					this.rendered = true;
 				},
 			);
 		});
@@ -192,6 +194,9 @@ export class PDFViewer implements DocumentViewer {
 
 		view.reset();
 		progress.reset();
+
+		this.rendered = false;
+		this.destroyed = true;
 
 		return Promise.resolve();
 	}

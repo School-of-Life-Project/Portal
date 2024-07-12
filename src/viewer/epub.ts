@@ -186,6 +186,9 @@ export class ePubViewer implements DocumentViewer {
 		view.reset();
 		progress.reset();
 
+		this.rendered = false;
+		this.destroyed = true;
+
 		return Promise.resolve();
 	}
 }
