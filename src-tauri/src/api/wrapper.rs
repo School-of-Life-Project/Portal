@@ -183,7 +183,7 @@ pub async fn set_course_completion(
     let state = state.state().await?;
 
     state
-        .set_course_completion(id, &data)
+        .set_course_completion(id, data)
         .await
         .map_err(|e| ErrorWrapper::new(format!("Unable to update completion for Course {id}"), &e))
 }

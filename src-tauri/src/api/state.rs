@@ -207,25 +207,41 @@ impl State {
     pub(super) async fn set_course_completion(
         &self,
         id: Uuid,
-        data: &CourseCompletion,
+        mut data: CourseCompletion,
     ) -> Result<(), Error> {
-        let (course, old_completion) = try_join!(self.get_course_index(id), async {
-            let completion_path = self.completion.get(id);
+        let time_change_secs;
+        let chapter_change;
 
-            let mut file = WritableConfigFile::new(completion_path).await?;
-            let old = file.read().await?;
-            file.write(data).await?;
+        {
+            let ((mut offsets_file, mut offsets), course, (mut completion_file, old_completion)) =
+                try_join!(
+                    async {
+                        let mut offsets_file = self.offsets.lock().await;
+                        let offsets: CourseTimeOffsets = offsets_file.read().await?;
 
-            Ok(old)
-        })?;
+                        Ok((offsets_file, offsets))
+                    },
+                    self.get_course_index(id),
+                    async {
+                        let completion_path = self.completion.get(id);
 
-        let mut offsets = CourseTimeOffsets::default();
+                        let mut completion_file = WritableConfigFile::new(completion_path).await?;
+                        let old_completion = completion_file.read().await?;
 
-        let old_progress = CourseProgress::calculate(&course, &old_completion, &mut offsets);
-        let new_progress = CourseProgress::calculate(&course, data, &mut offsets);
+                        Ok((completion_file, old_completion))
+                    }
+                )?;
 
-        let time_change_secs = CourseCompletion::calculate_time_diff_secs(&old_completion, data);
-        let chapter_change = CourseProgress::calculate_chapter_diff(&old_progress, &new_progress);
+            data.time_spent += offsets.today(&course, &old_completion);
+
+            let old_progress = CourseProgress::calculate(&course, &old_completion, &mut offsets);
+            let new_progress = CourseProgress::calculate(&course, &data, &mut offsets);
+
+            try_join!(completion_file.write(&data), offsets_file.write(&offsets))?;
+
+            time_change_secs = CourseCompletion::calculate_time_diff_secs(&old_completion, &data);
+            chapter_change = CourseProgress::calculate_chapter_diff(&old_progress, &new_progress);
+        }
 
         let mut total_progress_file = self.overall_progress.lock().await;
 
