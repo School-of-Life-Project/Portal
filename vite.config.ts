@@ -31,8 +31,7 @@ export default defineConfig({
 		rollupOptions: {
 			input: {
 				main: resolve(__dirname, "index.html"),
-				epub: resolve(__dirname, "epub.html"),
-				pdf: resolve(__dirname, "pdf.html"),
+				viewer: resolve(__dirname, "viewer.html"),
 				error: resolve(__dirname, "error.html"),
 			},
 		},

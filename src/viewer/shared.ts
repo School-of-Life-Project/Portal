@@ -20,13 +20,13 @@ export type ListingCallback = (identifier: string) => void;
 export class ViewManager {
 	titleContainer: HTMLElement;
 	listingContainer: HTMLElement;
-	contentContainer: HTMLElement;
+	contentContainer: HTMLDivElement;
 	#styleContainer: HTMLStyleElement;
 	rendered = false;
 	constructor(
 		titleContainer: HTMLElement,
 		listingContainer: HTMLElement,
-		contentContainer: HTMLElement,
+		contentContainer: HTMLDivElement,
 	) {
 		this.titleContainer = titleContainer;
 		this.listingContainer = listingContainer;

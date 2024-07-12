@@ -123,7 +123,7 @@ export class PDFViewer implements DocumentViewer {
 		this.rendered = false;
 		this.destroyed = false;
 	}
-	render(
+	async render(
 		view: ViewManager,
 		progress: ProgressManager,
 		initialProgress: CourseCompletionData,
@@ -139,9 +139,7 @@ export class PDFViewer implements DocumentViewer {
 			return Promise.all([document.getMetadata(), document.getOutline()]).then(
 				([metadata, outline]) => {
 					if (!pdfViewer) {
-						pdfViewer = initalizePdfViewer(
-							<HTMLDivElement>view.contentContainer,
-						);
+						pdfViewer = initalizePdfViewer(view.contentContainer);
 					}
 
 					view.render(
@@ -162,7 +160,10 @@ export class PDFViewer implements DocumentViewer {
 			);
 		});
 	}
-	destroy(view: ViewManager, progress: ProgressManager): Promise<null | void> {
+	async destroy(
+		view: ViewManager,
+		progress: ProgressManager,
+	): Promise<null | void> {
 		if (pdfViewer) {
 			// @ts-expect-error setting the pdfViewer document to null is necessary to reset it
 			pdfViewer.setDocument(null);
@@ -173,7 +174,5 @@ export class PDFViewer implements DocumentViewer {
 
 		this.rendered = false;
 		this.destroyed = true;
-
-		return Promise.resolve();
 	}
 }

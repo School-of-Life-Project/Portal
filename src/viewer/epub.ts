@@ -104,7 +104,7 @@ export class ePubViewer implements DocumentViewer {
 		this.rendered = false;
 		this.destroyed = false;
 	}
-	render(
+	async render(
 		view: ViewManager,
 		progress: ProgressManager,
 		initialProgress: CourseCompletionData,
@@ -179,7 +179,10 @@ export class ePubViewer implements DocumentViewer {
 			);
 		});
 	}
-	destroy(view: ViewManager, progress: ProgressManager): Promise<null | void> {
+	async destroy(
+		view: ViewManager,
+		progress: ProgressManager,
+	): Promise<null | void> {
 		this.#inner?.book.destroy();
 		this.#inner?.resizeObserver?.unobserve(view.contentContainer);
 
@@ -188,7 +191,5 @@ export class ePubViewer implements DocumentViewer {
 
 		this.rendered = false;
 		this.destroyed = true;
-
-		return Promise.resolve();
 	}
 }
