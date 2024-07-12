@@ -75,20 +75,27 @@ pub async fn ensure_folder_exists(path: &Path) -> Result<(), Error> {
     Ok(())
 }
 
-pub async fn unzip(input: PathBuf, dest: PathBuf) -> Result<(), Error> {
+pub async fn unzip(input: PathBuf, tmp: PathBuf, dest: PathBuf) -> Result<(), Error> {
     task::spawn_blocking(move || -> Result<_, Error> {
-        let file = File::open(&input)?;
-        file.lock(FileLockMode::Exclusive)?;
-        let mut archive = ZipArchive::new(file)?;
+        {
+            let file = File::open(&input)?;
+            file.lock(FileLockMode::Exclusive)?;
+            let mut archive = ZipArchive::new(file)?;
 
-        match archive.extract(&dest) {
-            Ok(()) => Ok(()),
-            Err(ZipError::Io(io_error)) => Err(Error::Io(io_error)),
-            Err(error) => {
-                std::fs::remove_dir_all(dest)?;
-                Err(Error::Decompression(error))
+            match archive.extract(&tmp) {
+                Ok(()) => {}
+                Err(ZipError::Io(io_error)) => return Err(Error::Io(io_error)),
+                Err(error) => {
+                    std::fs::remove_dir_all(tmp)?;
+                    return Err(Error::Decompression(error));
+                }
             }
         }
+
+        std::fs::rename(tmp, dest)?;
+        std::fs::remove_file(input)?;
+
+        Ok(())
     })
     .await?
 }
@@ -366,9 +373,7 @@ impl ResourceManager {
                 let tmp_path = path.with_extension(&temp_ext_os_string);
                 let result_path = path.with_extension("");
 
-                unzip(path.clone(), tmp_path.clone()).await?;
-                fs::rename(tmp_path, &result_path).await?;
-                fs::remove_file(&path).await?;
+                unzip(path.clone(), tmp_path.clone(), result_path.clone()).await?;
 
                 path = result_path;
             }

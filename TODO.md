@@ -16,4 +16,4 @@
 - [ ] Write documentation for internals via Rustdoc
 - [ ] Prune dependencies
 - [ ] Add additional Clippy lints
-- [ ] Automatically decompress ePubs
+- [X] Automatically decompress ePubs

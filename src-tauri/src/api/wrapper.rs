@@ -4,12 +4,19 @@
     clippy::module_name_repetitions
 )]
 
-use std::sync::Arc;
+use std::{
+    ffi::{OsStr, OsString},
+    path::PathBuf,
+    sync::Arc,
+};
 
+use futures_util::join;
 use serde::{Deserialize, Serialize};
-use tauri::Manager;
+use tauri::{FsScope, Manager};
 use tokio::{fs, sync::OnceCell};
 use uuid::Uuid;
+
+use crate::data;
 
 use super::{
     state::State, Course, CourseCompletion, CourseMap, CourseProgress, OverallProgress, Settings,
@@ -136,6 +143,21 @@ pub async fn get_courses_active(
         .map_err(|e| ErrorWrapper::new("Unable to get list of active Courses".to_string(), &e))
 }
 
+fn allow_path(scope: &FsScope, path: &mut PathBuf, is_dir: bool) -> Result<(), ErrorWrapper> {
+    if is_dir {
+        path.push("");
+        scope.allow_directory(&path, true)
+    } else {
+        scope.allow_file(&path)
+    }
+    .map_err(|e| {
+        ErrorWrapper::new(
+            format!("Unable to update renderer permissions for path {path:?}"),
+            &e,
+        )
+    })
+}
+
 #[tauri::command]
 pub async fn get_course(
     app_handle: tauri::AppHandle,
@@ -151,23 +173,39 @@ pub async fn get_course(
 
     let scope = app_handle.asset_protocol_scope();
 
+    let epub_extension = Some(OsString::from("epub"));
+    let epub_extracted_extension = OsString::from("decompressed.epub");
+    let tmp_extension = OsString::from("temp");
+
     for book in &mut course.books {
-        if let Ok(metadata) = fs::metadata(&book.file).await {
+        let extracted_path = book.file.with_extension(&epub_extracted_extension);
+
+        let (metadata_extract, metadata_full) =
+            join!(fs::metadata(&extracted_path), fs::metadata(&book.file));
+
+        if let Ok(metadata) = metadata_full {
             if metadata.is_dir() {
-                book.file.push("");
-                scope.allow_directory(&book.file, true)
+                allow_path(&scope, &mut book.file, true)?;
+            } else if book.file.extension().map(OsStr::to_ascii_lowercase) == epub_extension {
+                let tmp_path = book.file.with_extension(&tmp_extension);
+
+                data::unzip(book.file.clone(), tmp_path, extracted_path.clone())
+                    .await
+                    .map_err(|e| {
+                        ErrorWrapper::new(format!("Unable to extract {:?}", &book.file), &e)
+                    })?;
+
+                book.file = extracted_path;
+
+                allow_path(&scope, &mut book.file, true)?;
             } else {
-                scope.allow_file(&book.file)
+                allow_path(&scope, &mut book.file, false)?;
             }
-            .map_err(|e| {
-                ErrorWrapper::new(
-                    format!(
-                        "Unable to update renderer permissions for path {:?}",
-                        &book.file
-                    ),
-                    &e,
-                )
-            })?;
+        } else if let Ok(metadata) = metadata_extract {
+            if metadata.is_dir() {
+                book.file = extracted_path;
+                allow_path(&scope, &mut book.file, true)?;
+            }
         }
     }
 
