@@ -1,5 +1,7 @@
 /* Needs significant clean-up, copied from prototype */
 
+/* TODO: Remove new syntax (@scope, @layer) not properly handled by CSS post-processors */
+
 :root {
 	--background-color: oklch(98% 0.02 90);
 
