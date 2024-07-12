@@ -23,6 +23,11 @@ GlobalWorkerOptions.workerSrc = new URL(
 ).href;
 
 const container = document.createElement("div");
+const innerContainer = document.createElement("div");
+innerContainer.setAttribute("id", "viewer");
+innerContainer.setAttribute("class", "pdfViewer");
+container.appendChild(innerContainer);
+
 const eventBus = new EventBus();
 const linkService = new PDFLinkService({ eventBus });
 const scriptingManager = new PDFScriptingManager({
@@ -137,6 +142,8 @@ export class PDFViewer implements DocumentViewer {
 		}).promise.then((document) => {
 			return Promise.all([document.getMetadata(), document.getOutline()]).then(
 				([metadata, outline]) => {
+					view.contentContainer.appendChild(container);
+
 					pdfViewer.setDocument(document);
 					linkService.setDocument(document, null);
 
@@ -158,6 +165,8 @@ export class PDFViewer implements DocumentViewer {
 		// @ts-expect-error setting the pdfViewer document to null is necessary to reset it
 		pdfViewer.setDocument(null);
 		linkService.setDocument(null);
+
+		view.contentContainer.removeChild(container);
 
 		view.reset();
 		progress.reset();

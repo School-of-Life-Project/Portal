@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<!-- <link rel="stylesheet" href="pdfjs-dist/legacy/web/pdf_viewer.css" /> -->
+		<!-- LightningCSS currently fails to handle pdf.js CSS files properly, so disabled for now -->
+		<link rel="stylesheet" href="src/styles.css" />
+		<script type="module" src="src/view-pdf.ts"></script>
+		<!-- ! FIXME -->
+	</head>
+
+	<body class="course-viewer app-page">
+		<header>
+			<h1>📖 <span id="contentTitle"></span></h1>
+			<nav>
+				<div id="contentTimer"></div>
+				<a href="homepage.html">Exit 🚪</a>
+			</nav>
+		</header>
+		<nav class="table-of-contents" id="contentListing"></nav>
+		<article id="contentViewer">
+			<div id="viewer" class="pdfViewer"></div>
+		</article>
+	</body>
+</html>
