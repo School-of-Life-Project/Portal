@@ -21,8 +21,8 @@ export default defineConfig({
 		"TAURI_DEBUG",
 	],
 	build: {
-		// Tauri uses Chromium on Windows and WebKit on macOS and Linux
-		target: process.env.TAURI_PLATFORM == "windows" ? "chrome105" : "safari13",
+		// Tauri uses Edge on Windows and WebKit on macOS and Linux
+		target: process.env.TAURI_PLATFORM == "windows" ? "edge79" : "safari12",
 		// don't minify for debug builds
 		minify: !process.env.TAURI_DEBUG ? "terser" : false,
 		cssMinify: "lightningcss",
@@ -41,5 +41,14 @@ export default defineConfig({
 	css: {
 		transformer: "lightningcss",
 	},
-	plugins: [eslint(), legacy({ renderLegacyChunks: false })],
+	plugins: [
+		eslint(),
+		legacy({
+			modernTargets:
+				process.env.TAURI_PLATFORM == "windows" ? "edge>=79" : "safari>=12",
+			modernPolyfills: true,
+			additionalModernPolyfills: [],
+			renderLegacyChunks: false,
+		}),
+	],
 });
