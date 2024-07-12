@@ -10,7 +10,7 @@ export class TimeProgressMeter {
 		this.size = size;
 
 		const root = document.createElement("table");
-		root.setAttribute("class", "progress-map hourly-progress-map");
+		root.setAttribute("class", "progress-map time-map single-line-map");
 		const body = document.createElement("tbody");
 		const row = document.createElement("tr");
 
@@ -40,7 +40,7 @@ export class TimeProgressMeter {
 			if (lowerBound > i) {
 				element.className = "finished";
 			} else if (upperBound > i) {
-				element.className = "in-progress";
+				element.className = "incomplete";
 			} else {
 				element.className = "";
 			}
@@ -62,7 +62,7 @@ export class BookChapterGraph {
 		this.width = width;
 
 		const root = document.createElement("table");
-		root.setAttribute("class", "progress-map chapter-progress-map");
+		root.setAttribute("class", "progress-map chapter-map");
 		if (this.title) {
 			const caption = document.createElement("caption");
 			caption.innerText = "📖 " + this.title;
@@ -105,7 +105,7 @@ export class BookChapterGraph {
 			if (value >= 1) {
 				element.className = "finished";
 			} else if (value > 0) {
-				element.className = "in-progress";
+				element.className = "incomplete";
 			} else {
 				element.className = "";
 			}

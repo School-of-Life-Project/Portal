@@ -24,10 +24,6 @@
 	--primary-border: 0.1em solid var(--primary-border-color);
 	--secondary-border: 0.1em solid var(--secondary-border-color);
 
-	--primary-shadow: 0.04lh 0.04lh 0.12lh var(--primary-border-color);
-	--secondary-shadow: 0.03lh 0.03lh 0.09lh var(--primary-border-color);
-	--tertiary-shadow: 0.02lh 0.02lh 0.06lh var(--primary-border-color);
-
 	--time-progress-color: oklch(50% 0.16 140);
 	--chapter-progress-color: oklch(50% 0.16 calc(140 - (360 / 3)));
 

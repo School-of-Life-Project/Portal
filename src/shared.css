@@ -1,0 +1,29 @@
+:root {
+	--background-color: oklch(98% 0.02 90);
+
+	--primary-card-color: oklch(95% 0.03 calc(75 + 30));
+	--secondary-card-color: oklch(95% 0.04 75);
+	--card-border-radius: 0.2lh;
+	--large-card-padding: 1.25lh;
+	--small-card-padding: 0.5lh;
+
+	--button-color: var(--primary-card-color);
+	--button-border-radius: 0.3lh;
+	--button-padding: 0.4lh;
+
+	--top-navbar-color: oklch(80% 0.06 75);
+	--side-navbar-color: oklch(90% 0.04 75);
+
+	--primary-border-color: oklch(75% 0 0);
+	--secondary-border-color: oklch(65% 0 0);
+
+	--primary-border: 0.1em solid var(--primary-border-color);
+	--secondary-border: 0.1em solid var(--secondary-border-color);
+
+	--primary-shadow: 0.04lh 0.04lh 0.12lh var(--primary-border-color);
+	--secondary-shadow: 0.03lh 0.03lh 0.09lh var(--primary-border-color);
+	--tertiary-shadow: 0.02lh 0.02lh 0.06lh var(--primary-border-color);
+
+	--form-card-color: oklch(95% 0.03 75);
+	--form-card-title-color: oklch(92.5% 0.03 calc(360 - 75));
+}

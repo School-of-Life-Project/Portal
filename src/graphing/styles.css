@@ -1,0 +1,104 @@
+:root {
+	--time-progress-color: oklch(50% 0.16 140);
+	--chapter-progress-color: oklch(50% 0.16 calc(140 - (360 / 3)));
+}
+
+table.progress-map {
+	table-layout: fixed;
+	min-width: max-content;
+	contain: strict;
+}
+
+table.progress-map.color-key {
+	font-size: 0.9em;
+	float: right;
+}
+
+table.progress-map.color-key tbody td {
+	width: 1.1lh;
+	height: 1.1lh;
+}
+
+table.progress-map tbody td {
+	width: 1.2lh;
+	height: 1.2lh;
+	box-sizing: border-box;
+	border-radius: 15%;
+}
+
+table.progress-map th {
+	font-weight: normal;
+	text-align: right;
+	opacity: 0.5;
+}
+
+table.progress-map tfoot th:not(:first-of-type) {
+	text-align: center;
+}
+
+table.progress-map.single-line-map th {
+	opacity: 1;
+}
+
+table.progress-map.time-map tbody td {
+	background-color: oklch(from var(--time-progress-color) 2.5% c h / 0.1);
+}
+
+table.progress-map.time-map .incomplete {
+	background-color: oklch(from var(--time-progress-color) l c h / 0.55);
+}
+
+table.progress-map.time-map .level-1 {
+	background-color: oklch(from var(--time-progress-color) l c h / 0.4);
+}
+
+table.progress-map.time-map.level-2 {
+	background-color: oklch(from var(--time-progress-color) l c h / 0.55);
+}
+
+table.progress-map.time-map .level-3 {
+	background-color: oklch(from var(--time-progress-color) l c h / 0.7);
+}
+
+table.progress-map.time-map .level-4 {
+	background-color: oklch(from var(--time-progress-color) l c h / 0.85);
+}
+
+table.progress-map.time-map .level-5,
+table.progress-map.time-map .finished {
+	background-color: var(--time-progress-color);
+}
+
+table.progress-map.time-map .in-progress {
+	border: 0.12lh solid oklch(from var(--time-progress-color) 2.5% c h);
+}
+
+table.progress-map.chapter-map tbody td {
+	background-color: oklch(from var(--chapter-progress-color) 2.5% c h / 0.1);
+}
+
+table.progress-map.chapter-map .incomplete {
+	background-color: oklch(from var(--chapter-progress-color) l c h / 0.55);
+}
+
+table.progress-map.chapter-map .level-1 {
+	background-color: oklch(from var(--chapter-progress-color) l c h / 0.5);
+}
+
+table.progress-map.chapter-map .level-2 {
+	background-color: oklch(from var(--chapter-progress-color) l c h / 0.75);
+}
+
+table.progress-map.chapter-map .level-3,
+table.progress-map.chapter-map .finished {
+	background-color: var(--chapter-progress-color);
+}
+
+table.progress-map.chapter-map .in-progress {
+	border: 0.12lh solid oklch(from var(--chapter-progress-color) 2.5% c h);
+}
+
+table.progress-map.time-map .no-data,
+table.progress-map.chapter-map .no-data {
+	background-color: unset;
+}
