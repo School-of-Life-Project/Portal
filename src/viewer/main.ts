@@ -60,9 +60,13 @@ async function loadCourse(
 		});
 	}
 
+	view.titleContainer.innerText = "Loading Course...";
+
 	getCourse(uuid)
 		.then(async (result) => {
 			let viewer: DocumentViewer;
+
+			view.titleContainer.innerText = "Loading Viewer..";
 
 			if (result[0].books[document_index].file.endsWith(".pdf")) {
 				try {
@@ -87,6 +91,8 @@ async function loadCourse(
 					return;
 				}
 			}
+
+			view.titleContainer.innerText = "Loading Book..";
 
 			try {
 				return await viewer.render(view, progress, result[1]);

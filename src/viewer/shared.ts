@@ -35,7 +35,7 @@ export class ViewManager {
 		this.#styleContainer = document.createElement("style");
 		window.document.head.appendChild(this.#styleContainer);
 
-		this.reset();
+		this.rendered = false;
 	}
 	render(
 		listing?: ListingItem[],
@@ -51,6 +51,8 @@ export class ViewManager {
 
 		if (title) {
 			this.titleContainer.innerText = title;
+		} else {
+			this.titleContainer.innerText = "Untitled Book";
 		}
 
 		if (listing && callback) {
