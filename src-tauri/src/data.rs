@@ -19,6 +19,7 @@ use tokio::{
 };
 use toml::{Deserializer, Serializer};
 use uuid::{fmt::Simple, Uuid};
+use zip::{result::ZipError, ZipArchive};
 
 pub fn into_relative_path(root: &Path, path: &Path) -> PathBuf {
     let mut new = PathBuf::from(root);
@@ -74,18 +75,20 @@ pub async fn ensure_folder_exists(path: &Path) -> Result<(), Error> {
     Ok(())
 }
 
-pub async fn write_readme(path: PathBuf, data: &'static str) -> Result<(), Error> {
+pub async fn unzip(input: PathBuf, dest: PathBuf) -> Result<(), Error> {
     task::spawn_blocking(move || -> Result<_, Error> {
-        let mut file = OpenOptions::new()
-            .create(true)
-            .truncate(true)
-            .write(true)
-            .open(path)?;
+        let file = File::open(&input)?;
         file.lock(FileLockMode::Exclusive)?;
+        let mut archive = ZipArchive::new(file)?;
 
-        file.write_all(data.as_bytes())?;
-
-        Ok(())
+        match archive.extract(&dest) {
+            Ok(()) => Ok(()),
+            Err(ZipError::Io(io_error)) => Err(Error::Io(io_error)),
+            Err(error) => {
+                std::fs::remove_dir_all(dest)?;
+                Err(Error::Decompression(error))
+            }
+        }
     })
     .await?
 }
@@ -102,6 +105,8 @@ pub enum Error {
     Serialization(#[from] toml::ser::Error),
     #[error("File locking task was terminated or panicked")]
     BlockingTaskFailed(#[from] JoinError),
+    #[error(transparent)]
+    Decompression(#[from] ZipError),
 }
 
 impl Error {
@@ -306,13 +311,19 @@ impl DataManager {
 /// ``ResourceManager`` is a UUID-indexed folder manager.
 pub struct ResourceManager {
     pub root: PathBuf,
+    zip_extension: Option<OsString>,
+    temp_extension: Option<OsString>,
 }
 
 impl ResourceManager {
     pub async fn new(root: PathBuf) -> Result<Self, Error> {
         ensure_folder_exists(&root).await?;
 
-        Ok(Self { root })
+        Ok(Self {
+            root,
+            zip_extension: Some(OsString::from("zip")),
+            temp_extension: Some(OsString::from("temp")),
+        })
     }
     /// Get the path corresponding to a Uuid.
     ///
@@ -326,16 +337,39 @@ impl ResourceManager {
         let mut buffer = Uuid::encode_buffer();
 
         let mut entries = fs::read_dir(&self.root).await?;
+        let temp_ext_os_string = self.temp_extension.clone().unwrap();
+
         while let Some(entry) = entries.next_entry().await? {
-            let path = entry.path();
+            let mut path = entry.path();
 
             let is_dir = match entry.metadata().await {
                 Ok(metadata) => metadata.is_dir(),
                 Err(_) => false,
             };
 
-            if !is_dir {
+            let extension = path.extension().map(OsStr::to_ascii_lowercase);
+
+            if extension == self.temp_extension {
+                if is_dir {
+                    fs::remove_dir_all(path).await?;
+                } else {
+                    fs::remove_file(path).await?;
+                }
                 continue;
+            }
+
+            if !is_dir {
+                if extension != self.zip_extension {
+                    continue;
+                }
+
+                let new_path = path.with_extension(&temp_ext_os_string);
+
+                unzip(path.clone(), new_path.clone()).await?;
+                fs::remove_file(&path).await?;
+
+                path = path.with_extension("");
+                fs::rename(new_path, &path).await?;
             }
 
             let filename = path.file_name().unwrap_or_default().to_string_lossy();

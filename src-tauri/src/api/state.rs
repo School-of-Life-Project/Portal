@@ -1,6 +1,6 @@
 use std::{collections::HashSet, ffi::OsString, path::PathBuf};
 
-use futures::{future::join_all, try_join};
+use futures_util::{future::join_all, try_join};
 use tokio::sync::Mutex;
 use uuid::Uuid;
 
@@ -36,15 +36,13 @@ impl State {
         let progress_offset_path = completion_path.join("offsets.toml");
         let active_courses_path = data_dir.join("Active Courses.toml");
         let settings_path = data_dir.join("Settings.toml");
-        let readme_path = data_dir.join("README.md");
 
-        let (course_maps, courses, completion, active_courses, settings, ()) = try_join!(
+        let (course_maps, courses, completion, active_courses, settings) = try_join!(
             DataManager::new(course_map_path, extension.clone()),
             ResourceManager::new(course_path),
             DataManager::new(completion_path, extension),
             WritableConfigFile::new(active_courses_path),
             WritableConfigFile::new(settings_path),
-            data::write_readme(readme_path, include_str!("data_dir_readme.md")),
         )?;
         let (overall_progress, offsets) = try_join!(
             WritableConfigFile::new(overall_progress_path),
