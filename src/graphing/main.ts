@@ -141,7 +141,7 @@ export class LongTermProgressGraph {
 					this.max = 1.5;
 					break;
 				case "time":
-					this.max = 360;
+					this.max = 300;
 					break;
 				default:
 					this.max = 0;
@@ -262,10 +262,47 @@ export class LongTermProgressGraph {
 		root.appendChild(body);
 		return root;
 	}
-	// TODO
-	/*#getDay(day) {
+	#getDay(day: number) {
 		day = this.weeks * 7 - day;
 
 		return this.#dataElements[(day % 7) * this.weeks + Math.floor(day / 7)];
-	}*/
+	}
+	update(progress: number[] = [], activeIndex?: number) {
+		for (let i = 0; i < this.#dataElements.length; i++) {
+			const element = this.#getDay(i + 1);
+
+			if (i >= progress.length) {
+				element.className = "";
+				element.style.cssText = "color: transparent"; // Ugly hack
+				element.style.cssText = ""; // Ugly hack
+				continue;
+			}
+
+			if (Number.isNaN(progress[i])) {
+				element.className = "no-data";
+				element.style.cssText = "color: transparent"; // Ugly hack
+				element.style.cssText = ""; // Ugly hack
+				continue;
+			}
+
+			const level = Math.min(
+				Math.max(
+					Math.floor(
+						(progress[i] - this.min) / ((this.max - this.min) / this.#levels),
+					),
+					0,
+				),
+				this.#levels,
+			);
+
+			element.className = "level-" + level;
+
+			if (i == activeIndex) {
+				element.classList.add("in-progress");
+			}
+
+			element.style.cssText = "color: transparent"; // Ugly hack
+			element.style.cssText = ""; // Ugly hack
+		}
+	}
 }
