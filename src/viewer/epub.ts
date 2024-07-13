@@ -111,12 +111,7 @@ export class ePubViewer implements DocumentViewer {
 	): Promise<null | void> {
 		const path = this.course.books[this.document_index].file;
 
-		let options;
-		if (path.endsWith("/")) {
-			options = { openAs: "directory" };
-		}
-
-		return Epub(path, options).opened.then((book) => {
+		return Epub(path, { openAs: "directory" }).opened.then((book: Book) => {
 			return Promise.all([book.loaded.metadata, book.loaded.navigation]).then(
 				([metadata, navigation]) => {
 					this.#inner = {

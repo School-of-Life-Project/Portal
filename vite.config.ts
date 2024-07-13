@@ -35,7 +35,7 @@ export default defineConfig({
 				error: resolve(__dirname, "error.html"),
 			},
 		},
-		chunkSizeWarningLimit: 600,
+		chunkSizeWarningLimit: 550,
 	},
 	css: {
 		transformer: "lightningcss",

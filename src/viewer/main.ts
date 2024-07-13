@@ -7,6 +7,7 @@ import {
 	getSettings,
 } from "../bindings.ts";
 import { DocumentViewer, ProgressManager, ViewManager } from "./shared.ts";
+import { ePubViewer } from "./epub.ts";
 
 const settingsPromise = getSettings().catch((error) => {
 	displayError({
@@ -114,16 +115,7 @@ async function loadCourse(
 					return;
 				}
 			} else {
-				try {
-					const module = await import("./epub.ts");
-					viewer = new module.ePubViewer(result[0], document_index);
-				} catch (error) {
-					displayError({
-						message: "Unable to load DocumentViewer",
-						cause: JSON.stringify(error),
-					});
-					return;
-				}
+				viewer = new ePubViewer(result[0], document_index);
 			}
 
 			try {
