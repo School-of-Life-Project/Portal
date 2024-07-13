@@ -47,6 +47,8 @@ if (courseContainer && progressContainer && settings) {
 				courseContainer.appendChild(
 					graphCourse(settings, course.Ok[0], course.Ok[1]),
 				);
+			} else if (course.Err) {
+				displayError(course.Err);
 			}
 		}
 	});
