@@ -28,6 +28,11 @@ section.course h3 {
 	font-size: 1lh;
 }
 
+.course {
+	width: min-content;
+	min-width: calc((22 * 0.05em) + (10 * 1.2lh));
+}
+
 .textbook {
 	width: max-content;
 	min-width: calc((22 * 0.05em) + (10 * 1.2lh));
