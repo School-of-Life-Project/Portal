@@ -1,7 +1,14 @@
-import { displayError, Error, getCourse } from "../bindings.ts";
+import { displayError, Error, getCourse, getSettings } from "../bindings.ts";
 import { DocumentViewer, ProgressManager, ViewManager } from "./shared.ts";
 
-let viewer: DocumentViewer | null;
+const settingsPromise = getSettings().catch((error) => {
+	displayError({
+		message: "Unable to get Settings",
+		cause: JSON.stringify(error),
+	});
+});
+
+let viewer: DocumentViewer | undefined;
 
 const titleContainer = document.getElementById("contentTitle");
 const listingContainer = document.getElementById("contentListing");
@@ -22,24 +29,35 @@ if (titleContainer && listingContainer && contentContainer && timerContainer) {
 		listingContainer,
 		<HTMLDivElement>contentContainer,
 	);
-	const progressManager = new ProgressManager(viewManager, timerContainer);
 
-	if (identifier) {
-		const index = parseInt(document_index);
+	viewManager.titleContainer.innerText = "Loading Settings...";
 
-		if (!Number.isNaN(index)) {
-			loadCourse(viewManager, progressManager, identifier, index);
+	const settings = await settingsPromise;
+
+	if (settings) {
+		const progressManager = new ProgressManager(
+			viewManager,
+			timerContainer,
+			settings,
+		);
+
+		if (identifier) {
+			const index = parseInt(document_index);
+
+			if (!Number.isNaN(index)) {
+				loadCourse(viewManager, progressManager, identifier, index);
+			} else {
+				displayError({
+					message: "Unable to initalize document viewer",
+					cause: "Could not parse document_index",
+				});
+			}
 		} else {
 			displayError({
 				message: "Unable to initalize document viewer",
-				cause: "Could not parse document_index",
+				cause: "Course UUID was not specified",
 			});
 		}
-	} else {
-		displayError({
-			message: "Unable to initalize document viewer",
-			cause: "Course UUID was not specified",
-		});
 	}
 } else {
 	displayError({
@@ -56,7 +74,7 @@ async function loadCourse(
 ) {
 	if (viewer) {
 		await viewer.destroy(view, progress).then(() => {
-			viewer = null;
+			viewer = undefined;
 		});
 	}
 

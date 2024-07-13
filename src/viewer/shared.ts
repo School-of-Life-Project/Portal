@@ -6,6 +6,7 @@ import {
 	Chapter,
 	displayError,
 	Error,
+	Settings,
 } from "../bindings.ts";
 import { TimeProgressMeter } from "../graphing/main.ts";
 
@@ -167,10 +168,16 @@ export class ProgressManager {
 	#completedSections: Set<string> = new Set();
 	manager: ViewManager;
 	timerContainer: HTMLElement;
+	settings: Settings;
 	rendered = false;
-	constructor(view: ViewManager, timerContainer: HTMLElement) {
+	constructor(
+		view: ViewManager,
+		timerContainer: HTMLElement,
+		settings: Settings,
+	) {
 		this.manager = view;
 		this.timerContainer = timerContainer;
+		this.settings = settings;
 	}
 	render(course: [Course, CourseCompletionData], document_index: number) {
 		if (!this.manager.rendered) {
@@ -184,16 +191,25 @@ export class ProgressManager {
 			document_index,
 		);
 
-		const timeDisplay = new TimeProgressMeter();
-		this.timerContainer.appendChild(timeDisplay.element);
 		this.#completion.time_spent = course[1].time_spent;
 
-		timeDisplay.update(this.#completion.time_spent / 60);
+		let timeDisplay: TimeProgressMeter | undefined;
+		if (this.settings.show_course_clock) {
+			timeDisplay = new TimeProgressMeter(
+				0,
+				this.settings.maximum_course_time * 60,
+			);
+			timeDisplay.update(this.#completion.time_spent);
+			this.timerContainer.appendChild(timeDisplay.element);
+		}
+
 		this.#intervalId = window.setInterval(() => {
 			if (this.#completion && typeof this.#completion.time_spent == "number") {
 				this.#completion.time_spent += 5;
 				updateCompletion(course[0].uuid, this.#completion);
-				timeDisplay.update(this.#completion.time_spent / 60);
+				if (timeDisplay) {
+					timeDisplay.update(this.#completion.time_spent);
+				}
 			}
 		}, 5000);
 

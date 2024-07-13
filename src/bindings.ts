@@ -52,7 +52,11 @@ export interface OverallProgress {
 }
 
 export interface Settings {
-	// TODO
+	show_course_clock: boolean;
+	maximum_course_time: number;
+	maximum_daily_time: number;
+	maximum_daily_chapters: number;
+	weeks_displayed: number;
 }
 
 export interface Result<Type> {

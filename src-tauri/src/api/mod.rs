@@ -304,6 +304,23 @@ impl CourseTimeOffsets {
     }
 }
 
-// TODO
-#[derive(Serialize, Deserialize, Debug, Default)]
-pub struct Settings {}
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Settings {
+    show_course_clock: bool,
+    maximum_course_time: u16,
+    maximum_daily_time: u16,
+    maximum_daily_chapters: f32,
+    weeks_displayed: u8,
+}
+
+impl Default for Settings {
+    fn default() -> Self {
+        Settings {
+            show_course_clock: true,
+            maximum_course_time: 150,
+            maximum_daily_time: 300,
+            maximum_daily_chapters: 1.5,
+            weeks_displayed: 24,
+        }
+    }
+}
