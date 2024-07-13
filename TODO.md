@@ -13,6 +13,7 @@
 
 - [ ] Design Course Map object
 - [ ] Design Settings object
+- [ ] Improve handling of floating-point rounding errors
 
 ## backend TODOs
 
@@ -22,4 +23,3 @@
 - [ ] Add additional Clippy lints
 - [X] Automatically decompress ePubs
 - [ ] Implement concurrent decompression of Courses / Course Files
-- [ ] Fix floating point rounding errors in backend
