@@ -2,6 +2,7 @@ import {
 	Course,
 	CourseProgress,
 	OverallProgress,
+	Result,
 	Settings,
 } from "../bindings.ts";
 import {
@@ -52,6 +53,22 @@ function sortProgressData(data: Record<string, number>) {
 	});
 
 	return sortedTimeData;
+}
+
+export function sortCourses(courses: Result<[Course, CourseProgress]>[]) {
+	courses.sort((a, b) => {
+		if (a.Ok && b.Ok) {
+			const newA = a.Ok[0].title;
+			const newB = b.Ok[0].title;
+
+			if (newA < newB) {
+				return -1;
+			} else if (newA > newB) {
+				return 1;
+			}
+		}
+		return 0;
+	});
 }
 
 export function graphCourse(
