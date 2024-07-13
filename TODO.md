@@ -3,7 +3,11 @@
 ## front-end TODOs
 
 - [ ] Get code from [frontend-test](https://github.com/transkatgirl/frontend-test) working as frontend
+	- [ ] Implement Course Navigator
+	- [ ] Implement Settings
+- [ ] Unify ViewManager and ProgressManager code to improve performance
 - [ ] Write unit tests with vitest
+- [ ] Determine necessary polyfills
 
 ## full-stack TODOs
 

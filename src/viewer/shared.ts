@@ -18,6 +18,8 @@ export interface ListingItem {
 
 export type ListingCallback = (identifier: string) => void;
 
+// TODO: Unify ViewManager and ProgressManager code
+
 export class ViewManager {
 	titleContainer: HTMLElement;
 	listingContainer: HTMLElement;
