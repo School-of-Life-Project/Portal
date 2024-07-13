@@ -142,8 +142,8 @@ export class ViewManager {
 		this.#styleContainer.innerHTML =
 			"#" + CSS.escape(identifier) + " {font-weight: bold}";
 
-		let currentElement =
-			window.document.getElementById(identifier)?.parentElement?.parentElement;
+		const initialElement = window.document.getElementById(identifier);
+		let currentElement = initialElement?.parentElement?.parentElement;
 		while (
 			currentElement &&
 			currentElement.parentElement &&
@@ -154,6 +154,10 @@ export class ViewManager {
 			if (currentElement.tagName == "DETAILS") {
 				currentElement.setAttribute("open", "");
 			}
+		}
+
+		if (initialElement) {
+			initialElement.scrollIntoView({ block: "center" });
 		}
 	}
 }
