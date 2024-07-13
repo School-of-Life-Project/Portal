@@ -2,6 +2,16 @@ import { resolve } from "path";
 import { defineConfig } from "vite";
 import eslint from "vite-plugin-eslint";
 import legacy from "@vitejs/plugin-legacy";
+import { createWriteStream, existsSync, mkdirSync } from "fs";
+
+if (!existsSync("node_modules/jszip/dist/jszip.js")) {
+	mkdirSync("node_modules/jszip/dist");
+
+	// Hack required to get ePub.js to build without jszip
+	const writeStream = createWriteStream("node_modules/jszip/dist/jszip.js");
+	writeStream.write("module.exports = {};");
+	writeStream.end();
+}
 
 export default defineConfig({
 	// prevent vite from obscuring rust errors
