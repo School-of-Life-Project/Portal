@@ -17,3 +17,4 @@
 - [ ] Prune dependencies
 - [ ] Add additional Clippy lints
 - [X] Automatically decompress ePubs
+- [ ] Fix floating point rounding errors in backend

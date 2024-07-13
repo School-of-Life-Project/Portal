@@ -1,9 +1,58 @@
-import { Course, CourseProgress, Settings } from "../bindings.ts";
+import {
+	Course,
+	CourseProgress,
+	OverallProgress,
+	Settings,
+} from "../bindings.ts";
 import {
 	TimeProgressMeter,
 	BookChapterGraph,
-	//LongTermProgressGraph,
+	LongTermProgressGraph,
 } from "../graphing/main.ts";
+
+// Copied from https://stackoverflow.com/a/17727953
+function daysBetween(StartDate: Date, EndDate: Date) {
+	const oneDay = 1000 * 60 * 60 * 24;
+
+	const start = Date.UTC(
+		EndDate.getFullYear(),
+		EndDate.getMonth(),
+		EndDate.getDate(),
+	);
+	const end = Date.UTC(
+		StartDate.getFullYear(),
+		StartDate.getMonth(),
+		StartDate.getDate(),
+	);
+
+	return (start - end) / oneDay;
+}
+
+function sortProgressData(data: Record<string, number>) {
+	const sortedTimeData: Array<[Date, number]> = [];
+	for (const [dateString, value] of Object.entries(data)) {
+		const dateValues: string[] = dateString.split("-");
+		const date = new Date(
+			Number(dateValues[0]),
+			Number(dateValues[1]) - 1,
+			Number(dateValues[2]),
+		);
+
+		sortedTimeData.push([date, value]);
+	}
+
+	sortedTimeData.sort((a, b) => {
+		if (a[0] < b[0]) {
+			return -1;
+		} else if (a[0] > b[0]) {
+			return 1;
+		} else {
+			return 0;
+		}
+	});
+
+	return sortedTimeData;
+}
 
 export function graphCourse(
 	settings: Settings,
@@ -47,4 +96,84 @@ export function graphCourse(
 	element.appendChild(meter.element);
 
 	return element;
+}
+
+const dayMappings = [6, 5, 4, 3, 2, 1, 0];
+
+export function graphProgress(
+	settings: Settings,
+	progress: OverallProgress,
+): [HTMLElement, HTMLElement] {
+	const currentDate = new Date();
+
+	const timeData = sortProgressData(progress.time_spent);
+	const chapterData = sortProgressData(progress.chapters_completed);
+
+	const daysSinceLastTimeData = daysBetween(
+		timeData[timeData.length - 1][0],
+		currentDate,
+	);
+	const daysSinceLastChapterData = daysBetween(
+		chapterData[chapterData.length - 1][0],
+		currentDate,
+	);
+
+	const currentDayIndex = dayMappings[currentDate.getDay()];
+
+	const timeProgress: number[] = [];
+	const chapterProgress: number[] = [];
+
+	for (let i = 0; i < currentDayIndex; i++) {
+		timeProgress.push(NaN);
+		chapterProgress.push(NaN);
+	}
+
+	for (let i = 0; i < daysSinceLastTimeData; i++) {
+		timeProgress.push(0);
+	}
+
+	for (let i = 0; i < daysSinceLastChapterData; i++) {
+		chapterProgress.push(0);
+	}
+
+	for (const [_date, data] of timeData) {
+		timeProgress.push(data);
+	}
+
+	for (const [_date, data] of chapterData) {
+		chapterProgress.push(data);
+	}
+
+	const timeGraph = new LongTermProgressGraph(
+		"time",
+		settings.weeks_displayed,
+		0,
+		settings.maximum_daily_time,
+	);
+	const chapterGraph = new LongTermProgressGraph(
+		"chapter",
+		settings.weeks_displayed,
+		0,
+		settings.maximum_daily_chapters,
+	);
+	timeGraph.update(timeProgress);
+	chapterGraph.update(chapterProgress);
+
+	const timeSection = document.createElement("section");
+
+	const timeTitle = document.createElement("h3");
+	timeTitle.innerText = "⏳ Time Spent Studying Per Day";
+
+	timeSection.appendChild(timeTitle);
+	timeSection.appendChild(timeGraph.element);
+
+	const chapterSection = document.createElement("section");
+
+	const chapterTitle = document.createElement("h3");
+	chapterTitle.innerText = "📚 Chapters Completed Per Day";
+
+	chapterSection.appendChild(chapterTitle);
+	chapterSection.appendChild(chapterGraph.element);
+
+	return [timeSection, chapterSection];
 }

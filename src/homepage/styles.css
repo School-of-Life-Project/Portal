@@ -4,6 +4,7 @@
 body {
 	font: 1em/1.2 sans-serif;
 	margin: 1lh;
+	background-color: var(--background-color);
 }
 
 a {
@@ -50,7 +51,7 @@ section,
 	border-radius: var(--card-border-radius);
 }
 
-nav.course-list {
+.section-container {
 	display: flex;
 	flex-wrap: wrap;
 	align-items: flex-start;
