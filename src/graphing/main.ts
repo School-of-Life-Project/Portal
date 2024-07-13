@@ -208,19 +208,9 @@ export class LongTermProgressGraph {
 		footerCornerItem.innerText = "Week";
 		footerRow.appendChild(footerCornerItem);
 
-		let weekInterval = 1;
-
-		if (this.weeks % 4 == 0) {
-			weekInterval = 4;
-		} else if (this.weeks % 3 == 0) {
-			weekInterval = 3;
-		} else if (this.weeks % 2 == 0) {
-			weekInterval = 2;
-		}
-
 		for (let i = this.weeks; i > 0; i--) {
 			const label = document.createElement("th");
-			if (i % weekInterval == 0) {
+			if (i % 4 == 0) {
 				label.innerText = String(i);
 			}
 			footerRow.appendChild(label);
@@ -273,4 +263,9 @@ export class LongTermProgressGraph {
 		return root;
 	}
 	// TODO
+	/*#getDay(day) {
+		day = this.weeks * 7 - day;
+
+		return this.#dataElements[(day % 7) * this.weeks + Math.floor(day / 7)];
+	}*/
 }

@@ -205,7 +205,9 @@ export class ProgressManager {
 
 		this.#intervalId = window.setInterval(() => {
 			if (this.#completion && typeof this.#completion.time_spent == "number") {
-				this.#completion.time_spent += 5;
+				if (!document.hidden) {
+					this.#completion.time_spent += 5;
+				}
 				updateCompletion(course[0].uuid, this.#completion);
 				if (timeDisplay) {
 					timeDisplay.update(this.#completion.time_spent);
