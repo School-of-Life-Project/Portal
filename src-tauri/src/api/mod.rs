@@ -3,7 +3,7 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use chrono::{NaiveDate, Utc};
+use chrono::{Local, NaiveDate};
 use serde::{Deserialize, Serialize};
 use serde_with::{serde_as, DisplayFromStr};
 use uuid::Uuid;
@@ -249,7 +249,7 @@ pub struct OverallProgress {
 
 impl OverallProgress {
     fn update(&mut self, chapter_change: f32, time_change_secs: i64) {
-        let date = Utc::now().date_naive();
+        let date = Local::now().date_naive();
 
         if chapter_change.is_normal() {
             match self.chapters_completed.entry(date) {
@@ -287,7 +287,7 @@ pub struct CourseTimeOffsets {
 
 impl CourseTimeOffsets {
     fn today(&mut self, course: &Course, completion: &CourseCompletion) -> i64 {
-        let current_date = Utc::now().date_naive();
+        let current_date = Local::now().date_naive();
 
         if self.date != Some(current_date) {
             self.date = Some(current_date);
