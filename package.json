@@ -33,7 +33,8 @@
 	"overrides": {
 		"epubjs": {
 			"@xmldom/xmldom": "npm:dry-uninstall",
-			"jszip": "npm:dry-uninstall"
+			"jszip": "npm:dry-uninstall",
+			"localforage": "npm:dry-uninstall"
 		}
 	}
 }
