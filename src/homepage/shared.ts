@@ -43,9 +43,9 @@ function sortProgressData(data: Record<string, number>) {
 
 	sortedTimeData.sort((a, b) => {
 		if (a[0] < b[0]) {
-			return -1;
-		} else if (a[0] > b[0]) {
 			return 1;
+		} else if (a[0] > b[0]) {
+			return -1;
 		} else {
 			return 0;
 		}
@@ -110,12 +110,12 @@ export function graphProgress(
 	const chapterData = sortProgressData(progress.chapters_completed);
 
 	const daysSinceLastTimeData = daysBetween(
-		timeData[timeData.length - 1][0],
 		currentDate,
+		timeData[timeData.length - 1][0],
 	);
 	const daysSinceLastChapterData = daysBetween(
-		chapterData[chapterData.length - 1][0],
 		currentDate,
+		chapterData[chapterData.length - 1][0],
 	);
 
 	const currentDayIndex = dayMappings[currentDate.getDay()];
@@ -136,11 +136,32 @@ export function graphProgress(
 		chapterProgress.push(0);
 	}
 
-	for (const [_date, data] of timeData) {
+	let lastDate: Date | undefined;
+
+	for (const [date, data] of timeData) {
+		if (!lastDate) {
+			lastDate = date;
+		} else {
+			for (let ii = 1; ii < daysBetween(date, lastDate); ii++) {
+				timeProgress.push(0);
+			}
+			lastDate = date;
+		}
+
 		timeProgress.push(data);
 	}
 
-	for (const [_date, data] of chapterData) {
+	lastDate = undefined;
+	for (const [date, data] of chapterData) {
+		if (!lastDate) {
+			lastDate = date;
+		} else {
+			for (let ii = 1; ii < daysBetween(date, lastDate); ii++) {
+				chapterProgress.push(0);
+			}
+			lastDate = date;
+		}
+
 		chapterProgress.push(data);
 	}
 
@@ -148,7 +169,7 @@ export function graphProgress(
 		"time",
 		settings.weeks_displayed,
 		0,
-		settings.maximum_daily_time,
+		settings.maximum_daily_time * 60,
 	);
 	const chapterGraph = new LongTermProgressGraph(
 		"chapter",
@@ -156,8 +177,8 @@ export function graphProgress(
 		0,
 		settings.maximum_daily_chapters,
 	);
-	timeGraph.update(timeProgress);
-	chapterGraph.update(chapterProgress);
+	timeGraph.update(timeProgress, currentDayIndex);
+	chapterGraph.update(chapterProgress, currentDayIndex);
 
 	const timeSection = document.createElement("section");
 
