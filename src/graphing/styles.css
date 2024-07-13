@@ -9,6 +9,11 @@ table.progress-map {
 	contain: strict;
 }
 
+table.progress-map th,
+table.progress-map td {
+	padding: 0.05em;
+}
+
 table.progress-map.color-key {
 	font-size: 0.9em;
 	float: right;

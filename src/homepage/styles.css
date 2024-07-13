@@ -1,0 +1,66 @@
+@import "../shared.css";
+@import "../graphing/styles.css";
+
+body {
+	font: 1em/1.2 sans-serif;
+	margin: 1lh;
+}
+
+a {
+	color: unset;
+	text-decoration: unset;
+	cursor: pointer;
+}
+
+section {
+	background-color: var(--primary-card-color);
+	padding: var(--large-card-padding);
+	display: inline-block;
+	margin: 0 1lh 1lh 0;
+}
+
+section h2,
+section h3 {
+	margin-top: 0;
+}
+
+section.course h3 {
+	font-size: 1lh;
+}
+
+.textbook {
+	width: max-content;
+	min-width: calc((22 * 0.05em) + (10 * 1.2lh));
+	background-color: var(--secondary-card-color);
+	padding: var(--small-card-padding);
+}
+
+.textbook table {
+	min-width: 100%;
+}
+
+section,
+.textbook {
+	border: var(--primary-border);
+	border-radius: var(--card-border-radius);
+}
+
+nav.course-list {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-start;
+}
+
+nav.related {
+	float: right;
+	margin-top: 0.5lh;
+}
+
+nav.related a {
+	background-color: var(--button-color);
+	border: var(--primary-border);
+	border-radius: var(--button-border-radius);
+	padding: var(--button-padding);
+	margin-left: 0.5lh;
+	white-space: nowrap;
+}

@@ -38,6 +38,7 @@ export function graphCourse(
 		container.appendChild(containerInner);
 
 		element.appendChild(container);
+		element.appendChild(document.createElement("br"));
 	}
 
 	const meter = new TimeProgressMeter(0, settings.maximum_course_time * 60);
