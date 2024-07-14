@@ -130,9 +130,9 @@ pub enum Error {
     Deserialization(#[from] toml::de::Error),
     #[error(transparent)]
     Serialization(#[from] toml::ser::Error),
-    #[error("Unable to parse Graph")]
+    #[error("{0}")]
     GraphParse(String),
-    #[error("File locking task was terminated or panicked")]
+    #[error("Task was terminated or panicked")]
     BlockingTaskFailed(#[from] JoinError),
     #[error(transparent)]
     Decompression(#[from] ZipError),
@@ -183,7 +183,7 @@ impl GraphFile {
             file.read_to_string(&mut buffer)?;
 
             let mut parser = DotParser::new(&buffer);
-            let graph = parser.parse_graph(false).map_err(Error::GraphParse)?;
+            let graph = parser.process().map_err(Error::GraphParse)?;
 
             let mut builder = GraphBuilder::new();
             builder.visit_graph(&graph);
