@@ -10,7 +10,7 @@ use super::{
 };
 
 use crate::{
-    data::{self, ConfigFile, DataManager, Error, ResourceManager, WritableConfigFile},
+    data::{self, ConfigFile, DataManager, Error, GraphFile, ResourceManager, WritableConfigFile},
     MAX_FS_CONCURRENCY,
 };
 
@@ -29,7 +29,6 @@ impl State {
     pub(super) async fn new() -> Result<Self, Error> {
         let data_dir = data::get_data_dir(crate::IDENTIFIER)?;
 
-        let extension = Some(OsString::from("toml"));
         let course_map_path = data_dir.join("Course Maps");
         let course_path = data_dir.join("Courses");
         let completion_path = data_dir.join("Progress Data");
@@ -39,9 +38,9 @@ impl State {
         let settings_path = data_dir.join("Settings.toml");
 
         let (course_maps, courses, completion, active_courses, settings) = try_join!(
-            DataManager::new(course_map_path, extension.clone()),
+            DataManager::new(course_map_path, Some(OsString::from("dot"))),
             ResourceManager::new(course_path),
-            DataManager::new(completion_path, extension),
+            DataManager::new(completion_path, Some(OsString::from("toml"))),
             WritableConfigFile::new(active_courses_path),
             WritableConfigFile::new(settings_path),
         )?;
@@ -186,11 +185,10 @@ impl State {
     async fn get_course_map(&self, id: Uuid) -> Result<CourseMap, Error> {
         let path = self.course_maps.get(id);
 
-        let mut file = ConfigFile::new(path).await?;
-        let mut map: CourseMap = file.read().await?;
-        map.update_id(id);
+        let mut file = GraphFile::new(path).await?;
+        let (graph, graphed) = file.read().await?;
 
-        Ok(map)
+        Ok(CourseMap::new(id, &graph, graphed))
     }
     pub(super) async fn set_course_active_status(&self, id: Uuid, data: bool) -> Result<(), Error> {
         let mut file = self.active_courses.lock().await;

@@ -4,6 +4,7 @@ use std::{
 };
 
 use chrono::{Local, NaiveDate};
+use layout::gv::parser::ast::{Graph, Stmt};
 use serde::{Deserialize, Serialize};
 use serde_with::{serde_as, DisplayFromStr};
 use uuid::Uuid;
@@ -13,15 +14,44 @@ pub mod wrapper;
 
 use crate::data;
 
-// TODO
+fn get_graph_ids(graph: &Graph) -> HashSet<Uuid> {
+    let mut id_set = HashSet::with_capacity(graph.list.list.len());
+
+    for segment in &graph.list.list {
+        match segment {
+            Stmt::Node(node) => {
+                for (key, value) in &node.list.list {
+                    if key == "id" {
+                        if let Ok(uuid) = Uuid::try_parse(value) {
+                            id_set.insert(uuid);
+                        }
+                    }
+                }
+            }
+            Stmt::Edge(_) | Stmt::Attribute(_) => {}
+            Stmt::SubGraph(graph) => id_set.extend(get_graph_ids(graph)),
+        }
+    }
+
+    id_set
+}
+
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CourseMap {
-    uuid: Option<Uuid>,
+    uuid: Uuid,
+    graph: String,
+    courses: HashSet<Uuid>,
 }
 
 impl CourseMap {
-    fn update_id(&mut self, id: Uuid) {
-        self.uuid = Some(id);
+    fn new(uuid: Uuid, graph: &Graph, graphed: String) -> CourseMap {
+        let courses = get_graph_ids(graph);
+
+        CourseMap {
+            uuid,
+            courses,
+            graph: graphed,
+        }
     }
 }
 

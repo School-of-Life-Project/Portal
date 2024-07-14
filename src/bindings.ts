@@ -7,7 +7,8 @@ import { invoke, convertFileSrc } from "@tauri-apps/api/tauri";
 
 export interface CourseMap {
 	uuid: string;
-	// TODO
+	graph: string;
+	courses: string[];
 }
 
 export interface Course {

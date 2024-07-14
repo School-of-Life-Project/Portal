@@ -12,7 +12,7 @@
 
 ## full-stack TODOs
 
-- [ ] Design Course Map object
+- [X] Design Course Map object
 - [ ] Design Settings object
 - [ ] Improve handling of floating-point rounding errors
 
