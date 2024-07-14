@@ -139,9 +139,12 @@ export class ViewManager {
 			return;
 		}
 
+		const rootSelector = "#" + CSS.escape(this.listingContainer.id);
+
 		const selector = "#" + CSS.escape(identifier);
 
-		this.#styleContainer.innerHTML = selector + " {font-weight: bold}";
+		this.#styleContainer.innerHTML =
+			rootSelector + " " + selector + " {font-weight: bold}";
 
 		const initialElement = this.listingContainer.querySelector(selector);
 		let currentElement = initialElement?.parentElement?.parentElement;
