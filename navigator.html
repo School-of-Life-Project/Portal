@@ -4,7 +4,7 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<link rel="stylesheet" href="src/navigator/styles.css" />
-		<!-- <script type="module" src="src/viewer/main.ts"></script> -->
+		<script type="module" src="src/navigator/navigator.ts"></script>
 	</head>
 
 	<body class="course-viewer app-page">
@@ -14,7 +14,11 @@
 				<a href="/">Exit 🚪</a>
 			</nav>
 		</header>
-		<nav class="table-of-contents" id="contentListing"></nav>
+		<nav id="contentListing">
+			<footer>
+				<button type="button" id="folderOpener">📂 Open Data Folder</button>
+			</footer>
+		</nav>
 		<article>
 			<div id="contentViewer"></div>
 		</article>
