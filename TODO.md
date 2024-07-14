@@ -22,4 +22,4 @@
 - [ ] Prune dependencies
 - [ ] Add additional Clippy lints
 - [X] Automatically decompress ePubs
-- [ ] Implement concurrent decompression of Courses / Course Files
+- [X] Implement concurrent decompression of Courses / Course Files

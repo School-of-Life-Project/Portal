@@ -8,6 +8,8 @@ mod data;
 
 use api::wrapper;
 
+pub const MAX_FS_CONCURRENCY: usize = 8;
+
 const IDENTIFIER: &str = "com.schoolOfLifeProject.Portal";
 
 const PROJECT_ISSUE_TRACKER: &str = "https://github.com/School-of-Life-Project/Portal-App/issues";

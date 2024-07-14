@@ -4,12 +4,13 @@ use std::{
     collections::HashSet,
     env,
     ffi::{OsStr, OsString},
-    fs::{File, OpenOptions},
+    fs::{read_dir, File, OpenOptions},
     io::{ErrorKind, Read, Seek, SeekFrom, Write},
     path::{Component, Path, PathBuf},
 };
 
 use advisory_lock::{AdvisoryFileLock, FileLockError, FileLockMode};
+use futures_util::future::try_join_all;
 use serde::{de::DeserializeOwned, Serialize};
 use thiserror::Error;
 use tokio::{
@@ -20,6 +21,8 @@ use tokio::{
 use toml::{Deserializer, Serializer};
 use uuid::{fmt::Simple, Uuid};
 use zip::{result::ZipError, ZipArchive};
+
+use crate::MAX_FS_CONCURRENCY;
 
 pub fn into_relative_path(root: &Path, path: &Path) -> PathBuf {
     let mut new = PathBuf::from(root);
@@ -55,6 +58,19 @@ pub fn get_data_dir(dirname: &str) -> Result<PathBuf, Error> {
     path.set_file_name(dirname);
 
     Ok(path)
+}
+
+async fn get_paths(path: PathBuf) -> Result<Vec<PathBuf>, Error> {
+    task::spawn_blocking(move || -> Result<_, Error> {
+        let mut entries = Vec::new();
+
+        for entry in read_dir(path)? {
+            entries.push(entry?.path());
+        }
+
+        Ok(entries)
+    })
+    .await?
 }
 
 pub async fn ensure_folder_exists(path: &Path) -> Result<(), Error> {
@@ -272,43 +288,54 @@ impl DataManager {
 
         path
     }
+    async fn handle_scanned_path(&self, path: &Path) -> Result<Option<Uuid>, Error> {
+        let is_file = match fs::metadata(path).await {
+            Ok(metadata) => metadata.is_file(),
+            Err(_) => false,
+        };
+
+        let extension = path.extension();
+
+        if !is_file || extension.map(OsStr::to_ascii_lowercase) != self.extension {
+            return Ok(None);
+        }
+
+        let filestem = path.file_stem().unwrap_or_default().to_string_lossy();
+
+        let uuid = Uuid::try_parse(&filestem).unwrap_or_else(|_| Uuid::new_v4());
+        let mut buffer = Uuid::encode_buffer();
+        let formatted = Simple::from_uuid(uuid).encode_lower(&mut buffer);
+
+        if *formatted != *filestem || extension != self.extension.as_deref() {
+            let mut new_path = path.with_file_name(formatted);
+            if let Some(extension) = &self.extension {
+                new_path.set_extension(extension);
+            }
+            fs::rename(path, new_path).await?;
+        }
+
+        Ok(Some(uuid))
+    }
     pub async fn scan(&self) -> Result<HashSet<Uuid>, Error> {
         let mut items = HashSet::new();
-        let mut buffer = Uuid::encode_buffer();
 
-        let mut entries = fs::read_dir(&self.root).await?;
-        while let Some(entry) = entries.next_entry().await? {
-            let path = entry.path();
+        let paths = get_paths(self.root.clone()).await?;
+        for path_chunk in paths.chunks(MAX_FS_CONCURRENCY) {
+            let mut future_set = Vec::with_capacity(MAX_FS_CONCURRENCY);
 
-            let is_file = match entry.metadata().await {
-                Ok(metadata) => metadata.is_file(),
-                Err(_) => false,
-            };
-
-            let extension = path.extension();
-
-            if !is_file || extension.map(OsStr::to_ascii_lowercase) != self.extension {
-                continue;
+            for path in path_chunk {
+                future_set.push(self.handle_scanned_path(path));
             }
 
-            let filestem = path.file_stem().unwrap_or_default().to_string_lossy();
+            let results = try_join_all(future_set).await?;
 
-            let uuid = Uuid::try_parse(&filestem).unwrap_or_else(|_| Uuid::new_v4());
-            let formatted = Simple::from_uuid(uuid).encode_lower(&mut buffer);
-
-            if items.contains(&uuid) {
-                return Err(Error::Io(io::Error::from(ErrorKind::AlreadyExists)));
-            }
-
-            if *formatted != *filestem || extension != self.extension.as_deref() {
-                let mut new_path = path.with_file_name(formatted);
-                if let Some(extension) = &self.extension {
-                    new_path.set_extension(extension);
+            for result in results.into_iter().flatten() {
+                if items.contains(&result) {
+                    return Err(Error::Io(io::Error::from(ErrorKind::AlreadyExists)));
                 }
-                fs::rename(&path, new_path).await?;
-            }
 
-            items.insert(uuid);
+                items.insert(result);
+            }
         }
 
         Ok(items)
@@ -320,6 +347,7 @@ pub struct ResourceManager {
     pub root: PathBuf,
     zip_extension: Option<OsString>,
     temp_extension: Option<OsString>,
+    temp_extension_string: OsString,
 }
 
 impl ResourceManager {
@@ -330,6 +358,7 @@ impl ResourceManager {
             root,
             zip_extension: Some(OsString::from("zip")),
             temp_extension: Some(OsString::from("temp")),
+            temp_extension_string: OsString::from("temp"),
         })
     }
     /// Get the path corresponding to a Uuid.
@@ -339,59 +368,69 @@ impl ResourceManager {
         self.root
             .join(Simple::from_uuid(id).encode_lower(&mut Uuid::encode_buffer()))
     }
+    async fn handle_scanned_path(&self, mut path: PathBuf) -> Result<Option<Uuid>, Error> {
+        let is_dir = match fs::metadata(&path).await {
+            Ok(metadata) => metadata.is_dir(),
+            Err(_) => return Ok(None),
+        };
+
+        let extension = path.extension().map(OsStr::to_ascii_lowercase);
+
+        if extension == self.temp_extension {
+            if is_dir {
+                fs::remove_dir_all(path).await?;
+            } else {
+                fs::remove_file(path).await?;
+            }
+            return Ok(None);
+        }
+
+        if !is_dir {
+            if extension != self.zip_extension {
+                return Ok(None);
+            }
+
+            let tmp_path = path.with_extension(&self.temp_extension_string);
+            let result_path = path.with_extension("");
+
+            unzip(path.clone(), tmp_path.clone(), result_path.clone()).await?;
+
+            path = result_path;
+        }
+
+        let filename = path.file_name().unwrap_or_default().to_string_lossy();
+
+        let uuid = Uuid::try_parse(&filename).unwrap_or_else(|_| Uuid::new_v4());
+        let mut buffer = Uuid::encode_buffer();
+        let formatted = Simple::from_uuid(uuid).encode_lower(&mut buffer);
+
+        if *formatted != *filename {
+            fs::rename(&path, path.with_file_name(formatted)).await?;
+        }
+
+        Ok(Some(uuid))
+    }
     pub async fn scan(&self) -> Result<HashSet<Uuid>, Error> {
         let mut items = HashSet::new();
-        let mut buffer = Uuid::encode_buffer();
 
-        let mut entries = fs::read_dir(&self.root).await?;
-        let temp_ext_os_string = self.temp_extension.clone().unwrap();
+        let paths = get_paths(self.root.clone()).await?;
 
-        while let Some(entry) = entries.next_entry().await? {
-            let mut path = entry.path();
+        for path_chunk in paths.chunks(MAX_FS_CONCURRENCY) {
+            let mut future_set = Vec::with_capacity(MAX_FS_CONCURRENCY);
 
-            let is_dir = match entry.metadata().await {
-                Ok(metadata) => metadata.is_dir(),
-                Err(_) => continue,
-            };
-
-            let extension = path.extension().map(OsStr::to_ascii_lowercase);
-
-            if extension == self.temp_extension {
-                if is_dir {
-                    fs::remove_dir_all(path).await?;
-                } else {
-                    fs::remove_file(path).await?;
-                }
-                continue;
+            for path in path_chunk {
+                future_set.push(self.handle_scanned_path(path.clone()));
             }
 
-            if !is_dir {
-                if extension != self.zip_extension {
-                    continue;
+            let results = try_join_all(future_set).await?;
+
+            for result in results.into_iter().flatten() {
+                if items.contains(&result) {
+                    return Err(Error::Io(io::Error::from(ErrorKind::AlreadyExists)));
                 }
 
-                let tmp_path = path.with_extension(&temp_ext_os_string);
-                let result_path = path.with_extension("");
-
-                unzip(path.clone(), tmp_path.clone(), result_path.clone()).await?;
-
-                path = result_path;
+                items.insert(result);
             }
-
-            let filename = path.file_name().unwrap_or_default().to_string_lossy();
-
-            let uuid = Uuid::try_parse(&filename).unwrap_or_else(|_| Uuid::new_v4());
-            let formatted = Simple::from_uuid(uuid).encode_lower(&mut buffer);
-
-            if items.contains(&uuid) {
-                return Err(Error::Io(io::Error::from(ErrorKind::AlreadyExists)));
-            }
-
-            if *formatted != *filename {
-                fs::rename(&path, path.with_file_name(formatted)).await?;
-            }
-
-            items.insert(uuid);
         }
 
         Ok(items)

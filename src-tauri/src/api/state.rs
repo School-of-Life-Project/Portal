@@ -9,7 +9,10 @@ use super::{
     OverallProgress, Settings,
 };
 
-use crate::data::{self, ConfigFile, DataManager, Error, ResourceManager, WritableConfigFile};
+use crate::{
+    data::{self, ConfigFile, DataManager, Error, ResourceManager, WritableConfigFile},
+    MAX_FS_CONCURRENCY,
+};
 
 pub(super) struct State {
     pub(super) data_dir: PathBuf,
@@ -21,8 +24,6 @@ pub(super) struct State {
     settings: Mutex<WritableConfigFile>,
     offsets: Mutex<WritableConfigFile>,
 }
-
-pub const MAX_FS_CONCURRENCY: usize = 8;
 
 impl State {
     pub(super) async fn new() -> Result<Self, Error> {

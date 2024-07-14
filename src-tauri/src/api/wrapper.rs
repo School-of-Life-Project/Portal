@@ -16,11 +16,11 @@ use tauri::{FsScope, Manager};
 use tokio::{fs, sync::OnceCell};
 use uuid::Uuid;
 
-use crate::data;
+use crate::{data, MAX_FS_CONCURRENCY};
 
 use super::{
-    state::{State, MAX_FS_CONCURRENCY},
-    Course, CourseCompletion, CourseMap, CourseProgress, OverallProgress, Settings, Textbook,
+    state::State, Course, CourseCompletion, CourseMap, CourseProgress, OverallProgress, Settings,
+    Textbook,
 };
 
 #[derive(Serialize, Deserialize, Debug)]
