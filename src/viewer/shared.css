@@ -1,0 +1,122 @@
+@import "../shared.css";
+
+body {
+	font: 1em/1.2 sans-serif;
+}
+
+a {
+	color: unset;
+	text-decoration: unset;
+	cursor: pointer;
+}
+
+ol {
+	padding-left: 1.75lh;
+}
+
+details summary {
+	cursor: pointer;
+}
+
+header,
+#contentListing,
+#contentViewer {
+	position: absolute;
+	box-sizing: border-box;
+	contain: strict;
+}
+
+#contentListing,
+#contentViewer {
+	height: calc(100vh - 3lh);
+}
+
+#contentViewer {
+	right: 0;
+	bottom: 0;
+	width: calc(100vw - (1.6lh + 30ch));
+	color: black;
+	background-color: white;
+	overflow: auto;
+}
+
+#contentListing {
+	z-index: 2;
+	left: 0;
+	bottom: 0;
+	width: calc(1.6lh + 30ch);
+	background-color: var(--side-navbar-color);
+	border-right: var(--secondary-border);
+	padding: 0.8lh 0.8em 0.8lh 0.8lh;
+	overflow: auto;
+}
+
+header {
+	z-index: 3;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 3lh;
+	background-color: var(--top-navbar-color);
+	border-bottom: var(--secondary-border);
+	padding: 0 0.8lh;
+	vertical-align: baseline;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+header h1 {
+	font-size: 1.2em;
+	flex-shrink: 2;
+}
+
+header nav {
+	display: flex;
+	align-items: center;
+	flex-shrink: 0;
+}
+
+header nav a {
+	background-color: var(--button-color);
+	border: var(--secondary-border);
+	border-radius: var(--button-border-radius);
+	padding: var(--button-padding);
+	margin-left: 0.8lh;
+	white-space: nowrap;
+}
+
+#contentListing a:hover {
+	text-decoration: underline;
+}
+
+#contentListing > ol {
+	padding: 0;
+	margin: 0;
+}
+
+#contentListing > ol > li:first-of-type {
+	margin-top: 0;
+}
+
+#contentListing ol {
+	list-style: none;
+}
+
+#contentListing li {
+	margin: calc((1lh - 1ch) / 2) 0;
+}
+
+@media (max-width: calc((1.6lh + 30ch) + 120ch)) {
+	#contentViewer {
+		width: calc(100vw - 1.6lh);
+	}
+
+	#contentListing:not(:hover) {
+		width: unset;
+	}
+
+	#contentListing:not(:hover) > * {
+		display: none;
+	}
+}

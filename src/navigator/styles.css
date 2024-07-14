@@ -1,5 +1,4 @@
-@import "../shared.css";
-@import "styles.css";
+@import "../viewer/shared.css";
 
 #contentListing h2 {
 	margin-top: 0;
