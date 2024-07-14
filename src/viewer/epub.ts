@@ -127,6 +127,25 @@ export class ePubViewer implements DocumentViewer {
 						allowScriptedContent: true,
 					});
 
+					const renderPromise = new Promise(
+						(resolve: (value: void) => void) => {
+							view.render(
+								convertNavItems(navigation.toc),
+								(identifier) => {
+									rendition.display(identifier);
+								},
+								metadata.title,
+								metadata.language,
+							);
+							progress.render(
+								[this.course, initialProgress],
+								this.document_index,
+							);
+
+							resolve();
+						},
+					);
+
 					return rendition
 						.display(initialProgress.position[this.document_index])
 						.then(() => {
@@ -147,19 +166,6 @@ export class ePubViewer implements DocumentViewer {
 								}
 							});
 
-							view.render(
-								convertNavItems(navigation.toc),
-								(identifier) => {
-									rendition.display(identifier);
-								},
-								metadata.title,
-								metadata.language,
-							);
-							progress.render(
-								[this.course, initialProgress],
-								this.document_index,
-							);
-
 							if (this.#inner) {
 								this.#inner.resizeObserver = new ResizeObserver((_event) => {
 									// @ts-expect-error need to call rendition.resize() with zero arguments to resize without providing a specific length and height
@@ -169,6 +175,8 @@ export class ePubViewer implements DocumentViewer {
 							}
 
 							this.rendered = true;
+
+							return renderPromise;
 						});
 				},
 			);
