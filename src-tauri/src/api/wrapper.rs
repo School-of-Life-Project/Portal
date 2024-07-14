@@ -10,7 +10,7 @@ use std::{
     sync::Arc,
 };
 
-use futures_util::join;
+use futures_util::{future::try_join_all, join};
 use serde::{Deserialize, Serialize};
 use tauri::{FsScope, Manager};
 use tokio::{fs, sync::OnceCell};
@@ -19,7 +19,8 @@ use uuid::Uuid;
 use crate::data;
 
 use super::{
-    state::State, Course, CourseCompletion, CourseMap, CourseProgress, OverallProgress, Settings,
+    state::{State, MAX_FS_CONCURRENCY},
+    Course, CourseCompletion, CourseMap, CourseProgress, OverallProgress, Settings, Textbook,
 };
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -158,6 +159,44 @@ fn allow_path(scope: &FsScope, path: &mut PathBuf, is_dir: bool) -> Result<(), E
     })
 }
 
+async fn prepare_textbook(
+    scope: &FsScope,
+    book: &mut Textbook,
+    epub_extension: &Option<OsString>,
+) -> Result<(), ErrorWrapper> {
+    let extracted_path = book.file.with_extension("decompressed.epub");
+
+    let (metadata_extract, metadata_full) =
+        join!(fs::metadata(&extracted_path), fs::metadata(&book.file));
+
+    if let Ok(metadata) = metadata_full {
+        if metadata.is_dir() {
+            allow_path(scope, &mut book.file, true)?;
+        } else if book.file.extension().map(OsStr::to_ascii_lowercase) == *epub_extension {
+            let tmp_path = book.file.with_extension("temp");
+
+            data::unzip(book.file.clone(), tmp_path, extracted_path.clone())
+                .await
+                .map_err(|e| {
+                    ErrorWrapper::new(format!("Unable to extract {:?}", &book.file), &e)
+                })?;
+
+            book.file = extracted_path;
+
+            allow_path(scope, &mut book.file, true)?;
+        } else {
+            allow_path(scope, &mut book.file, false)?;
+        }
+    } else if let Ok(metadata) = metadata_extract {
+        if metadata.is_dir() {
+            book.file = extracted_path;
+            allow_path(scope, &mut book.file, true)?;
+        }
+    }
+
+    Ok(())
+}
+
 #[tauri::command]
 pub async fn get_course(
     app_handle: tauri::AppHandle,
@@ -174,39 +213,15 @@ pub async fn get_course(
     let scope = app_handle.asset_protocol_scope();
 
     let epub_extension = Some(OsString::from("epub"));
-    let epub_extracted_extension = OsString::from("decompressed.epub");
-    let tmp_extension = OsString::from("temp");
 
-    for book in &mut course.books {
-        let extracted_path = book.file.with_extension(&epub_extracted_extension);
+    for book_chunk in course.books.chunks_mut(MAX_FS_CONCURRENCY / 2) {
+        let mut future_set = Vec::with_capacity(MAX_FS_CONCURRENCY / 2);
 
-        let (metadata_extract, metadata_full) =
-            join!(fs::metadata(&extracted_path), fs::metadata(&book.file));
-
-        if let Ok(metadata) = metadata_full {
-            if metadata.is_dir() {
-                allow_path(&scope, &mut book.file, true)?;
-            } else if book.file.extension().map(OsStr::to_ascii_lowercase) == epub_extension {
-                let tmp_path = book.file.with_extension(&tmp_extension);
-
-                data::unzip(book.file.clone(), tmp_path, extracted_path.clone())
-                    .await
-                    .map_err(|e| {
-                        ErrorWrapper::new(format!("Unable to extract {:?}", &book.file), &e)
-                    })?;
-
-                book.file = extracted_path;
-
-                allow_path(&scope, &mut book.file, true)?;
-            } else {
-                allow_path(&scope, &mut book.file, false)?;
-            }
-        } else if let Ok(metadata) = metadata_extract {
-            if metadata.is_dir() {
-                book.file = extracted_path;
-                allow_path(&scope, &mut book.file, true)?;
-            }
+        for book in book_chunk {
+            future_set.push(prepare_textbook(&scope, book, &epub_extension));
         }
+
+        try_join_all(future_set).await?;
     }
 
     Ok((course, progress))

@@ -22,7 +22,7 @@ pub(super) struct State {
     offsets: Mutex<WritableConfigFile>,
 }
 
-const MAX_FS_CONCURRENCY: usize = 8;
+pub const MAX_FS_CONCURRENCY: usize = 8;
 
 impl State {
     pub(super) async fn new() -> Result<Self, Error> {
