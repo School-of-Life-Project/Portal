@@ -139,10 +139,11 @@ export class ViewManager {
 			return;
 		}
 
-		this.#styleContainer.innerHTML =
-			"#" + CSS.escape(identifier) + " {font-weight: bold}";
+		const selector = "#" + CSS.escape(identifier);
 
-		const initialElement = window.document.getElementById(identifier);
+		this.#styleContainer.innerHTML = selector + " {font-weight: bold}";
+
+		const initialElement = this.listingContainer.querySelector(selector);
 		let currentElement = initialElement?.parentElement?.parentElement;
 		while (
 			currentElement &&
@@ -237,6 +238,11 @@ export class ProgressManager {
 		this.timerContainer.innerHTML = "";
 		this.rendered = false;
 	}
+	#getListingElement(identifier: string): HTMLElement | null {
+		const selector = "#" + CSS.escape(identifier);
+
+		return this.manager.listingContainer.querySelector(selector);
+	}
 	#buildListingProgressTracker(
 		course: { course: Course; progress: CourseCompletionData },
 		document_index: number,
@@ -245,7 +251,7 @@ export class ProgressManager {
 
 		for (const chapter of textbook.chapters) {
 			if (chapter.root) {
-				const element = document.getElementById(chapter.root);
+				const element = this.#getListingElement(chapter.root);
 
 				if (element && element.parentElement) {
 					element.parentElement.appendChild(
@@ -287,7 +293,7 @@ export class ProgressManager {
 	) {
 		for (const sectionGroup of chapter.sections) {
 			for (const section of sectionGroup) {
-				const element = document.getElementById(section);
+				const element = this.#getListingElement(section);
 
 				if (element && element.parentElement) {
 					element.parentElement.appendChild(
@@ -313,14 +319,16 @@ export class ProgressManager {
 			}
 		}
 	}
-	#buildCheckbox(checked: boolean, listener: (event: Event) => void) {
+	#buildCheckbox(checked: boolean, listener?: (event: Event) => void) {
 		const checkbox = document.createElement("input");
 		checkbox.setAttribute("type", "checkbox");
 
 		if (checked) {
 			checkbox.setAttribute("checked", "");
 		}
-		checkbox.addEventListener("change", listener);
+		if (listener) {
+			checkbox.addEventListener("change", listener);
+		}
 
 		return checkbox;
 	}
@@ -352,7 +360,7 @@ export class ProgressManager {
 			return;
 		}
 
-		const element = document.getElementById(identifier);
+		const element = this.#getListingElement(identifier);
 		if (element && element.parentElement) {
 			const inputElements = element.parentElement.getElementsByTagName("input");
 
@@ -368,7 +376,7 @@ export class ProgressManager {
 
 		for (const chapter of textbook.chapters) {
 			if (chapter.root) {
-				const element = document.getElementById(chapter.root);
+				const element = this.#getListingElement(chapter.root);
 				if (element) {
 					this.#handleListingItemVisibility(
 						element,
@@ -387,7 +395,7 @@ export class ProgressManager {
 
 				for (const sectionGroup of chapter.sections) {
 					for (const section of sectionGroup) {
-						const element = document.getElementById(section);
+						const element = this.#getListingElement(section);
 						if (element) {
 							this.#handleListingItemVisibility(
 								element,
