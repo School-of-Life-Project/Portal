@@ -40,17 +40,18 @@ if (courseContainer && progressContainer && settings) {
 
 		sortCourses(courses);
 
-		courseContainer.innerHTML = "";
+		const fragment = document.createDocumentFragment();
 
 		for (const course of courses) {
 			if (course.Ok) {
-				courseContainer.appendChild(
-					graphCourse(settings, course.Ok[0], course.Ok[1]),
-				);
+				fragment.appendChild(graphCourse(settings, course.Ok[0], course.Ok[1]));
 			} else if (course.Err) {
 				displayError(course.Err);
 			}
 		}
+
+		courseContainer.innerHTML = "";
+		courseContainer.appendChild(fragment);
 	});
 
 	progressPromise.then((progress) => {
@@ -60,9 +61,11 @@ if (courseContainer && progressContainer && settings) {
 
 		const [timeGraph, sectionGraph] = graphProgress(settings, progress);
 
-		progressContainer.innerHTML = "";
+		const fragment = document.createDocumentFragment();
+		fragment.appendChild(timeGraph);
+		fragment.appendChild(sectionGraph);
 
-		progressContainer.appendChild(timeGraph);
-		progressContainer.appendChild(sectionGraph);
+		progressContainer.innerHTML = "";
+		progressContainer.appendChild(fragment);
 	});
 }
