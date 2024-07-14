@@ -44,8 +44,6 @@ export class TimeProgressMeter {
 			} else {
 				element.className = "";
 			}
-			element.style.cssText = "color: transparent"; // Ugly hack
-			element.style.cssText = ""; // Ugly hack
 		});
 	}
 }
@@ -95,8 +93,6 @@ export class BookChapterGraph {
 
 			if (i >= progress.length) {
 				element.className = "";
-				element.style.cssText = "color: transparent"; // Ugly hack
-				element.style.cssText = ""; // Ugly hack
 				continue;
 			}
 
@@ -109,8 +105,6 @@ export class BookChapterGraph {
 			} else {
 				element.className = "";
 			}
-			element.style.cssText = "color: transparent"; // Ugly hack
-			element.style.cssText = ""; // Ugly hack
 		}
 	}
 }
@@ -273,15 +267,11 @@ export class LongTermProgressGraph {
 
 			if (i >= progress.length) {
 				element.className = "";
-				element.style.cssText = "color: transparent"; // Ugly hack
-				element.style.cssText = ""; // Ugly hack
 				continue;
 			}
 
 			if (Number.isNaN(progress[i])) {
 				element.className = "no-data";
-				element.style.cssText = "color: transparent"; // Ugly hack
-				element.style.cssText = ""; // Ugly hack
 				continue;
 			}
 
@@ -300,9 +290,6 @@ export class LongTermProgressGraph {
 			if (i == activeIndex) {
 				element.classList.add("in-progress");
 			}
-
-			element.style.cssText = "color: transparent"; // Ugly hack
-			element.style.cssText = ""; // Ugly hack
 		}
 	}
 }
