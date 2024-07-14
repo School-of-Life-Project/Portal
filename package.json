@@ -26,7 +26,6 @@
 	"dependencies": {
 		"@tauri-apps/api": "^1.6.0",
 		"epubjs": "^0.3.93",
-		"mermaid": "^10.9.1",
 		"panzoom": "^9.4.3",
 		"pdfjs-dist": "^4.4.168"
 	},

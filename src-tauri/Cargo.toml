@@ -45,6 +45,7 @@ zip = { version = "2.1.3", default-features = false, features = [
 	"lzma",
 	"zstd",
 ] }
+layout-rs = "0.1.2"
 
 [features]
 custom-protocol = [
