@@ -6,7 +6,7 @@
 	- [ ] Implement Course Navigator
 	- [ ] Implement Settings
 - [X] Optimize ePub viewer loading
-- [ ] Optimize ProgressManager eventListeners
+- [ ] Optimize shared viewer code
 - [ ] Write unit tests with vitest
 - [ ] Determine necessary polyfills
 

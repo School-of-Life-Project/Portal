@@ -18,6 +18,10 @@ export interface ListingItem {
 
 export type ListingCallback = (identifier: string) => void;
 
+// TODO:
+// - Reduce DOM updates by combining viewManager.render() and listingManager.render()
+// - Optimize event listners using event delegation and event.stopPropagation()
+
 export class ViewManager {
 	titleContainer: HTMLElement;
 	listingContainer: HTMLElement;
