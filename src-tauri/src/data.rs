@@ -11,10 +11,6 @@ use std::{
 
 use advisory_lock::{AdvisoryFileLock, FileLockError, FileLockMode};
 use futures_util::future::try_join_all;
-use layout::{
-    backends::svg::SVGWriter,
-    gv::{parser::ast::Graph, DotParser, GraphBuilder},
-};
 use serde::{de::DeserializeOwned, Serialize};
 use thiserror::Error;
 use tokio::{
@@ -130,8 +126,6 @@ pub enum Error {
     Deserialization(#[from] toml::de::Error),
     #[error(transparent)]
     Serialization(#[from] toml::ser::Error),
-    #[error("{0}")]
-    GraphParse(String),
     #[error("Task was terminated or panicked")]
     BlockingTaskFailed(#[from] JoinError),
     #[error(transparent)]
@@ -154,49 +148,6 @@ impl From<FileLockError> for Error {
             FileLockError::AlreadyLocked => Self::AlreadyLocked,
             FileLockError::Io(err) => Self::Io(err),
         }
-    }
-}
-
-pub struct GraphFile {
-    file: File,
-}
-
-impl GraphFile {
-    pub async fn new(path: PathBuf) -> Result<Self, Error> {
-        let file = task::spawn_blocking(move || -> Result<_, Error> {
-            let file = File::open(path)?;
-            file.lock(FileLockMode::Shared)?;
-
-            Ok(file)
-        })
-        .await??;
-
-        Ok(Self { file })
-    }
-    pub async fn read(&mut self) -> Result<(Graph, String), Error> {
-        let mut file = self.file.try_clone()?;
-        task::spawn_blocking(move || -> Result<_, Error> {
-            let metadata = file.metadata()?;
-            let mut buffer = String::with_capacity(metadata.len().try_into().unwrap_or_default());
-
-            file.seek(SeekFrom::Start(0))?;
-            file.read_to_string(&mut buffer)?;
-
-            let mut parser = DotParser::new(&buffer);
-            let graph = parser.process().map_err(Error::GraphParse)?;
-
-            let mut builder = GraphBuilder::new();
-            builder.visit_graph(&graph);
-            let mut visual = builder.get();
-
-            let mut svg = SVGWriter::new();
-            visual.do_it(false, false, false, &mut svg);
-
-            let graphed = svg.finalize();
-
-            Ok((graph, graphed))
-        })
-        .await?
     }
 }
 

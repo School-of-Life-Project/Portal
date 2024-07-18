@@ -111,7 +111,7 @@ pub async fn open_project_repo(state: tauri::State<'_, StateWrapper>) -> Result<
 #[tauri::command]
 pub async fn get_course_maps(
     state: tauri::State<'_, StateWrapper>,
-) -> Result<Vec<Result<CourseMap, ErrorWrapper>>, ErrorWrapper> {
+) -> Result<Vec<Result<(CourseMap, String), ErrorWrapper>>, ErrorWrapper> {
     let state = state.state().await?;
 
     state

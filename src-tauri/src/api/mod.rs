@@ -4,54 +4,113 @@ use std::{
 };
 
 use chrono::{Local, NaiveDate};
-use layout::gv::parser::ast::{Graph, Stmt};
+use layout::{
+    backends::svg::SVGWriter,
+    gv::{
+        parser::ast::{
+            ArrowKind, AttributeList, EdgeStmt, Graph, NodeId, NodeStmt, Stmt, StmtList,
+        },
+        GraphBuilder,
+    },
+};
 use serde::{Deserialize, Serialize};
 use serde_with::{serde_as, DisplayFromStr};
-use uuid::Uuid;
+use uuid::{fmt::Simple, Uuid};
 
 mod state;
 pub mod wrapper;
 
 use crate::data;
 
-fn get_graph_ids(graph: &Graph) -> HashSet<Uuid> {
-    let mut id_set = HashSet::with_capacity(graph.list.list.len());
-
-    for segment in &graph.list.list {
-        match segment {
-            Stmt::Node(node) => {
-                for (key, value) in &node.list.list {
-                    if key == "id" {
-                        if let Ok(uuid) = Uuid::try_parse(value) {
-                            id_set.insert(uuid);
-                        }
-                    }
-                }
-            }
-            Stmt::Edge(_) | Stmt::Attribute(_) => {}
-            Stmt::SubGraph(graph) => id_set.extend(get_graph_ids(graph)),
-        }
-    }
-
-    id_set
+#[derive(Serialize, Deserialize, Debug)]
+pub struct CourseMap {
+    uuid: Option<Uuid>,
+    title: String,
+    description: Option<String>,
+    courses: Vec<CourseMapCourse>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct CourseMap {
+pub struct CourseMapCourse {
     uuid: Uuid,
-    graph: String,
-    courses: HashSet<Uuid>,
+    label: String,
+    group: u8,
+    prerequisites: Vec<Uuid>,
+    corequisites: Vec<Uuid>,
 }
 
 impl CourseMap {
-    fn new(uuid: Uuid, graph: &Graph, graphed: String) -> CourseMap {
-        let courses = get_graph_ids(graph);
+    fn graph(&self) -> String {
+        let mut buffer = Uuid::encode_buffer();
 
-        CourseMap {
-            uuid,
-            courses,
-            graph: graphed,
+        let mut to_node_id = |uuid| {
+            let formatter = Simple::from_uuid(uuid);
+            NodeId {
+                name: formatter.encode_lower(&mut buffer).to_owned(),
+                port: None,
+            }
+        };
+
+        let mut list = Vec::with_capacity(self.courses.len());
+
+        for course in &self.courses {
+            let root = to_node_id(course.uuid);
+
+            list.push(Stmt::Node(NodeStmt {
+                id: root.clone(),
+                list: AttributeList {
+                    list: [
+                        ("label".to_string(), course.label.clone()),
+                        ("group".to_string(), course.group.to_string()),
+                        ("class".to_string(), course.group.to_string()),
+                    ]
+                    .to_vec(),
+                },
+            }));
+
+            for prerequisite in &course.prerequisites {
+                list.push(Stmt::Edge(EdgeStmt {
+                    from: to_node_id(*prerequisite),
+                    to: [(root.clone(), ArrowKind::Arrow)].to_vec(),
+                    list: AttributeList {
+                        list: [
+                            ("label".to_string(), "prerequisite".to_string()),
+                            ("class".to_string(), course.group.to_string()),
+                        ]
+                        .to_vec(),
+                    },
+                }));
+            }
+
+            for corequisite in &course.corequisites {
+                list.push(Stmt::Edge(EdgeStmt {
+                    from: to_node_id(*corequisite),
+                    to: [(root.clone(), ArrowKind::Line)].to_vec(),
+                    list: AttributeList {
+                        list: [
+                            ("label".to_string(), "corequisite".to_string()),
+                            ("class".to_string(), course.group.to_string()),
+                        ]
+                        .to_vec(),
+                    },
+                }));
+            }
         }
+
+        let graph = Graph {
+            name: self.title.to_string(),
+            list: StmtList { list },
+        };
+
+        let mut builder = GraphBuilder::new();
+        builder.visit_graph(&graph);
+
+        let mut writer = SVGWriter::new();
+
+        let mut visual = builder.get();
+        visual.do_it(false, false, false, &mut writer);
+
+        writer.finalize()
     }
 }
 

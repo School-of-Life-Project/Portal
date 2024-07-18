@@ -10,7 +10,7 @@ use super::{
 };
 
 use crate::{
-    data::{self, ConfigFile, DataManager, Error, GraphFile, ResourceManager, WritableConfigFile},
+    data::{self, ConfigFile, DataManager, Error, ResourceManager, WritableConfigFile},
     MAX_FS_CONCURRENCY,
 };
 
@@ -156,7 +156,7 @@ impl State {
     }
     pub(super) async fn get_course_maps(
         &self,
-    ) -> Result<Vec<Result<CourseMap, ErrorWrapper>>, Error> {
+    ) -> Result<Vec<Result<(CourseMap, String), ErrorWrapper>>, Error> {
         let course_map_list: Vec<Uuid> = self.course_maps.scan().await?.into_iter().collect();
 
         let mut course_maps = Vec::with_capacity(course_map_list.len());
@@ -182,13 +182,16 @@ impl State {
 
         Ok(course_maps)
     }
-    async fn get_course_map(&self, id: Uuid) -> Result<CourseMap, Error> {
+    async fn get_course_map(&self, id: Uuid) -> Result<(CourseMap, String), Error> {
         let path = self.course_maps.get(id);
 
-        let mut file = GraphFile::new(path).await?;
-        let (graph, graphed) = file.read().await?;
+        let mut file = ConfigFile::new(path).await?;
+        let mut map = file.read::<CourseMap>().await?;
+        map.uuid = Some(id);
 
-        Ok(CourseMap::new(id, &graph, graphed))
+        let graphed = map.graph();
+
+        Ok((map, graphed))
     }
     pub(super) async fn set_course_active_status(&self, id: Uuid, data: bool) -> Result<(), Error> {
         let mut file = self.active_courses.lock().await;
