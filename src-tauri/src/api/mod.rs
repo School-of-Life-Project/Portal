@@ -24,7 +24,9 @@ use crate::data;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CourseMap {
+    #[serde(skip_deserializing)]
     uuid: Option<Uuid>,
+
     title: String,
     description: Option<String>,
     courses: Vec<CourseMapCourse>,
@@ -34,8 +36,11 @@ pub struct CourseMap {
 pub struct CourseMapCourse {
     uuid: Uuid,
     label: String,
+    #[serde(default)]
     group: u8,
+    #[serde(default)]
     prerequisites: Vec<Uuid>,
+    #[serde(default)]
     corequisites: Vec<Uuid>,
 }
 
@@ -117,7 +122,8 @@ impl CourseMap {
 /// A Course bundle index
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Course {
-    /// The unique ID of the course. Do NOT include in an index file, this will be automatically overwritten by the Course's folder name.
+    /// The unique ID of the course.
+    #[serde(skip_deserializing)]
     uuid: Option<Uuid>,
     /// Title for the course
     title: String,

@@ -38,7 +38,7 @@ impl State {
         let settings_path = data_dir.join("Settings.toml");
 
         let (course_maps, courses, completion, active_courses, settings) = try_join!(
-            DataManager::new(course_map_path, Some(OsString::from("dot"))),
+            DataManager::new(course_map_path, Some(OsString::from("toml"))),
             ResourceManager::new(course_path),
             DataManager::new(completion_path, Some(OsString::from("toml"))),
             WritableConfigFile::new(active_courses_path),
