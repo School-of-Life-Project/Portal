@@ -7,8 +7,17 @@ import { invoke, convertFileSrc } from "@tauri-apps/api/tauri";
 
 export interface CourseMap {
 	uuid: string;
-	graph: string;
-	courses: string[];
+	title: string;
+	description?: string;
+	courses: CourseMapCourse[];
+}
+
+export interface CourseMapCourse {
+	uuid: string;
+	label: string;
+	group: number;
+	prerequisites: string[];
+	corequisites: string[];
 }
 
 export interface Course {
@@ -114,7 +123,9 @@ export function displayError(error: Error) {
 	window.location.assign("/error.html?" + params.toString());
 }
 
-export async function getCourseMaps(): Promise<Array<Result<CourseMap>>> {
+export async function getCourseMaps(): Promise<
+	Array<Result<[CourseMap, string]>>
+> {
 	try {
 		return await invoke("get_course_maps");
 	} catch (error) {
