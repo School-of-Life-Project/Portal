@@ -6,16 +6,18 @@ use std::{
 use chrono::{Local, NaiveDate};
 use layout::{
     backends::svg::SVGWriter,
-    gv::{
-        parser::ast::{
-            ArrowKind, AttributeList, EdgeStmt, Graph, NodeId, NodeStmt, Stmt, StmtList,
-        },
-        GraphBuilder,
+    core::{
+        base::Orientation,
+        color::Color,
+        geometry::{Point, Position},
+        style::{LineStyleKind, StyleAttr},
     },
+    std_shapes::shapes::{Arrow, Element, LineEndKind, ShapeKind},
+    topo::layout::VisualGraph,
 };
 use serde::{Deserialize, Serialize};
 use serde_with::{serde_as, DisplayFromStr};
-use uuid::{fmt::Simple, Uuid};
+use uuid::Uuid;
 
 mod state;
 pub mod wrapper;
@@ -46,74 +48,86 @@ pub struct CourseMapCourse {
 
 impl CourseMap {
     fn graph(&self) -> String {
-        let mut buffer = Uuid::encode_buffer();
+        const SIZE: f64 = 128.0;
+        const PADDING: f64 = 16.0;
+        const LINE_WIDTH: usize = 2;
+        const FONT_SIZE: usize = 16;
 
-        let mut to_node_id = |uuid| {
-            let formatter = Simple::from_uuid(uuid);
-            NodeId {
-                name: formatter.encode_lower(&mut buffer).to_owned(),
-                port: None,
-            }
+        let mut graph = VisualGraph::new(Orientation::TopToBottom);
+
+        let mut nodes = HashMap::with_capacity(self.courses.len());
+
+        #[allow(clippy::cast_sign_loss)]
+        #[allow(clippy::cast_possible_truncation)]
+        let style = StyleAttr {
+            line_color: Color::from_name("black").unwrap(),
+            line_width: LINE_WIDTH,
+            fill_color: None,
+            rounded: SIZE as usize / 16,
+            font_size: FONT_SIZE,
         };
 
-        let mut list = Vec::with_capacity(self.courses.len());
+        for course in &self.courses {
+            let node = Element {
+                shape: ShapeKind::Box(course.label.clone()),
+                look: style.clone(),
+                orientation: Orientation::TopToBottom,
+                pos: Position::new(
+                    Point::zero(),
+                    Point::new(SIZE, SIZE),
+                    Point::zero(),
+                    Point::splat(PADDING),
+                ),
+            };
+
+            nodes.insert(course.uuid, graph.add_node(node));
+        }
 
         for course in &self.courses {
-            let root = to_node_id(course.uuid);
+            if let Some(dest) = nodes.get(&course.uuid) {
+                for prerequisite in &course.prerequisites {
+                    if let Some(source) = nodes.get(prerequisite) {
+                        graph.add_edge(
+                            Arrow {
+                                start: LineEndKind::None,
+                                end: LineEndKind::Arrow,
+                                line_style: LineStyleKind::Normal,
+                                //text: "prerequisite".to_string(),
+                                text: " ".to_string(),
+                                look: style.clone(),
+                                src_port: None,
+                                dst_port: None,
+                            },
+                            *source,
+                            *dest,
+                        );
+                    }
+                }
 
-            list.push(Stmt::Node(NodeStmt {
-                id: root.clone(),
-                list: AttributeList {
-                    list: [
-                        ("label".to_string(), course.label.clone()),
-                        ("group".to_string(), course.group.to_string()),
-                        ("class".to_string(), course.group.to_string()),
-                    ]
-                    .to_vec(),
-                },
-            }));
-
-            for prerequisite in &course.prerequisites {
-                list.push(Stmt::Edge(EdgeStmt {
-                    from: to_node_id(*prerequisite),
-                    to: [(root.clone(), ArrowKind::Arrow)].to_vec(),
-                    list: AttributeList {
-                        list: [
-                            ("label".to_string(), "prerequisite".to_string()),
-                            ("class".to_string(), course.group.to_string()),
-                        ]
-                        .to_vec(),
-                    },
-                }));
-            }
-
-            for corequisite in &course.corequisites {
-                list.push(Stmt::Edge(EdgeStmt {
-                    from: to_node_id(*corequisite),
-                    to: [(root.clone(), ArrowKind::Line)].to_vec(),
-                    list: AttributeList {
-                        list: [
-                            ("label".to_string(), "corequisite".to_string()),
-                            ("class".to_string(), course.group.to_string()),
-                        ]
-                        .to_vec(),
-                    },
-                }));
+                for corequisite in &course.corequisites {
+                    if let Some(source) = nodes.get(corequisite) {
+                        graph.add_edge(
+                            Arrow {
+                                start: LineEndKind::None,
+                                end: LineEndKind::None,
+                                line_style: LineStyleKind::Normal,
+                                //text: "corequisite".to_string(),
+                                text: " ".to_string(),
+                                look: style.clone(),
+                                src_port: None,
+                                dst_port: None,
+                            },
+                            *source,
+                            *dest,
+                        );
+                    }
+                }
             }
         }
 
-        let graph = Graph {
-            name: self.title.to_string(),
-            list: StmtList { list },
-        };
-
-        let mut builder = GraphBuilder::new();
-        builder.visit_graph(&graph);
-
         let mut writer = SVGWriter::new();
 
-        let mut visual = builder.get();
-        visual.do_it(false, false, false, &mut writer);
+        graph.do_it(false, false, false, &mut writer);
 
         writer.finalize()
     }
