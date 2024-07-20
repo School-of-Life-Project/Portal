@@ -12,6 +12,8 @@ subject to change; this is *not* a roadmap, this is a list of ideas
 - make a script to convert various formats to ePub
 	- PDF -> ePub via https://github.com/coolwanglu/pdf2htmlEX
 	- LaTeX -> ePub via https://tex.stackexchange.com/questions/1551/use-latex-to-produce-epub
+- make a script to convert various open-access textbooks into high-quality ePubs
+	- make a torrent of these converted books?
 
 ## Course Management
 
@@ -38,8 +40,12 @@ how should this tree be displayed?
 	- needs to run well on older devices
 - should include all tools a learner is likely to need
 	- excluding tools built into the base operating system, such as a calculator, note-taking app, and browser
+- ship a user guide as a built-in course
 
 ### display settings
 - theming
 - allow enabling/disabling all non-core features
 - add localization support?
+
+## Packaging
+- ship an example course map that contains a variety of courses, covering a variety of topics
