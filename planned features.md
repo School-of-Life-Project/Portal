@@ -5,13 +5,12 @@ subject to change; this is *not* a set-in-stone roadmap, this is a list of ideas
 
 - (optionally) gate-keeping chapters behind previous lessons
 - remove poor PDF support (need to perform high-quality PDF -> ePub conversion on the course creation end)
-- add support for single-document HTML courses
-	- save scroll position, use scroll position to track progress
 
 ### Course Building
-- make a sigil plugin for adding Portal manifests to ePubs
-- make a calibre plugin to turn a set of ePubs into a Course
-	- also perform on-the-fly conversion to PDFs to HTML via https://github.com/coolwanglu/pdf2htmlEX
+- make a python script to convert PDFs into (non-standards-compliant) ePubs via https://github.com/coolwanglu/pdf2htmlEX
+	- need to make the ePub *just* standard compliant enough to work in both the Portal app and in the Sigil plugin
+- make a Sigil plugin for adding Portal manifests to ePubs
+- make a Calibre plugin to turn a set of ePubs into a Course
 - change course format:
 	- 1 manifest file per ePub (embedded within ePub) + 1 manifest file per course
 - make a script to convert various open-access textbooks into high-quality ePubs
