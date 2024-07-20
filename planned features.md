@@ -1,18 +1,22 @@
 # Planned Features
-subject to change; this is *not* a roadmap, this is a list of ideas
+subject to change; this is *not* a set-in-stone roadmap, this is a list of ideas
 
 ## Courses
 
 - (optionally) gate-keeping chapters behind previous lessons
 - remove poor PDF support (need to perform high-quality PDF -> ePub conversion on the course creation end)
+- add support for single-document HTML courses
+	- save scroll position, use scroll position to track progress
 
 ### Course Building
-- create a separate app for building courses
-	- make this a calibre plugin?
-- make a script to convert various formats to ePub
-	- PDF -> ePub via https://github.com/coolwanglu/pdf2htmlEX
-	- LaTeX -> ePub via https://tex.stackexchange.com/questions/1551/use-latex-to-produce-epub
+- make a sigil plugin for adding Portal manifests to ePubs
+- make a calibre plugin to turn a set of ePubs into a Course
+	- also perform on-the-fly conversion to PDFs to HTML via https://github.com/coolwanglu/pdf2htmlEX
+- change course format:
+	- 1 manifest file per ePub (embedded within ePub) + 1 manifest file per course
 - make a script to convert various open-access textbooks into high-quality ePubs
+	- scrape online viewers to get raw HTML whenever possible
+	- see https://tex.stackexchange.com/questions/1551/use-latex-to-produce-epub
 	- make a torrent of these converted books?
 
 ## Course Management
@@ -29,6 +33,12 @@ a graphed, color-coded course dependency tree
 - allow specifying corequisites in addition to prerequisites
 
 how should this tree be displayed?
+
+### Course Map Building
+- add a course map building interface
+	- build this into the app?
+	- make a calibre plugin for building course maps?
+	- something else?
 
 ## App
 - should support a wide range of devices
