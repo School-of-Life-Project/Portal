@@ -4,16 +4,14 @@ subject to change; this is *not* a roadmap, this is a list of ideas
 ## Courses
 
 - (optionally) gate-keeping chapters behind previous lessons
-- other types of coursebooks
-	- supplemental/optional material
-	- reference material
-- allow creating coursebooks that are a hybrid of multiple textbooks
-
-other:
-- is PDF support still worth including?
+- remove poor PDF support (need to perform high-quality PDF -> ePub conversion on the course creation end)
 
 ### Course Building
 - create a separate app for building courses
+	- make this a calibre plugin?
+- make a script to convert various formats to ePub
+	- PDF -> ePub via https://github.com/coolwanglu/pdf2htmlEX
+	- LaTeX -> ePub via https://tex.stackexchange.com/questions/1551/use-latex-to-produce-epub
 
 ## Course Management
 
