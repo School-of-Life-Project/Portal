@@ -43,6 +43,7 @@ export default defineConfig({
 				main: resolve(__dirname, "index.html"),
 				viewer: resolve(__dirname, "viewer.html"),
 				error: resolve(__dirname, "error.html"),
+				navigator: resolve(__dirname, "navigator.html"),
 			},
 		},
 		chunkSizeWarningLimit: 550,
