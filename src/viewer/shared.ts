@@ -7,6 +7,7 @@ import {
 	displayError,
 	Error,
 	Settings,
+	getCurrentBackendDate,
 } from "../bindings.ts";
 import { TimeProgressMeter } from "../graphing/main.ts";
 
@@ -211,18 +212,20 @@ export class ProgressManager {
 				0,
 				this.settings.maximum_course_time * 60,
 			);
-			timeDisplay.update(this.#completion.time_spent);
+			timeDisplay.update(this.#completion.time_spent[getCurrentBackendDate()]);
 			this.timerContainer.appendChild(timeDisplay.element);
 		}
 
 		this.#intervalId = window.setInterval(() => {
-			if (this.#completion && typeof this.#completion.time_spent == "number") {
+			if (this.#completion && typeof this.#completion.time_spent == "object") {
 				if (!document.hidden) {
-					this.#completion.time_spent += 5;
+					this.#completion.time_spent[getCurrentBackendDate()] += 5;
 				}
 				updateCompletion(course[0].uuid, this.#completion);
 				if (timeDisplay) {
-					timeDisplay.update(this.#completion.time_spent);
+					timeDisplay.update(
+						this.#completion.time_spent[getCurrentBackendDate()],
+					);
 				}
 			}
 		}, 5000);

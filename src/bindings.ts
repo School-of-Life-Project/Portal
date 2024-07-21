@@ -116,6 +116,24 @@ function convertBackendAsyncError(error: Error | string | unknown): Error {
 	}
 }
 
+export function getCurrentBackendDate() {
+	const date = new Date();
+
+	const year = String(date.getFullYear());
+	let month = String(date.getMonth());
+	let day = String(date.getDate());
+
+	if (month.length == 1) {
+		month = "0" + month;
+	}
+
+	if (day.length == 1) {
+		day = "0" + day;
+	}
+
+	return year + "-" + month + "-" + day;
+}
+
 export async function openDataDir(): Promise<null> {
 	try {
 		return await invoke("open_data_dir");
