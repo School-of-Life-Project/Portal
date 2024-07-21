@@ -17,16 +17,16 @@ subject to change; this is *not* a set-in-stone roadmap, this is a list of ideas
 - (optionally) gate-keeping chapters behind previous lessons
 - remove poor PDF support
 - remove automatic ePub decompression
+- review viewer and sigil plugin for ePub spec compliance: https://www.w3.org/TR/epub-33/
 
 ### Course Building
 note: this will require **significant changes to the course format**
 
 - make a Sigil plugin for adding Portal manifests to ePubs
 	- store chapter manifest within ePub metadata
-	- (optional) lossily compress images
-		- possibly convert WebP images to JPEG if epub.js works on Safari <16?
 - make a Calibre plugin to turn a set of ePubs into a packaged Course
 	- decompress ePub files
+	- optimize embedded media for smaller filesize
 	- create a central manifest file
 	- compress course into a LZMA-compressed ZIP file
 - make a script to convert various open-access textbooks into high-quality ePubs
