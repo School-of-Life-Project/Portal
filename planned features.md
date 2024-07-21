@@ -5,8 +5,10 @@ subject to change; this is *not* a set-in-stone roadmap, this is a list of ideas
 - use documentFragment to minimize DOM updates on first page load
 - properly handle the case when the user has no courses installed
 - work on internal data structures
-	- should user data be easily modifiable externally, or should the app focus on "idiot-proofing" at the expense of customizability?
+	- should user data be easily modifiable externally, or should the app focus on "idiot-proofing" at the expense of customizability? (probably the latter...)
+		- for "idiot-proofed" version, load all data into memory at app start and then write data to disk on change or app close in Borsh format
 	- should courses & course maps be stored separately from app data (such as keeping app data in $data_dir / $config_dir, while keeping courses in $document_dir)
+- properly handle file lock conflicts
 
 ## Courses
 
