@@ -296,8 +296,8 @@ export class ProgressManager {
 		chapter: Chapter,
 		document_index: number,
 	) {
-		for (const sectionGroup of chapter.sections) {
-			for (const section of sectionGroup) {
+		for (const group of chapter.groups) {
+			for (const section of group.sections) {
 				const element = this.#getListingElement(section);
 
 				if (element && element.parentElement) {
@@ -342,8 +342,8 @@ export class ProgressManager {
 			return;
 		}
 
-		for (const sectionGroup of chapter.sections) {
-			for (const section of sectionGroup) {
+		for (const group of chapter.groups) {
+			for (const section of group.sections) {
 				if (!this.#completedSections.has(section)) {
 					if (chapter.root) {
 						this.#updateChapterCheckbox(chapter.root);
@@ -398,8 +398,8 @@ export class ProgressManager {
 			} else {
 				// If the chapter has no root, treat individual sections as if they were chapters
 
-				for (const sectionGroup of chapter.sections) {
-					for (const section of sectionGroup) {
+				for (const group of chapter.groups) {
+					for (const section of group.sections) {
 						const element = this.#getListingElement(section);
 						if (element) {
 							this.#handleListingItemVisibility(

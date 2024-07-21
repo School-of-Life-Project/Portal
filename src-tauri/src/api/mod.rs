@@ -230,15 +230,27 @@ struct Textbook {
 /// ``Chapter`` elements should only be included when a chapter's completion is meaningful to progress within the overall course.
 #[derive(Serialize, Deserialize, Debug)]
 struct Chapter {
-    /// The section-id corresponding to the chapter's root.
+    /// The section-id (ePub href) corresponding to the chapter's root.
     ///
     /// If this is ommitted, the completion status of the entire chapter will not be displayed within the book reader.
     root: Option<String>,
-    /// A completable ``Section`` within a chapter, corresponding to a book section-id.
+
+    /// A group of completable ``Section`` items within the chapter.
+    #[serde(default)]
+    groups: Vec<SectionGroup>,
+}
+
+/// A group of completable ``Section`` elements within a Chapter.
+///
+/// Grouping sections allows the weight of their completion to be intentionally weighted unevenly throughout the chapter.
+#[derive(Serialize, Deserialize, Debug)]
+struct SectionGroup {
+    /// The relative weight multiplier of the ``SectionGroup``, defaults to 1.0.
+    weight: Option<f32>,
+    /// The ``Section``s included in the section group, each corresponding to a section-id (ePub href).
     ///
     /// Sections should only be included when a section's completion is meaningful to progress within the overall course.
-    #[serde(default)]
-    sections: Vec<Vec<String>>,
+    sections: Vec<String>,
 }
 
 /// The raw data used to keep track of ``Course`` completion
@@ -308,22 +320,31 @@ impl CourseProgress {
 
                         let mut progress = 0.0;
 
-                        for section_group in &chapter.sections {
+                        let mut total = 0.0;
+
+                        for group in &chapter.groups {
+                            let weight = group.weight.unwrap_or(1.0).max(0.0);
+
                             let mut group_progress: usize = 0;
 
-                            for section in section_group {
+                            for section in &group.sections {
                                 if book_completion.contains(section) {
                                     group_progress += 1;
                                 }
                             }
 
-                            if group_progress > 0 {
-                                progress += group_progress as f32 / section_group.len() as f32;
+                            if group_progress == group.sections.len() {
+                                progress += weight;
+                            } else if group_progress > 0 {
+                                progress +=
+                                    (group_progress as f32 / group.sections.len() as f32) * weight;
                             }
+
+                            total += weight;
                         }
 
                         if progress > 0.0 {
-                            chapter_progress.push(progress / chapter.sections.len() as f32);
+                            chapter_progress.push(progress / total);
                         } else {
                             chapter_progress.push(0.0);
                         }

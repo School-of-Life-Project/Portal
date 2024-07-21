@@ -37,7 +37,12 @@ export interface Textbook {
 
 export interface Chapter {
 	root?: string;
-	sections: Array<Array<string>>;
+	groups: SectionGroup[];
+}
+
+export interface SectionGroup {
+	weight?: number;
+	sections: string[];
 }
 
 export interface CourseCompletionData {
