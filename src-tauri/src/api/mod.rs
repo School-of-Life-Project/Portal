@@ -5,7 +5,6 @@ use std::{
 
 use chrono::{Local, NaiveDate};
 use layout::{
-    adt::dag::NodeHandle,
     backends::svg::SVGWriter,
     core::{
         base::Orientation,
@@ -51,23 +50,36 @@ pub struct CourseMapCourse {
     /// This can be useful to visually differentiate courses by subject.
     color: Option<String>,
 
-    /// The courses which must be taken before this course.
+    /// The courses which have a dependency relation to this course.
+    ///
+    /// Relations are always unidirectional, with the source being the ``CourseMapRelation`` and the destination being the ``CourseMapCourse``.
     #[serde(default)]
-    prerequisites: Vec<Uuid>,
-    /// The courses which must be taken either with, or before, this course.
-    /// Corequisites specifications are unidirectional, and function similarly to prerequisites.
-    #[serde(default)]
-    corequisites: Vec<Uuid>,
-    /// The courses which are suggested to be taken before this course.
+    relations: Vec<CourseMapRelation>,
+}
+
+/// A representation of a Course's dependency relation.
+#[derive(Serialize, Deserialize, Debug)]
+pub struct CourseMapRelation {
+    /// The unique ID of the course, mapping to a ``CourseMapCourse`` object.
+    uuid: Uuid,
+
+    /// The type of the relation.
+    /// Relations are always unidirectional, with the source being the ``CourseMapRelation`` and the destination being the ``CourseMapCourse``.
+    r#type: CourseMapRelationType,
+
     /// Optional courses should be used to specify material which, while not necessary to complete the course itself, gives you a deeper understanding of the material than the required courses alone.
     /// Do not use optional courses to list courses which are required to understand the material, or courses which would be better specified as required corequisites (such as courses which are necessary to understand future material).
     #[serde(default)]
-    optional_prerequisites: Vec<Uuid>,
-    /// The courses which are suggested to be taken with this course.
-    /// Optional courses should be used to specify material which, while not necessary to complete the course itself, gives you a deeper understanding of the material than the required courses alone.
-    /// Do not use optional courses to list courses which are required to understand the material, or courses which would be better specified as required corequisites (such as courses which are necessary to understand future material).
-    #[serde(default)]
-    optional_corequisites: Vec<Uuid>,
+    optional: bool,
+}
+
+/// The type of a ``CourseMapRelation``.
+#[derive(Serialize, Deserialize, Debug)]
+pub enum CourseMapRelationType {
+    /// Prerequisites are courses which should be taken before the following course.
+    Prerequisite,
+    /// Corequisites are courses which should be taken either with a course or before it.
+    Corequisite,
 }
 
 impl CourseMap {
@@ -120,56 +132,41 @@ impl CourseMap {
             nodes.insert(course.uuid, graph.add_node(node));
         }
 
-        let mut add_edge = |source_uuid, dest: &NodeHandle, end, line_style| {
-            if let Some(source) = nodes.get(source_uuid) {
-                let mut style = style.clone();
-
-                if let Some(color) = colors.get(source_uuid) {
-                    style.line_color = *color;
-                }
-
-                graph.add_edge(
-                    Arrow {
-                        start: LineEndKind::None,
-                        end,
-                        line_style,
-                        text: " ".to_string(),
-                        look: style,
-                        src_port: None,
-                        dst_port: None,
-                    },
-                    *source,
-                    *dest,
-                );
-            }
-        };
-
         for course in &self.courses {
             if let Some(dest) = nodes.get(&course.uuid) {
-                for prerequisite in &course.prerequisites {
-                    add_edge(
-                        prerequisite,
-                        dest,
-                        LineEndKind::Arrow,
-                        LineStyleKind::Normal,
-                    );
-                }
+                for relation in &course.relations {
+                    if let Some(source) = nodes.get(&relation.uuid) {
+                        let mut style = style.clone();
 
-                for prerequisite in &course.optional_prerequisites {
-                    add_edge(
-                        prerequisite,
-                        dest,
-                        LineEndKind::Arrow,
-                        LineStyleKind::Dashed,
-                    );
-                }
+                        if let Some(color) = colors.get(&relation.uuid) {
+                            style.line_color = *color;
+                        }
 
-                for corequisite in &course.corequisites {
-                    add_edge(corequisite, dest, LineEndKind::None, LineStyleKind::Normal);
-                }
+                        let end = match relation.r#type {
+                            CourseMapRelationType::Prerequisite => LineEndKind::Arrow,
+                            CourseMapRelationType::Corequisite => LineEndKind::None,
+                        };
 
-                for corequisite in &course.optional_corequisites {
-                    add_edge(corequisite, dest, LineEndKind::None, LineStyleKind::Dashed);
+                        let line_style = if relation.optional {
+                            LineStyleKind::Dashed
+                        } else {
+                            LineStyleKind::Normal
+                        };
+
+                        graph.add_edge(
+                            Arrow {
+                                start: LineEndKind::None,
+                                end,
+                                line_style,
+                                text: " ".to_string(),
+                                look: style,
+                                src_port: None,
+                                dst_port: None,
+                            },
+                            *source,
+                            *dest,
+                        );
+                    }
                 }
             }
         }

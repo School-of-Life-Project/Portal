@@ -7,7 +7,6 @@ subject to change; this is *not* a set-in-stone roadmap, this is a list of ideas
 - bug fixes
 	- properly handle the case when the user has no courses installed
 	- properly handle filesystem lock timeouts
-- refactor CourseMapCourse
 - refactor internal progress tracking
 	- get rid of offsets.toml, store offset data in CourseProgress files
 
