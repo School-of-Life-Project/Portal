@@ -32,6 +32,7 @@ a graphed, color-coded course dependency tree
 - color code by subject, course completion status
 - allow specifying alternate/equivalent courses
 - allow specifying corequisites in addition to prerequisites
+- allow specifying optional corequisites/prerequisites
 
 how should this tree be displayed?
 
