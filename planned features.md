@@ -9,18 +9,17 @@ subject to change; this is *not* a set-in-stone roadmap, this is a list of ideas
 		- update UI to separate $app_document_dir and $app_data_dir
 	- store user data in nativeDB (kept in $data_dir/$app_id)
 		- remove need for file locking
+- properly support MathML in ePubs
+	- see https://github.com/futurepress/epub.js/blob/f09089cf77c55427bfdac7e0a4fa130e373a19c8/examples/mathml.html#L154
+	- see https://www.npmjs.com/package/katex
 
 ## Courses
 
 - (optionally) gate-keeping chapters behind previous lessons
-- remove poor PDF support (need to perform high-quality PDF -> ePub conversion on the course creation end)
+- remove poor PDF support
 - remove automatic ePub decompression, require courses to use decompressed ePubs
 
 ### Course Building
-- make a script to convert from PDF -> ePub via https://github.com/coolwanglu/pdf2htmlEX
-	- may not be fully standards-compliant; just needs to be standards compliant *enough* to work in Sigil and in the Portal app
-		- aim for full standards compliance if possible, but this may not be reasonably possible
-	- need to convert HTML5 -> XHTML via https://stackoverflow.com/questions/12092532/how-to-convert-html-to-valid-xhtml
 - make a Sigil plugin for adding Portal manifests to ePubs
 - make a Calibre plugin or basic python script to turn a set of ePubs into a valid Course
 - change course format:
