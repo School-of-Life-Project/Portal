@@ -12,7 +12,6 @@
 		"@eslint/js": "^9.6.0",
 		"@types/eslint__js": "^8.42.3",
 		"@types/node": "^20.14.10",
-		"@vitejs/plugin-legacy": "^5.4.1",
 		"eslint": "^9.6.0",
 		"globals": "^15.8.0",
 		"lightningcss": "^1.25.1",
@@ -26,7 +25,6 @@
 	"dependencies": {
 		"@tauri-apps/api": "^1.6.0",
 		"epubjs": "^0.3.93",
-		"katex": "^0.16.11",
 		"panzoom": "^9.4.3",
 		"pdfjs-dist": "^4.4.168"
 	},

@@ -1,7 +1,6 @@
 import { resolve } from "path";
 import { defineConfig } from "vite";
 import eslint from "vite-plugin-eslint";
-import legacy from "@vitejs/plugin-legacy";
 import { createWriteStream, existsSync, mkdirSync } from "fs";
 
 if (!existsSync("node_modules/jszip/dist/jszip.js")) {
@@ -32,7 +31,7 @@ export default defineConfig({
 	],
 	build: {
 		// Tauri uses Edge on Windows and WebKit on macOS and Linux
-		target: process.env.TAURI_PLATFORM == "windows" ? "edge79" : "safari12",
+		target: process.env.TAURI_PLATFORM == "windows" ? "edge109" : "safari12",
 		// don't minify for debug builds
 		minify: !process.env.TAURI_DEBUG ? "terser" : false,
 		cssMinify: "lightningcss",
@@ -50,17 +49,5 @@ export default defineConfig({
 	css: {
 		transformer: "lightningcss",
 	},
-	plugins: [
-		eslint(),
-		legacy({
-			// TODO: Figure out if this is even necessary
-			targets:
-				process.env.TAURI_PLATFORM == "windows" ? "edge>=79" : "safari>=12",
-			additionalLegacyPolyfills: [],
-			modernTargets:
-				process.env.TAURI_PLATFORM == "windows"
-					? "last 10 Edge versions"
-					: "safari>=15.6",
-		}),
-	],
+	plugins: [eslint()],
 });

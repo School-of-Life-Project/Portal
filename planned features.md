@@ -9,21 +9,26 @@ subject to change; this is *not* a set-in-stone roadmap, this is a list of ideas
 		- update UI to separate $app_document_dir and $app_data_dir
 	- store user data in nativeDB (kept in $data_dir/$app_id)
 		- remove need for file locking
-- properly support MathML in ePubs
-	- see https://github.com/futurepress/epub.js/blob/f09089cf77c55427bfdac7e0a4fa130e373a19c8/examples/mathml.html#L154
-	- see https://www.npmjs.com/package/katex
+- ensure that MathML-containing ePubs display properly
+- test ePub.js browser support
 
 ## Courses
 
 - (optionally) gate-keeping chapters behind previous lessons
 - remove poor PDF support
-- remove automatic ePub decompression, require courses to use decompressed ePubs
+- remove automatic ePub decompression
 
 ### Course Building
+note: this will require **significant changes to the course format**
+
 - make a Sigil plugin for adding Portal manifests to ePubs
-- make a Calibre plugin or basic python script to turn a set of ePubs into a valid Course
-- change course format:
-	- completable chapter manifest embedded within ePub metadata + 1 manifest file per course
+	- store chapter manifest within ePub metadata
+	- (optional) lossily compress images
+		- possibly convert WebP images to JPEG if epub.js works on Safari <16?
+- make a Calibre plugin to turn a set of ePubs into a packaged Course
+	- decompress ePub files
+	- create a central manifest file
+	- compress course into a LZMA-compressed ZIP file
 - make a script to convert various open-access textbooks into high-quality ePubs
 	- scrape online viewers to get raw HTML whenever possible
 	- see https://tex.stackexchange.com/questions/1551/use-latex-to-produce-epub
