@@ -218,7 +218,7 @@ struct Textbook {
     /// Label for the textbook when displayed as part of a larger course.
     /// This generally shouldn't be set to the full textbook title.
     label: String,
-    /// The path of the textbook's corresponding ePub/PDF file, relative to the course's root directory.
+    /// The path of the textbook's corresponding ePub file, relative to the course's root directory.
     file: PathBuf,
     /// A list of *completable* ``Chapter`` items within the textbook.
     #[serde(default)]

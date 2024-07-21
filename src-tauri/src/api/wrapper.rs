@@ -4,23 +4,15 @@
     clippy::module_name_repetitions
 )]
 
-use std::{
-    ffi::{OsStr, OsString},
-    path::PathBuf,
-    sync::Arc,
-};
+use std::sync::Arc;
 
-use futures_util::{future::try_join_all, join};
 use serde::{Deserialize, Serialize};
-use tauri::{FsScope, Manager};
-use tokio::{fs, sync::OnceCell};
+use tauri::Manager;
+use tokio::sync::OnceCell;
 use uuid::Uuid;
-
-use crate::{data, MAX_FS_CONCURRENCY};
 
 use super::{
     state::State, Course, CourseCompletion, CourseMap, CourseProgress, OverallProgress, Settings,
-    Textbook,
 };
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -144,59 +136,6 @@ pub async fn get_courses_active(
         .map_err(|e| ErrorWrapper::new("Unable to get list of active Courses".to_string(), &e))
 }
 
-fn allow_path(scope: &FsScope, path: &mut PathBuf, is_dir: bool) -> Result<(), ErrorWrapper> {
-    if is_dir {
-        path.push("");
-        scope.allow_directory(&path, true)
-    } else {
-        scope.allow_file(&path)
-    }
-    .map_err(|e| {
-        ErrorWrapper::new(
-            format!("Unable to update renderer permissions for path {path:?}"),
-            &e,
-        )
-    })
-}
-
-async fn prepare_textbook(
-    scope: &FsScope,
-    book: &mut Textbook,
-    epub_extension: &Option<OsString>,
-) -> Result<(), ErrorWrapper> {
-    let extracted_path = book.file.with_extension("decompressed.epub");
-
-    let (metadata_extract, metadata_full) =
-        join!(fs::metadata(&extracted_path), fs::metadata(&book.file));
-
-    if let Ok(metadata) = metadata_full {
-        if metadata.is_dir() {
-            allow_path(scope, &mut book.file, true)?;
-        } else if book.file.extension().map(OsStr::to_ascii_lowercase) == *epub_extension {
-            let tmp_path = book.file.with_extension("temp");
-
-            data::unzip(book.file.clone(), tmp_path, extracted_path.clone())
-                .await
-                .map_err(|e| {
-                    ErrorWrapper::new(format!("Unable to extract {:?}", &book.file), &e)
-                })?;
-
-            book.file = extracted_path;
-
-            allow_path(scope, &mut book.file, true)?;
-        } else {
-            allow_path(scope, &mut book.file, false)?;
-        }
-    } else if let Ok(metadata) = metadata_extract {
-        if metadata.is_dir() {
-            book.file = extracted_path;
-            allow_path(scope, &mut book.file, true)?;
-        }
-    }
-
-    Ok(())
-}
-
 #[tauri::command]
 pub async fn get_course(
     app_handle: tauri::AppHandle,
@@ -212,16 +151,17 @@ pub async fn get_course(
 
     let scope = app_handle.asset_protocol_scope();
 
-    let epub_extension = Some(OsString::from("epub"));
-
-    for book_chunk in course.books.chunks_mut(MAX_FS_CONCURRENCY / 2) {
-        let mut future_set = Vec::with_capacity(MAX_FS_CONCURRENCY / 2);
-
-        for book in book_chunk {
-            future_set.push(prepare_textbook(&scope, book, &epub_extension));
-        }
-
-        try_join_all(future_set).await?;
+    for book in &mut course.books {
+        book.file.push("");
+        scope.allow_directory(&book.file, true).map_err(|e| {
+            ErrorWrapper::new(
+                format!(
+                    "Unable to update renderer permissions for path {:?}",
+                    book.file
+                ),
+                &e,
+            )
+        })?;
     }
 
     Ok((course, progress))

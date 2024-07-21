@@ -15,20 +15,25 @@ subject to change; this is *not* a set-in-stone roadmap, this is a list of ideas
 ## Courses
 
 - (optionally) gate-keeping chapters behind previous lessons
-- remove poor PDF support
-- remove automatic ePub decompression
-- review viewer and sigil plugin for ePub spec compliance: https://www.w3.org/TR/epub-33/
 
 ### Course Building
-note: this will require **significant changes to the course format**
 
-- make a Sigil plugin for adding Portal manifests to ePubs
-	- store chapter manifest within ePub metadata
-- make a Calibre plugin to turn a set of ePubs into a packaged Course
-	- decompress ePub files
+#### Short-term
+write instructions on how to build a course manually using Sigil (to view the ePub's ToC), a file manager, and a text editor
+
+#### Long-term
+- make a Sigil plugin for generating a sidecar JSON file from an ePub file
+- make a Sigil plugin to reduce ePub filesize
 	- optimize embedded media for smaller filesize
-	- create a central manifest file
-	- compress course into a LZMA-compressed ZIP file
+		- images
+		- audio
+		- fonts
+	- minify HTML/CSS/JS/XML
+- make a Calibre plugin to turn a set of ePubs into a packaged Course
+	- takes a sidecar JSON file as input per-textbook, to add completable sections
+	- decompresses ePub files
+	- create a central manifest file from the sidecar files
+	- compresses course into a LZMA-compressed ZIP file
 - make a script to convert various open-access textbooks into high-quality ePubs
 	- scrape online viewers to get raw HTML whenever possible
 	- see https://tex.stackexchange.com/questions/1551/use-latex-to-produce-epub

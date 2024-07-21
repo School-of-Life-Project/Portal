@@ -101,22 +101,7 @@ async function loadCourse(
 				return;
 			}
 
-			let viewer: DocumentViewer;
-
-			if (result[0].books[document_index].file.endsWith(".pdf")) {
-				try {
-					const module = await import("./pdf.ts");
-					viewer = new module.PDFViewer(result[0], document_index);
-				} catch (error) {
-					displayError({
-						message: "Unable to load DocumentViewer",
-						cause: JSON.stringify(error),
-					});
-					return;
-				}
-			} else {
-				viewer = new ePubViewer(result[0], document_index);
-			}
+			const viewer = new ePubViewer(result[0], document_index);
 
 			try {
 				return await viewer.render(view, progress, result[1]);
