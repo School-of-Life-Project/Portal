@@ -5,6 +5,7 @@ use std::{
 
 use chrono::{Local, NaiveDate};
 use layout::{
+    adt::dag::NodeHandle,
     backends::svg::SVGWriter,
     core::{
         base::Orientation,
@@ -31,19 +32,25 @@ pub struct CourseMap {
 
     title: String,
     description: Option<String>,
+
     courses: Vec<CourseMapCourse>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CourseMapCourse {
     uuid: Uuid,
+
     label: String,
-    #[serde(default)]
-    group: u8,
+    color: Option<String>,
+
     #[serde(default)]
     prerequisites: Vec<Uuid>,
     #[serde(default)]
     corequisites: Vec<Uuid>,
+    #[serde(default)]
+    optional_prerequisites: Vec<Uuid>,
+    #[serde(default)]
+    optional_corequisites: Vec<Uuid>,
 }
 
 impl CourseMap {
@@ -57,6 +64,8 @@ impl CourseMap {
 
         let mut nodes = HashMap::with_capacity(self.courses.len());
 
+        let mut colors = HashMap::with_capacity(self.courses.len());
+
         #[allow(clippy::cast_sign_loss)]
         #[allow(clippy::cast_possible_truncation)]
         let style = StyleAttr {
@@ -68,9 +77,19 @@ impl CourseMap {
         };
 
         for course in &self.courses {
+            let mut style = style.clone();
+
+            if let Some(colorstring) = &course.color {
+                if let Some(color) = Color::from_name(&colorstring.to_ascii_lowercase()) {
+                    style.line_color = color;
+
+                    colors.insert(course.uuid, color);
+                }
+            }
+
             let node = Element {
                 shape: ShapeKind::Box(course.label.clone()),
-                look: style.clone(),
+                look: style,
                 orientation: Orientation::TopToBottom,
                 pos: Position::new(
                     Point::zero(),
@@ -83,44 +102,56 @@ impl CourseMap {
             nodes.insert(course.uuid, graph.add_node(node));
         }
 
+        let mut add_edge = |source_uuid, dest: &NodeHandle, end, line_style| {
+            if let Some(source) = nodes.get(source_uuid) {
+                let mut style = style.clone();
+
+                if let Some(color) = colors.get(source_uuid) {
+                    style.line_color = *color;
+                }
+
+                graph.add_edge(
+                    Arrow {
+                        start: LineEndKind::None,
+                        end,
+                        line_style,
+                        text: " ".to_string(),
+                        look: style,
+                        src_port: None,
+                        dst_port: None,
+                    },
+                    *source,
+                    *dest,
+                );
+            }
+        };
+
         for course in &self.courses {
             if let Some(dest) = nodes.get(&course.uuid) {
                 for prerequisite in &course.prerequisites {
-                    if let Some(source) = nodes.get(prerequisite) {
-                        graph.add_edge(
-                            Arrow {
-                                start: LineEndKind::None,
-                                end: LineEndKind::Arrow,
-                                line_style: LineStyleKind::Normal,
-                                //text: "prerequisite".to_string(),
-                                text: " ".to_string(),
-                                look: style.clone(),
-                                src_port: None,
-                                dst_port: None,
-                            },
-                            *source,
-                            *dest,
-                        );
-                    }
+                    add_edge(
+                        prerequisite,
+                        dest,
+                        LineEndKind::Arrow,
+                        LineStyleKind::Normal,
+                    );
+                }
+
+                for prerequisite in &course.optional_prerequisites {
+                    add_edge(
+                        prerequisite,
+                        dest,
+                        LineEndKind::Arrow,
+                        LineStyleKind::Dashed,
+                    );
                 }
 
                 for corequisite in &course.corequisites {
-                    if let Some(source) = nodes.get(corequisite) {
-                        graph.add_edge(
-                            Arrow {
-                                start: LineEndKind::None,
-                                end: LineEndKind::None,
-                                line_style: LineStyleKind::Normal,
-                                //text: "corequisite".to_string(),
-                                text: " ".to_string(),
-                                look: style.clone(),
-                                src_port: None,
-                                dst_port: None,
-                            },
-                            *source,
-                            *dest,
-                        );
-                    }
+                    add_edge(corequisite, dest, LineEndKind::None, LineStyleKind::Normal);
+                }
+
+                for corequisite in &course.optional_corequisites {
+                    add_edge(corequisite, dest, LineEndKind::None, LineStyleKind::Dashed);
                 }
             }
         }

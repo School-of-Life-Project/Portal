@@ -15,9 +15,11 @@ export interface CourseMap {
 export interface CourseMapCourse {
 	uuid: string;
 	label: string;
-	group: number;
+	color: string;
 	prerequisites: string[];
 	corequisites: string[];
+	optional_prerequisites: string[];
+	optional_corequisites: string[];
 }
 
 export interface Course {
