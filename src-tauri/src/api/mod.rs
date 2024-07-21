@@ -25,35 +25,53 @@ pub mod wrapper;
 
 use crate::data;
 
+/// A dependency tree of courses
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CourseMap {
+    /// The unique ID of the course map.
     #[serde(skip_deserializing)]
     uuid: Option<Uuid>,
-
+    /// Title for the course map
     title: String,
+    /// Optional description for the course map
     description: Option<String>,
-
+    /// The courses which are a part of this course map.
     courses: Vec<CourseMapCourse>,
 }
 
+/// A representation of a Course within a ``CourseMap``
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CourseMapCourse {
+    /// The unique ID of the course, mapping to a ``Course`` object.
     uuid: Uuid,
-
+    /// Label for the course when displayed as part of the course map.
+    /// This generally shouldn't be set to the full course title.
     label: String,
+    /// The accent color of the course, defaulting to black if not specified.
+    /// This can be useful to visually differentiate courses by subject.
     color: Option<String>,
 
+    /// The courses which must be taken before this course.
     #[serde(default)]
     prerequisites: Vec<Uuid>,
+    /// The courses which must be taken either with, or before, this course.
+    /// Corequisites specifications are unidirectional, and function similarly to prerequisites.
     #[serde(default)]
     corequisites: Vec<Uuid>,
+    /// The courses which are suggested to be taken before this course.
+    /// Optional courses should be used to specify material which, while not necessary to complete the course itself, gives you a deeper understanding of the material than the required courses alone.
+    /// Do not use optional courses to list courses which are required to understand the material, or courses which would be better specified as required corequisites (such as courses which are necessary to understand future material).
     #[serde(default)]
     optional_prerequisites: Vec<Uuid>,
+    /// The courses which are suggested to be taken with this course.
+    /// Optional courses should be used to specify material which, while not necessary to complete the course itself, gives you a deeper understanding of the material than the required courses alone.
+    /// Do not use optional courses to list courses which are required to understand the material, or courses which would be better specified as required corequisites (such as courses which are necessary to understand future material).
     #[serde(default)]
     optional_corequisites: Vec<Uuid>,
 }
 
 impl CourseMap {
+    /// Creates a visual representation of a ``CourseMap`` as an SVG.
     fn graph(&self) -> String {
         const SIZE: f64 = 128.0;
         const PADDING: f64 = 16.0;
