@@ -2,15 +2,14 @@
 subject to change; this is *not* a set-in-stone roadmap, this is a list of ideas
 
 ## Short-term
-- use documentFragment to minimize DOM updates on first page load
-- properly handle the case when the user has no courses installed
-- change internal data structures
-	- store courses and course maps in $document_dir/Portal
-		- update UI to separate $app_document_dir and $app_data_dir
-	- store user data in nativeDB (kept in $data_dir/$app_id)
-		- remove need for file locking
-- ensure that MathML-containing ePubs display properly
-- test ePub.js browser support
+- performance
+	- use documentFragment to minimize DOM updates on first page load
+- bug fixes
+	- properly handle the case when the user has no courses installed
+	- properly handle filesystem lock timeouts
+- refactor Course.Textbook.Chapter
+- refactor internal progress tracking
+	- get rid of offsets.toml, store offset data in CourseProgress files
 
 ## Courses
 
@@ -51,6 +50,11 @@ write instructions on how to build a course manually using Sigil (to view the eP
 how should Course Maps be best displayed?
 
 ### Course Map Building
+
+#### Short term
+write instructions on how to create course maps by hand
+
+#### Long term
 - add a course map building interface
 	- build this into the app?
 	- make a separate app / script / plugin for building course maps?
