@@ -1,6 +1,9 @@
 # Planned Features
 subject to change; this is *not* a set-in-stone roadmap, this is a list of ideas
 
+## Short-term
+use documentFragment to minimize DOM updates on first page load
+
 ## Courses
 
 - (optionally) gate-keeping chapters behind previous lessons
@@ -14,7 +17,7 @@ subject to change; this is *not* a set-in-stone roadmap, this is a list of ideas
 - make a Sigil plugin for adding Portal manifests to ePubs
 - make a Calibre plugin to turn a set of ePubs into a Course
 - change course format:
-	- 1 manifest file per ePub (embedded within ePub) + 1 manifest file per course
+	- completable chapter manifest embedded within ePub metadata + 1 manifest file per course
 - make a script to convert various open-access textbooks into high-quality ePubs
 	- scrape online viewers to get raw HTML whenever possible
 	- see https://tex.stackexchange.com/questions/1551/use-latex-to-produce-epub
@@ -27,20 +30,14 @@ subject to change; this is *not* a set-in-stone roadmap, this is a list of ideas
 - viewing additional course metadata (author, year created, title & description, etc...)
 - create a centralized hub to find and download courses?
 
-### Course Maps
-a graphed, color-coded course dependency tree
-- color code by subject, course completion status
-- allow specifying alternate/equivalent courses
-- allow specifying corequisites in addition to prerequisites
-- allow specifying optional corequisites/prerequisites
 
-how should this tree be displayed?
+### Course Maps
+how should Course Maps be best displayed?
 
 ### Course Map Building
 - add a course map building interface
 	- build this into the app?
-	- make a calibre plugin for building course maps?
-	- something else?
+	- make a separate app / script / plugin for building course maps?
 
 ## App
 - should support a wide range of devices

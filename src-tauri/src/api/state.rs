@@ -37,16 +37,16 @@ impl State {
         let active_courses_path = data_dir.join("Active Courses.toml");
         let settings_path = data_dir.join("Settings.toml");
 
-        let (course_maps, courses, completion, active_courses, settings) = try_join!(
+        let (course_maps, courses, completion) = try_join!(
             DataManager::new(course_map_path, Some(OsString::from("toml"))),
             ResourceManager::new(course_path),
             DataManager::new(completion_path, Some(OsString::from("toml"))),
+        )?;
+        let (overall_progress, offsets, active_courses, settings) = try_join!(
+            WritableConfigFile::new(overall_progress_path),
+            WritableConfigFile::new(progress_offset_path),
             WritableConfigFile::new(active_courses_path),
             WritableConfigFile::new(settings_path),
-        )?;
-        let (overall_progress, offsets) = try_join!(
-            WritableConfigFile::new(overall_progress_path),
-            WritableConfigFile::new(progress_offset_path)
         )?;
 
         Ok(Self {
