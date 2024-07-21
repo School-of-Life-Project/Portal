@@ -219,7 +219,11 @@ export class ProgressManager {
 		this.#intervalId = window.setInterval(() => {
 			if (this.#completion && typeof this.#completion.time_spent == "object") {
 				if (!document.hidden) {
-					this.#completion.time_spent[getCurrentBackendDate()] += 5;
+					if (this.#completion.time_spent[getCurrentBackendDate()]) {
+						this.#completion.time_spent[getCurrentBackendDate()] += 5;
+					} else {
+						this.#completion.time_spent[getCurrentBackendDate()] = 5;
+					}
 				}
 				updateCompletion(course[0].uuid, this.#completion);
 				if (timeDisplay) {
