@@ -5,8 +5,8 @@ use tokio::sync::Mutex;
 use uuid::Uuid;
 
 use super::{
-    wrapper::ErrorWrapper, Course, CourseCompletion, CourseMap, CourseProgress, CourseTimeOffsets,
-    OverallProgress, Settings,
+    wrapper::ErrorWrapper, Course, CourseCompletion, CourseMap, CourseProgress, OverallProgress,
+    Settings,
 };
 
 use crate::{
@@ -22,7 +22,6 @@ pub(super) struct State {
     active_courses: Mutex<WritableConfigFile>,
     overall_progress: Mutex<WritableConfigFile>,
     settings: Mutex<WritableConfigFile>,
-    offsets: Mutex<WritableConfigFile>,
 }
 
 impl State {
@@ -33,7 +32,6 @@ impl State {
         let course_path = data_dir.join("Courses");
         let completion_path = data_dir.join("Progress Data");
         let overall_progress_path = completion_path.join("total.toml");
-        let progress_offset_path = completion_path.join("offsets.toml");
         let active_courses_path = data_dir.join("Active Courses.toml");
         let settings_path = data_dir.join("Settings.toml");
 
@@ -42,9 +40,8 @@ impl State {
             ResourceManager::new(course_path),
             DataManager::new(completion_path, Some(OsString::from("toml"))),
         )?;
-        let (overall_progress, offsets, active_courses, settings) = try_join!(
+        let (overall_progress, active_courses, settings) = try_join!(
             WritableConfigFile::new(overall_progress_path),
-            WritableConfigFile::new(progress_offset_path),
             WritableConfigFile::new(active_courses_path),
             WritableConfigFile::new(settings_path),
         )?;
@@ -57,7 +54,6 @@ impl State {
             active_courses: Mutex::new(active_courses),
             overall_progress: Mutex::new(overall_progress),
             settings: Mutex::new(settings),
-            offsets: Mutex::new(offsets),
         })
     }
     async fn get_course_index(&self, id: Uuid) -> Result<Course, Error> {
@@ -72,18 +68,7 @@ impl State {
         Ok(course)
     }
     pub(super) async fn get_course(&self, id: Uuid) -> Result<(Course, CourseCompletion), Error> {
-        let mut offsets_file = self.offsets.lock().await;
-
-        let ((course, mut completion), mut offsets) = try_join!(
-            self.hydrate_course(id),
-            offsets_file.read::<CourseTimeOffsets>()
-        )?;
-
-        completion.time_spent -= offsets.today(&course, &completion);
-
-        offsets_file.write(&offsets).await?;
-
-        Ok((course, completion))
+        self.hydrate_course(id).await
     }
     async fn hydrate_course(&self, id: Uuid) -> Result<(Course, CourseCompletion), Error> {
         try_join!(self.get_course_index(id), async {
@@ -122,9 +107,6 @@ impl State {
 
         let mut courses = Vec::with_capacity(course_list.len());
 
-        let mut offsets_file = self.offsets.lock().await;
-        let mut offsets = offsets_file.read().await?;
-
         for course_chunk in course_list.chunks(MAX_FS_CONCURRENCY / 2) {
             let mut future_set = Vec::with_capacity(MAX_FS_CONCURRENCY / 2);
 
@@ -138,8 +120,7 @@ impl State {
                 courses.push(match result {
                     Ok((mut course, completion)) => {
                         course.remove_resources();
-                        let progress =
-                            CourseProgress::calculate(&course, &completion, &mut offsets);
+                        let progress = CourseProgress::calculate(&course, &completion);
                         Ok((course, progress))
                     }
                     Err(err) => Err(ErrorWrapper::new(
@@ -149,8 +130,6 @@ impl State {
                 });
             }
         }
-
-        offsets_file.write(&offsets).await?;
 
         Ok(courses)
     }
@@ -209,37 +188,26 @@ impl State {
     pub(super) async fn set_course_completion(
         &self,
         id: Uuid,
-        mut data: CourseCompletion,
+        data: CourseCompletion,
     ) -> Result<(), Error> {
         let time_change_secs;
         let chapter_change;
 
         {
-            let ((mut offsets_file, mut offsets), course, (mut completion_file, old_completion)) =
-                try_join!(
-                    async {
-                        let mut offsets_file = self.offsets.lock().await;
-                        let offsets: CourseTimeOffsets = offsets_file.read().await?;
+            let (course, (mut completion_file, old_completion)) =
+                try_join!(self.get_course_index(id), async {
+                    let completion_path = self.completion.get(id);
 
-                        Ok((offsets_file, offsets))
-                    },
-                    self.get_course_index(id),
-                    async {
-                        let completion_path = self.completion.get(id);
+                    let mut completion_file = WritableConfigFile::new(completion_path).await?;
+                    let old_completion = completion_file.read().await?;
 
-                        let mut completion_file = WritableConfigFile::new(completion_path).await?;
-                        let old_completion = completion_file.read().await?;
+                    Ok((completion_file, old_completion))
+                })?;
 
-                        Ok((completion_file, old_completion))
-                    }
-                )?;
+            let old_progress = CourseProgress::calculate(&course, &old_completion);
+            let new_progress = CourseProgress::calculate(&course, &data);
 
-            data.time_spent += offsets.today(&course, &old_completion);
-
-            let old_progress = CourseProgress::calculate(&course, &old_completion, &mut offsets);
-            let new_progress = CourseProgress::calculate(&course, &data, &mut offsets);
-
-            try_join!(completion_file.write(&data), offsets_file.write(&offsets))?;
+            completion_file.write(&data).await?;
 
             time_change_secs = CourseCompletion::calculate_time_diff_secs(&old_completion, &data);
             chapter_change = CourseProgress::calculate_chapter_diff(&old_progress, &new_progress);

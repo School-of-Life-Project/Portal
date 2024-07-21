@@ -51,7 +51,7 @@ export interface SectionGroup {
 export interface CourseCompletionData {
 	completed?: boolean;
 	book_sections: Record<number, string[]>;
-	time_spent: number;
+	time_spent: Record<string, number>;
 	position: Record<number, string>;
 }
 

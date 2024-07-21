@@ -261,7 +261,7 @@ pub struct CourseCompletion {
     #[serde_as(as = "HashMap<DisplayFromStr, _>")]
     book_sections: HashMap<usize, HashSet<String>>,
     /// The total amount of time spent in this course, in seconds.
-    time_spent: i64,
+    time_spent: HashMap<NaiveDate, u64>,
     /// The raw data used to keep track of the viewer's current position within a textbook.
     #[serde_as(as = "HashMap<DisplayFromStr, _>")]
     position: HashMap<usize, String>,
@@ -269,7 +269,19 @@ pub struct CourseCompletion {
 
 impl CourseCompletion {
     fn calculate_time_diff_secs(before: &Self, after: &Self) -> i64 {
-        after.time_spent - before.time_spent
+        let mut before_total = 0;
+        for before_date in before.time_spent.values() {
+            before_total += before_date;
+        }
+
+        let mut after_total = 0;
+        for after_date in after.time_spent.values() {
+            after_total += after_date;
+        }
+
+        (i128::from(after_total) - i128::from(before_total))
+            .try_into()
+            .unwrap_or_default()
     }
 }
 
@@ -294,11 +306,7 @@ pub struct TextbookProgress {
 }
 
 impl CourseProgress {
-    fn calculate(
-        course: &Course,
-        completion: &CourseCompletion,
-        offsets: &mut CourseTimeOffsets,
-    ) -> Self {
+    fn calculate(course: &Course, completion: &CourseCompletion) -> Self {
         let mut book_progress = Vec::with_capacity(course.books.len());
 
         for (book_index, book) in course.books.iter().enumerate() {
@@ -386,10 +394,18 @@ impl CourseProgress {
             }
         };
 
+        let current_date = Local::now().date_naive();
+
         Self {
             completed,
             completion: book_progress,
-            time_spent_today: completion.time_spent - offsets.today(course, completion),
+            time_spent_today: completion
+                .time_spent
+                .get(&current_date)
+                .copied()
+                .unwrap_or_default()
+                .try_into()
+                .unwrap_or(i64::MAX),
         }
     }
     fn calculate_chapter_diff(before: &Self, after: &Self) -> f32 {
@@ -448,33 +464,6 @@ impl OverallProgress {
                 if time_change_secs.is_positive() {
                     entry.insert(time_change_secs);
                 }
-            }
-        }
-    }
-}
-
-/// The per-course time offsets used to separate progress by day
-#[derive(Serialize, Deserialize, Debug, Default)]
-#[serde(default)]
-pub struct CourseTimeOffsets {
-    date: Option<NaiveDate>,
-    offsets: HashMap<Uuid, i64>,
-}
-
-impl CourseTimeOffsets {
-    fn today(&mut self, course: &Course, completion: &CourseCompletion) -> i64 {
-        let current_date = Local::now().date_naive();
-
-        if self.date != Some(current_date) {
-            self.date = Some(current_date);
-            self.offsets = HashMap::new();
-        }
-
-        match self.offsets.entry(course.uuid.unwrap()) {
-            Entry::Occupied(entry) => *entry.get(),
-            Entry::Vacant(entry) => {
-                entry.insert(completion.time_spent);
-                completion.time_spent
             }
         }
     }
