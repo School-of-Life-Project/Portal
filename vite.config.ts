@@ -1,6 +1,7 @@
 import { resolve } from "path";
 import { defineConfig } from "vite";
 import eslint from "vite-plugin-eslint";
+import legacy from "@vitejs/plugin-legacy";
 import { createWriteStream, existsSync, mkdirSync } from "fs";
 
 if (!existsSync("node_modules/jszip/dist/jszip.js")) {
@@ -49,5 +50,16 @@ export default defineConfig({
 	css: {
 		transformer: "lightningcss",
 	},
-	plugins: [eslint()],
+	plugins: [
+		eslint(),
+		legacy({
+			targets:
+				process.env.TAURI_PLATFORM == "windows" ? "edge>=109" : "safari>=12",
+			additionalLegacyPolyfills: [],
+			modernTargets:
+				process.env.TAURI_PLATFORM == "windows"
+					? "last 10 Edge versions"
+					: "safari>=15.6",
+		}),
+	],
 });
