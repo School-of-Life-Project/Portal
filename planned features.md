@@ -2,12 +2,17 @@
 subject to change; this is *not* a set-in-stone roadmap, this is a list of ideas
 
 ## Short-term
-use documentFragment to minimize DOM updates on first page load
+- use documentFragment to minimize DOM updates on first page load
+- properly handle the case when the user has no courses installed
+- work on internal data structures
+	- should user data be easily modifiable externally, or should the app focus on "idiot-proofing" at the expense of customizability?
+	- should courses & course maps be stored separately from app data (such as keeping app data in $data_dir / $config_dir, while keeping courses in $document_dir)
 
 ## Courses
 
 - (optionally) gate-keeping chapters behind previous lessons
 - remove poor PDF support (need to perform high-quality PDF -> ePub conversion on the course creation end)
+- remove automatic ePub decompression, require courses to use decompressed ePubs
 
 ### Course Building
 - make a script to convert from PDF -> ePub via https://github.com/coolwanglu/pdf2htmlEX
@@ -15,7 +20,7 @@ use documentFragment to minimize DOM updates on first page load
 		- aim for full standards compliance if possible, but this may not be reasonably possible
 	- need to convert HTML5 -> XHTML via https://stackoverflow.com/questions/12092532/how-to-convert-html-to-valid-xhtml
 - make a Sigil plugin for adding Portal manifests to ePubs
-- make a Calibre plugin to turn a set of ePubs into a Course
+- make a Calibre plugin or basic python script to turn a set of ePubs into a valid Course
 - change course format:
 	- completable chapter manifest embedded within ePub metadata + 1 manifest file per course
 - make a script to convert various open-access textbooks into high-quality ePubs
