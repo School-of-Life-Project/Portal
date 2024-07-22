@@ -7,8 +7,6 @@ subject to change; this is *not* a set-in-stone roadmap, this is a list of ideas
 - bug fixes
 	- properly handle the case when the user has no courses installed
 	- properly handle filesystem lock timeouts
-- refactor internal progress tracking
-	- refactor CourseCompletion
 - combine ActiveCourses with Settings
 
 ## Courses

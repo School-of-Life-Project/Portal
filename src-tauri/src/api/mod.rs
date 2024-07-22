@@ -255,16 +255,20 @@ struct SectionGroup {
 #[derive(Serialize, Deserialize, Debug, Default)]
 #[serde(default)]
 pub struct CourseCompletion {
-    /// If the course has a manually marked completion status
-    completed: Option<bool>,
-    /// A list of all completed section-ids within each textbook within the course.
-    #[serde_as(as = "HashMap<DisplayFromStr, _>")]
-    book_sections: HashMap<usize, HashSet<String>>,
-    /// The total amount of time spent in this course, in seconds.
+    /// The amount of time spent in the ``Course``, by day.
     time_spent: HashMap<NaiveDate, u64>,
-    /// The raw data used to keep track of the viewer's current position within a textbook.
+    /// The raw data used to keep track of ``Textbook`` completion.
     #[serde_as(as = "HashMap<DisplayFromStr, _>")]
-    position: HashMap<usize, String>,
+    books: HashMap<usize, CourseCompletionTextbook>,
+}
+
+/// The raw data used to keep track of ``Textbook`` completion
+#[derive(Serialize, Deserialize, Debug, Default)]
+pub struct CourseCompletionTextbook {
+    /// All completed section-ids within the textbook.
+    completed_sections: HashSet<String>,
+    /// The raw representation of the viewer's current position in the textbook.
+    position: Option<String>,
 }
 
 impl CourseCompletion {
@@ -288,8 +292,6 @@ impl CourseCompletion {
 /// The displayed progress through a ``Course``
 #[derive(Serialize, Debug)]
 pub struct CourseProgress {
-    /// If a course should be considered completed
-    completed: bool,
     /// The completion of textbooks within the course, in the order they are included in the course.
     completion: Vec<TextbookProgress>,
     /// The amount of time spent on this course today.
@@ -311,13 +313,13 @@ impl CourseProgress {
 
         for (book_index, book) in course.books.iter().enumerate() {
             #[allow(clippy::cast_precision_loss)]
-            book_progress.push(match completion.book_sections.get(&book_index) {
+            book_progress.push(match completion.books.get(&book_index) {
                 Some(book_completion) => {
                     let mut chapter_progress = Vec::with_capacity(book.chapters.len());
 
                     for chapter in &book.chapters {
                         if let Some(root) = &chapter.root {
-                            if book_completion.contains(root) {
+                            if book_completion.completed_sections.contains(root) {
                                 chapter_progress.push(1.0);
                                 continue;
                             }
@@ -333,7 +335,7 @@ impl CourseProgress {
                             let mut group_progress: usize = 0;
 
                             for section in &group.sections {
-                                if book_completion.contains(section) {
+                                if book_completion.completed_sections.contains(section) {
                                     group_progress += 1;
                                 }
                             }
@@ -375,29 +377,9 @@ impl CourseProgress {
             });
         }
 
-        let completed = match completion.completed {
-            Some(c) => c,
-            None => {
-                if book_progress.is_empty() {
-                    false
-                } else {
-                    let mut is_completed = true;
-
-                    for book in &book_progress {
-                        if 1.0 > book.overall_completion {
-                            is_completed = false;
-                        }
-                    }
-
-                    is_completed
-                }
-            }
-        };
-
         let current_date = Local::now().date_naive();
 
         Self {
-            completed,
             completion: book_progress,
             time_spent_today: completion
                 .time_spent
