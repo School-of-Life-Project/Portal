@@ -12,6 +12,7 @@ subject to change; this is *not* a set-in-stone roadmap, this is a list of ideas
 ### Back-end
 - separate Course (and CourseMap) from progress tracking
 	- further optimize Course / CourseMap loading
+		- store Courses and Course Maps in the same folder
 - move progress tracking and settings to native_db
 - remove need for filesystem-based locks
 
