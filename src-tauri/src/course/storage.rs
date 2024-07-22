@@ -187,7 +187,7 @@ impl DataStore {
         let deserializer = Deserializer::new(&data);
 
         let mut index = Course::deserialize(deserializer)?;
-        index.uuid = Some(id);
+        index.uuid = id;
         index.make_paths_relative();
 
         for book in &mut index.books {
@@ -207,7 +207,7 @@ impl DataStore {
         let deserializer = Deserializer::new(&data);
 
         let mut data = CourseMap::deserialize(deserializer)?;
-        data.uuid = Some(id);
+        data.uuid = id;
 
         Ok(data)
     }
