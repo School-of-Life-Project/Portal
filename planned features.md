@@ -7,7 +7,9 @@ subject to change; this is *not* a set-in-stone roadmap, this is a list of ideas
 - bug fixes
 	- properly handle the case when the user has no courses installed
 	- properly handle filesystem lock timeouts
-- combine ActiveCourses with Settings
+- separate Course (and CourseMap) from progress tracking
+	- further optimize Course / CourseMap loading
+- move progress tracking and settings to native_db
 
 ## Courses
 
