@@ -2,6 +2,7 @@ import {
 	Course,
 	CourseProgress,
 	OverallProgress,
+	parseBackendDate,
 	Result,
 	Settings,
 } from "../bindings.ts";
@@ -32,14 +33,7 @@ function daysBetween(StartDate: Date, EndDate: Date) {
 function sortProgressData(data: Record<string, number>) {
 	const sortedTimeData: Array<[Date, number]> = [];
 	for (const [dateString, value] of Object.entries(data)) {
-		const dateValues: string[] = dateString.split("-");
-		const date = new Date(
-			Number(dateValues[0]),
-			Number(dateValues[1]) - 1,
-			Number(dateValues[2]),
-		);
-
-		sortedTimeData.push([date, value]);
+		sortedTimeData.push([parseBackendDate(dateString), value]);
 	}
 
 	sortedTimeData.sort((a, b) => {

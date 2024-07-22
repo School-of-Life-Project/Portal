@@ -5,6 +5,8 @@ import { invoke, convertFileSrc } from "@tauri-apps/api/tauri";
 // - /src-tauri/src/api/wrapper.rs
 // - /error.html
 
+type BackendDate = string;
+
 export interface CourseMap {
 	uuid: string;
 	title: string;
@@ -51,7 +53,7 @@ export interface SectionGroup {
 export interface CourseCompletionData {
 	completed?: boolean;
 	book_sections: Record<number, string[]>;
-	time_spent: Record<string, number>;
+	time_spent: Record<BackendDate, number>;
 	position: Record<number, string>;
 }
 
@@ -68,7 +70,7 @@ export interface TextbookProgress {
 
 export interface OverallProgress {
 	chapters_completed: Record<string, number>;
-	time_spent: Record<string, number>;
+	time_spent: Record<BackendDate, number>;
 }
 
 export interface Settings {
@@ -116,7 +118,7 @@ function convertBackendAsyncError(error: Error | string | unknown): Error {
 	}
 }
 
-export function getCurrentBackendDate() {
+export function getCurrentBackendDate(): BackendDate {
 	const date = new Date();
 
 	const year = String(date.getFullYear());
@@ -132,6 +134,15 @@ export function getCurrentBackendDate() {
 	}
 
 	return year + "-" + month + "-" + day;
+}
+
+export function parseBackendDate(dateString: BackendDate) {
+	const dateValues: string[] = dateString.split("-");
+	return new Date(
+		Number(dateValues[0]),
+		Number(dateValues[1]) - 1,
+		Number(dateValues[2]),
+	);
 }
 
 export async function openDataDir(): Promise<null> {
