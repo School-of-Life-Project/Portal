@@ -2,25 +2,25 @@
 subject to change; this is *not* a set-in-stone roadmap, this is a list of ideas
 
 ## Short-term
+
+### Front-end
 - performance
 	- use documentFragment to minimize DOM updates on first page load
 - bug fixes
 	- properly handle the case when the user has no courses installed
-	- properly handle filesystem lock timeouts
+
+### Back-end
 - separate Course (and CourseMap) from progress tracking
 	- further optimize Course / CourseMap loading
 - move progress tracking and settings to native_db
+- remove need for filesystem-based locks
 
-## Courses
+## Course Building
 
-- (optionally) gate-keeping chapters behind previous lessons
-
-### Course Building
-
-#### Short-term
+### Short-term
 write instructions on how to build a course manually using Sigil (to view the ePub's ToC), a file manager, and a text editor
 
-#### Long-term
+### Long-term
 - make a Sigil plugin for generating a sidecar JSON file from an ePub file
 - make a Sigil plugin to reduce ePub filesize
 	- optimize embedded media for smaller filesize
