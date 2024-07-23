@@ -1,14 +1,10 @@
 #![allow(clippy::used_underscore_binding)]
-use std::{path::Path, sync::Arc};
 
 use anyhow::anyhow;
 use futures_util::{future::try_join_all, try_join};
-use serde::{Deserialize, Serialize};
-use tauri::{AppHandle, Manager, PathResolver};
-use tokio::{
-    sync::OnceCell,
-    task::{self, JoinError},
-};
+use serde::Serialize;
+use tauri::{AppHandle, Manager};
+use tokio::task::JoinError;
 use uuid::Uuid;
 
 use super::{
@@ -18,7 +14,9 @@ use super::{
 
 use crate::MAX_FS_CONCURRENCY;
 
-#[derive(Serialize, Deserialize, Debug)]
+// TODO: Further refactor the internal API to reduce number of function calls
+
+#[derive(Serialize)]
 pub struct ErrorWrapper {
     pub(super) message: String,
     pub(super) cause: String,
@@ -234,20 +232,24 @@ pub async fn set_active_courses(
 }
 
 #[tauri::command]
-pub async fn get_all(
-    state: tauri::State<'_, State>,
-) -> Result<(Vec<(Course, CourseProgress)>, Vec<(CourseMap, String)>), ErrorWrapper> {
+pub async fn get_all(state: tauri::State<'_, State>) -> Result<ListingResult, ErrorWrapper> {
     let scan =
         state.datastore.scan().await.map_err(|e| {
             ErrorWrapper::new("Unable to get Course/CourseMap list".to_string(), &e)
         })?;
 
-    try_join!(
+    let (courses, course_maps) = try_join!(
         get_courses(&state, &scan.courses),
         get_course_maps(&state, &scan.course_maps)
-    )
+    )?;
+
+    Ok(ListingResult {
+        courses,
+        course_maps,
+    })
 }
 
+#[derive(Serialize)]
 pub struct ListingResult {
     courses: Vec<(Course, CourseProgress)>,
     course_maps: Vec<(CourseMap, String)>,

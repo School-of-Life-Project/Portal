@@ -20,6 +20,10 @@ use crate::MAX_FS_CONCURRENCY;
 
 use super::{Course, CourseMap};
 
+// TODO: Need to cleanup this module to improve concurrency
+
+// TODO: Use spawn_blocking for both file reads and deserialization
+
 #[derive(Error, Debug)]
 pub enum Error {
     #[error(transparent)]

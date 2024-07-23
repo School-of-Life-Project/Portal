@@ -1,3 +1,5 @@
+#![allow(clippy::module_name_repetitions)]
+
 use std::{
     collections::HashMap,
     path::{Component, Path, PathBuf},
@@ -19,7 +21,7 @@ use uuid::Uuid;
 
 pub mod storage;
 
-pub fn into_relative_path(path: &Path) -> PathBuf {
+fn into_relative_path(path: &Path) -> PathBuf {
     let mut new = PathBuf::new();
 
     let mut items: usize = 0;
@@ -215,7 +217,7 @@ pub struct Course {
 }
 
 impl Course {
-    pub fn make_paths_relative(&mut self) {
+    fn make_paths_relative(&mut self) {
         for book in &mut self.books {
             book.file = into_relative_path(&book.file);
         }
