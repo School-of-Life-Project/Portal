@@ -2,17 +2,14 @@
 #![warn(clippy::pedantic)]
 
 use anyhow::{Context, Result};
+use api::State;
+use tauri::Manager;
 
 mod api;
 mod course;
-mod data;
 mod progress;
 
-use api::wrapper;
-
 pub const MAX_FS_CONCURRENCY: usize = 8;
-
-const IDENTIFIER: &str = "com.schoolOfLifeProject.Portal";
 
 const PROJECT_ISSUE_TRACKER: &str = "https://github.com/School-of-Life-Project/Portal-App/issues";
 const PROJECT_ISSUE_TRACKER_NEW: &str =
@@ -21,20 +18,22 @@ const PROJECT_SOURCE_REPO: &str = "https://github.com/School-of-Life-Project/Por
 
 fn main() -> Result<()> {
     tauri::Builder::default()
-        .manage(wrapper::StateWrapper::new())
+        .setup(|app| {
+            app.manage(State::new(&app.handle())?);
+            Ok(())
+        })
         .invoke_handler(tauri::generate_handler![
-            wrapper::open_data_dir,
-            wrapper::open_project_issue_tracker,
-            wrapper::open_project_repo,
-            wrapper::get_course_maps,
-            wrapper::get_courses,
-            wrapper::get_courses_active,
-            wrapper::get_course,
-            wrapper::set_course_completion,
-            wrapper::set_course_active_status,
-            wrapper::get_overall_progress,
-            wrapper::get_settings,
-            wrapper::set_settings,
+            api::open_data_dir,
+            api::open_project_issue_tracker,
+            api::open_project_repo,
+            api::get_overall_progress,
+            api::get_all,
+            api::get_course,
+            api::set_course_completion,
+            api::get_active_courses,
+            api::set_active_courses,
+            api::get_settings,
+            api::set_settings,
         ])
         .run(tauri::generate_context!())
         .context("Failed to initalize application window")

@@ -197,7 +197,7 @@ impl DataStore {
         Ok(index)
     }
 
-    pub async fn get_course_map(&self, id: Uuid) -> Result<CourseMap, Error> {
+    pub async fn get_course_map(&self, id: Uuid) -> Result<(CourseMap, String), Error> {
         let mut path = self
             .root
             .join(Simple::from_uuid(id).encode_lower(&mut Uuid::encode_buffer()));
@@ -209,7 +209,9 @@ impl DataStore {
         let mut data = CourseMap::deserialize(deserializer)?;
         data.uuid = id;
 
-        Ok(data)
+        let rendered = data.generate_svg();
+
+        Ok((data, rendered))
     }
 
     pub async fn scan(&self) -> Result<ScanResult, Error> {
@@ -218,13 +220,13 @@ impl DataStore {
         let scan = scan_dir(&self.root).await?;
 
         Ok(ScanResult {
-            courses: scan.files,
-            course_maps: scan.folders,
+            courses: scan.files.into_iter().collect(),
+            course_maps: scan.folders.into_iter().collect(),
         })
     }
 }
 
 pub struct ScanResult {
-    pub courses: HashSet<Uuid>,
-    pub course_maps: HashSet<Uuid>,
+    pub courses: Vec<Uuid>,
+    pub course_maps: Vec<Uuid>,
 }

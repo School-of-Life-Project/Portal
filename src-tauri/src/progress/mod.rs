@@ -1,3 +1,5 @@
+#![allow(clippy::module_name_repetitions)]
+
 use std::collections::{hash_map::Entry, HashMap, HashSet};
 
 use chrono::{Local, NaiveDate};
