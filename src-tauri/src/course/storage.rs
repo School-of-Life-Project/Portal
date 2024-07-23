@@ -1,6 +1,6 @@
 use std::{
     collections::HashSet,
-    ffi::{OsStr, OsString},
+    ffi::OsStr,
     fs::{self, File},
     io::{self, ErrorKind},
     path::PathBuf,
@@ -56,15 +56,25 @@ async fn unpack_dir(root: PathBuf) -> Result<(), Error> {
         for path in path_chunk {
             let root = root.clone();
             let path = path.clone();
+            let extension = path
+                .extension()
+                .map(OsStr::to_ascii_lowercase)
+                .unwrap_or_default();
+            let extension = extension.to_string_lossy();
 
-            join_set.spawn_blocking(move || -> Result<(), Error> {
-                let file = File::open(&path)?;
-                let mut archive = ZipArchive::new(file)?;
+            if extension == "zip" {
+                join_set.spawn_blocking(move || -> Result<(), Error> {
+                    if path.metadata()?.is_file() {
+                        let file = File::open(&path)?;
+                        let mut archive = ZipArchive::new(file)?;
 
-                archive.extract(&*root)?;
+                        archive.extract(&*root)?;
+                        fs::remove_file(&path)?;
+                    }
 
-                Ok(())
-            });
+                    Ok(())
+                });
+            }
         }
 
         while let Some(result) = join_set.join_next().await {
@@ -76,10 +86,7 @@ async fn unpack_dir(root: PathBuf) -> Result<(), Error> {
 }
 
 async fn handle_dir_entry(path: PathBuf) -> Result<Option<IndexedDirEntry>, Error> {
-    let toml_extension = Some(OsString::from("toml"));
-
     task::spawn_blocking(move || {
-        let extension = path.extension();
         let filename = path.file_name().unwrap_or_default().to_string_lossy();
         let filestem = path.file_stem().unwrap_or_default().to_string_lossy();
 
@@ -87,35 +94,41 @@ async fn handle_dir_entry(path: PathBuf) -> Result<Option<IndexedDirEntry>, Erro
         let mut buffer = Uuid::encode_buffer();
         let formatted = Simple::from_uuid(uuid).encode_lower(&mut buffer);
 
-        if extension.is_none() {
-            let metadata = path.metadata()?;
+        #[allow(clippy::single_match_else)]
+        match path.extension() {
+            Some(extension) => {
+                if extension.to_ascii_lowercase() == "toml" {
+                    let metadata = path.metadata()?;
 
-            if !metadata.is_dir() {
-                return Ok(None);
+                    if !metadata.is_file() {
+                        return Ok(None);
+                    }
+
+                    if *formatted != *filestem || extension != "toml" {
+                        let mut new_path = path.with_file_name(formatted);
+                        new_path.set_extension("toml");
+                        fs::rename(path, new_path)?;
+                    }
+
+                    Ok(Some(IndexedDirEntry::File(uuid)))
+                } else {
+                    Ok(None)
+                }
             }
+            None => {
+                let metadata = path.metadata()?;
 
-            if *formatted != *filename {
-                let new_path = path.with_file_name(formatted);
-                fs::rename(path, new_path)?;
+                if !metadata.is_dir() {
+                    return Ok(None);
+                }
+
+                if *formatted != *filename {
+                    let new_path = path.with_file_name(formatted);
+                    fs::rename(path, new_path)?;
+                }
+
+                Ok(Some(IndexedDirEntry::Folder(uuid)))
             }
-
-            Ok(Some(IndexedDirEntry::Folder(uuid)))
-        } else if extension.map(OsStr::to_ascii_lowercase) == toml_extension {
-            let metadata = path.metadata()?;
-
-            if !metadata.is_file() {
-                return Ok(None);
-            }
-
-            if *formatted != *filestem || extension != toml_extension.as_deref() {
-                let mut new_path = path.with_file_name(formatted);
-                new_path.set_extension(extension.unwrap_or_default());
-                fs::rename(path, new_path)?;
-            }
-
-            Ok(Some(IndexedDirEntry::File(uuid)))
-        } else {
-            Ok(None)
         }
     })
     .await?
