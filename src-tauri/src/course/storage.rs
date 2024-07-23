@@ -104,6 +104,11 @@ async fn unpack_dir(path: &Path) -> Result<(), Error> {
     Ok(())
 }
 
+struct DirScanResults {
+    files: HashSet<Uuid>,
+    folders: HashSet<Uuid>,
+}
+
 async fn scan_dir(path: &Path) -> Result<DirScanResults, Error> {
     let mut read_dir = read_dir(path).await?;
 
@@ -166,11 +171,6 @@ async fn scan_dir(path: &Path) -> Result<DirScanResults, Error> {
     Ok(results)
 }
 
-struct DirScanResults {
-    files: HashSet<Uuid>,
-    folders: HashSet<Uuid>,
-}
-
 pub struct DataStore {
     pub root: PathBuf,
 }
@@ -212,45 +212,19 @@ impl DataStore {
         Ok(data)
     }
 
-    pub async fn scan(&self) -> Result<(Vec<Course>, Vec<CourseMap>), Error> {
+    pub async fn scan(&self) -> Result<ScanResult, Error> {
         unpack_dir(&self.root).await?;
 
         let scan = scan_dir(&self.root).await?;
 
-        let folder_ids: Vec<Uuid> = scan.folders.into_iter().collect();
-        let file_ids: Vec<Uuid> = scan.files.into_iter().collect();
-
-        let mut folders = Vec::with_capacity(folder_ids.len());
-        let mut files = Vec::with_capacity(file_ids.len());
-
-        {
-            for chunk in folder_ids.chunks(MAX_FS_CONCURRENCY) {
-                let mut future_set = Vec::with_capacity(MAX_FS_CONCURRENCY);
-
-                for uuid in chunk {
-                    future_set.push(async { self.get_course(uuid).await });
-                }
-
-                let mut results = try_join_all(future_set).await?;
-
-                folders.append(&mut results);
-            }
-        }
-
-        {
-            for chunk in file_ids.chunks(MAX_FS_CONCURRENCY) {
-                let mut future_set = Vec::with_capacity(MAX_FS_CONCURRENCY);
-
-                for uuid in chunk {
-                    future_set.push(async { self.get_course_map(uuid).await });
-                }
-
-                let mut results = try_join_all(future_set).await?;
-
-                files.append(&mut results);
-            }
-        }
-
-        Ok((folders, files))
+        Ok(ScanResult {
+            courses: scan.files,
+            course_maps: scan.folders,
+        })
     }
+}
+
+pub struct ScanResult {
+    pub courses: HashSet<Uuid>,
+    pub course_maps: HashSet<Uuid>,
 }
