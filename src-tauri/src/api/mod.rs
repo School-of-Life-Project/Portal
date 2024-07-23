@@ -132,15 +132,17 @@ pub async fn get_listing(state: tauri::State<'_, State>) -> Result<ListingResult
             ErrorWrapper::new("Unable to get Course/CourseMap list".to_string(), &e)
         })?;
 
-    let (courses, course_maps, settings) = try_join!(
+    let (courses, course_maps, active_courses, settings) = try_join!(
         util::get_courses(&state, &scan.courses),
         util::get_course_maps(&state, &scan.course_maps),
+        util::get_active_courses(&state),
         util::get_settings(&state)
     )?;
 
     Ok(ListingResult {
         courses,
         course_maps,
+        active_courses,
         settings,
     })
 }
@@ -149,15 +151,13 @@ pub async fn get_listing(state: tauri::State<'_, State>) -> Result<ListingResult
 pub struct ListingResult {
     courses: Vec<(Course, CourseProgress)>,
     course_maps: Vec<(CourseMap, String)>,
+    active_courses: Vec<Uuid>,
     settings: Settings,
 }
 
 #[tauri::command]
 pub async fn get_overview(state: tauri::State<'_, State>) -> Result<OverviewResult, ErrorWrapper> {
-    let scan =
-        state.database.get_active_courses().await.map_err(|e| {
-            ErrorWrapper::new("Unable to get list of active Courses".to_string(), &e)
-        })?;
+    let scan = util::get_active_courses(&state).await?;
 
     let (active_courses, overall_progress, settings) = try_join!(
         util::get_courses(&state, &scan),

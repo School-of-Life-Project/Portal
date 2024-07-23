@@ -77,6 +77,14 @@ pub(super) async fn get_courses(
     Ok(hydrated_courses)
 }
 
+pub(super) async fn get_active_courses(state: &State) -> Result<Vec<Uuid>, ErrorWrapper> {
+    state
+        .database
+        .get_active_courses()
+        .await
+        .map_err(|e| ErrorWrapper::new("Unable to get list of active Courses".to_string(), &e))
+}
+
 pub(super) async fn get_course_maps(
     state: &State,
     ids: &[Uuid],
