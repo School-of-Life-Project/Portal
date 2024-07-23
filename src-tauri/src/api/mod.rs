@@ -80,9 +80,9 @@ pub fn open_project_repo() -> Result<(), ErrorWrapper> {
 pub async fn get_course(
     app_handle: tauri::AppHandle,
     state: tauri::State<'_, State>,
-    id: Uuid,
+    uuid: Uuid,
 ) -> Result<(Course, CourseCompletion), ErrorWrapper> {
-    let (course, completion, _) = util::get_course(&state, id).await?;
+    let (course, completion, _) = util::get_course(&state, uuid).await?;
 
     let scope = app_handle.asset_protocol_scope();
 
@@ -102,13 +102,13 @@ pub async fn get_course(
 pub async fn set_course_completion(
     state: tauri::State<'_, State>,
     course: Course,
-    data: CourseCompletion,
+    completion: CourseCompletion,
 ) -> Result<(), ErrorWrapper> {
     let uuid = course.uuid;
 
     state
         .database
-        .set_course_completion(course, data)
+        .set_course_completion(course, completion)
         .await
         .map_err(|e| ErrorWrapper::new(format!("Unable to update progress for Course {uuid}"), &e))
 }
@@ -116,11 +116,11 @@ pub async fn set_course_completion(
 #[tauri::command]
 pub async fn set_active_courses(
     state: tauri::State<'_, State>,
-    data: Vec<Uuid>,
+    courses: Vec<Uuid>,
 ) -> Result<(), ErrorWrapper> {
     state
         .database
-        .set_active_courses(data)
+        .set_active_courses(courses)
         .await
         .map_err(|e| ErrorWrapper::new("Unable to update list of active Courses".to_string(), &e))
 }
@@ -187,11 +187,11 @@ pub async fn get_settings(state: tauri::State<'_, State>) -> Result<Settings, Er
 #[tauri::command]
 pub async fn set_settings(
     state: tauri::State<'_, State>,
-    data: Settings,
+    settings: Settings,
 ) -> Result<(), ErrorWrapper> {
     state
         .database
-        .set_settings(data)
+        .set_settings(settings)
         .await
         .map_err(|e| ErrorWrapper::new("Unable to update Settings".to_string(), &e))
 }

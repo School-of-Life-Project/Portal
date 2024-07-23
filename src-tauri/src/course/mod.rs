@@ -219,7 +219,7 @@ pub struct Course {
 impl Course {
     fn make_paths_relative(&mut self) {
         for book in &mut self.books {
-            book.file = into_relative_path(&book.file).join("");
+            book.file = into_relative_path(&book.file);
         }
     }
 }

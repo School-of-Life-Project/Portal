@@ -1,11 +1,6 @@
 import { invoke, convertFileSrc } from "@tauri-apps/api/tauri";
 
-// Relevant source files:
-// - /src-tauri/src/api/mod.rs
-// - /src-tauri/src/api/wrapper.rs
-// - /error.html
-
-type BackendDate = string;
+// Based on /src-tauri/src/course/mod.rs
 
 export interface CourseMap {
 	uuid: string;
@@ -50,6 +45,10 @@ export interface SectionGroup {
 	sections: string[];
 }
 
+// Based on /src-tauri/src/progress/mod.rs
+
+type BackendDate = string;
+
 export interface CourseCompletionData {
 	time_spent: Record<BackendDate, number>;
 	books: Record<number, CourseCompletionTextbookData>;
@@ -71,7 +70,7 @@ export interface TextbookProgress {
 }
 
 export interface OverallProgress {
-	chapters_completed: Record<string, number>;
+	chapters_completed: Record<BackendDate, number>;
 	time_spent: Record<BackendDate, number>;
 }
 
@@ -82,6 +81,35 @@ export interface Settings {
 	maximum_daily_chapters: number;
 	weeks_displayed: number;
 }
+
+export function getCurrentBackendDate(): BackendDate {
+	const date = new Date();
+
+	const year = String(date.getFullYear());
+	let month = String(date.getMonth());
+	let day = String(date.getDate());
+
+	if (month.length == 1) {
+		month = "0" + month;
+	}
+
+	if (day.length == 1) {
+		day = "0" + day;
+	}
+
+	return year + "-" + month + "-" + day;
+}
+
+export function parseBackendDate(dateString: BackendDate) {
+	const dateValues: string[] = dateString.split("-");
+	return new Date(
+		Number(dateValues[0]),
+		Number(dateValues[1]) - 1,
+		Number(dateValues[2]),
+	);
+}
+
+// Based on /src-tauri/src/api/util.rs
 
 export interface Result<Type> {
 	Ok?: Type;
@@ -120,41 +148,6 @@ function convertBackendAsyncError(error: Error | string | unknown): Error {
 	}
 }
 
-export function getCurrentBackendDate(): BackendDate {
-	const date = new Date();
-
-	const year = String(date.getFullYear());
-	let month = String(date.getMonth());
-	let day = String(date.getDate());
-
-	if (month.length == 1) {
-		month = "0" + month;
-	}
-
-	if (day.length == 1) {
-		day = "0" + day;
-	}
-
-	return year + "-" + month + "-" + day;
-}
-
-export function parseBackendDate(dateString: BackendDate) {
-	const dateValues: string[] = dateString.split("-");
-	return new Date(
-		Number(dateValues[0]),
-		Number(dateValues[1]) - 1,
-		Number(dateValues[2]),
-	);
-}
-
-export async function openDataDir(): Promise<null> {
-	try {
-		return await invoke("open_data_dir");
-	} catch (error) {
-		throw convertBackendAsyncError(error);
-	}
-}
-
 export function displayError(error: Error) {
 	const params = new URLSearchParams();
 
@@ -164,31 +157,11 @@ export function displayError(error: Error) {
 	window.location.assign("/error.html?" + params.toString());
 }
 
-export async function getCourseMaps(): Promise<
-	Array<Result<[CourseMap, string]>>
-> {
-	try {
-		return await invoke("get_course_maps");
-	} catch (error) {
-		throw convertBackendAsyncError(error);
-	}
-}
+// Based on /src-tauri/src/api/mod.rs
 
-export async function getCourses(): Promise<
-	Array<Result<[Course, CourseProgress]>>
-> {
+export async function openDataDir(): Promise<null> {
 	try {
-		return await invoke("get_courses");
-	} catch (error) {
-		throw convertBackendAsyncError(error);
-	}
-}
-
-export async function getCoursesActive(): Promise<
-	Array<Result<[Course, CourseProgress]>>
-> {
-	try {
-		return await invoke("get_courses_active");
+		return await invoke("open_data_dir");
 	} catch (error) {
 		throw convertBackendAsyncError(error);
 	}
@@ -199,18 +172,12 @@ export async function getCourse(
 ): Promise<[Course, CourseCompletionData]> {
 	try {
 		const course: [Course, CourseCompletionData] = await invoke("get_course", {
-			id: uuid,
+			uuid,
 		});
 		if (Array.isArray(course)) {
 			if (course[0].books) {
 				for (const book of course[0].books) {
-					if (book.file.endsWith("/")) {
-						book.file =
-							convertFileSrc(book.file.slice(undefined, book.file.length - 1)) +
-							"/";
-					} else {
-						book.file = convertFileSrc(book.file);
-					}
+					book.file = convertFileSrc(book.file) + "/";
 				}
 			}
 		}
@@ -221,39 +188,56 @@ export async function getCourse(
 }
 
 export async function setCourseCompletion(
-	uuid: string,
+	course: Course,
 	completion: CourseCompletionData,
 ): Promise<null> {
 	try {
 		return await invoke("set_course_completion", {
-			id: uuid,
-			data: completion,
+			course,
+			completion,
 		});
 	} catch (error) {
 		throw convertBackendAsyncError(error);
 	}
 }
 
-export async function setCourseActiveStatus(
-	uuid: string,
-	active: boolean,
-): Promise<null> {
+export async function setActiveCourses(courses: string[]): Promise<null> {
 	try {
-		return await invoke("set_course_active_status", {
-			id: uuid,
-			data: active,
+		return await invoke("set_active_courses", {
+			courses,
 		});
 	} catch (error) {
 		throw convertBackendAsyncError(error);
 	}
 }
 
-export async function getOverallProgress(): Promise<OverallProgress> {
+export async function getListing(): Promise<ListingResult> {
 	try {
-		return await invoke("get_overall_progress");
+		return await invoke("get_listing");
 	} catch (error) {
 		throw convertBackendAsyncError(error);
 	}
+}
+
+export interface ListingResult {
+	courses: Array<[Course, CourseProgress]>;
+	course_maps: Array<[CourseMap, string]>;
+	active_courses: Array<string>;
+	settings: Settings;
+}
+
+export async function getOverview(): Promise<OverviewResult> {
+	try {
+		return await invoke("get_overview");
+	} catch (error) {
+		throw convertBackendAsyncError(error);
+	}
+}
+
+export interface OverviewResult {
+	active_courses: Array<[Course, CourseProgress]>;
+	overall_progress: OverallProgress;
+	settings: Settings;
 }
 
 export async function getSettings(): Promise<Settings> {
@@ -267,7 +251,7 @@ export async function getSettings(): Promise<Settings> {
 export async function setSettings(settings: Settings): Promise<null> {
 	try {
 		return await invoke("set_settings", {
-			data: settings,
+			settings,
 		});
 	} catch (error) {
 		throw convertBackendAsyncError(error);
