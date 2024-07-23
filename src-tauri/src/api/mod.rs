@@ -1,44 +1,19 @@
 #![allow(clippy::used_underscore_binding)]
 
 use anyhow::anyhow;
-use futures_util::{future::try_join_all, try_join};
+use futures_util::try_join;
 use serde::Serialize;
 use tauri::{AppHandle, Manager};
-use tokio::task::JoinError;
 use uuid::Uuid;
+
+mod util;
+
+use util::ErrorWrapper;
 
 use super::{
     course::{storage::DataStore, Course, CourseMap},
     progress::{database::Database, CourseCompletion, CourseProgress, OverallProgress, Settings},
 };
-
-use crate::MAX_FS_CONCURRENCY;
-
-// TODO: Further refactor the internal API to reduce number of function calls
-
-#[derive(Serialize)]
-pub struct ErrorWrapper {
-    pub(super) message: String,
-    pub(super) cause: String,
-}
-
-impl ErrorWrapper {
-    pub(super) fn new<T>(message: String, inner: &T) -> Self
-    where
-        T: std::error::Error,
-    {
-        Self {
-            message,
-            cause: format!("{inner}"),
-        }
-    }
-}
-
-impl From<JoinError> for ErrorWrapper {
-    fn from(value: JoinError) -> Self {
-        Self::new("An internal error occured".to_string(), &value)
-    }
-}
 
 pub struct State {
     database: Database,
@@ -101,82 +76,13 @@ pub fn open_project_repo() -> Result<(), ErrorWrapper> {
     Ok(())
 }
 
-async fn get_hydrated_course(
-    state: &State,
-    id: Uuid,
-) -> Result<(Course, CourseCompletion, CourseProgress), ErrorWrapper> {
-    let course = state
-        .datastore
-        .get_course(id)
-        .await
-        .map_err(|e| ErrorWrapper::new(format!("Unable to get Course {id}"), &e))?;
-
-    state
-        .database
-        .get_course_progress(course)
-        .await
-        .map_err(|e| ErrorWrapper::new(format!("Unable to get progress for Course {id}"), &e))
-}
-
-async fn get_courses(
-    state: &State,
-    ids: &[Uuid],
-) -> Result<Vec<(Course, CourseProgress)>, ErrorWrapper> {
-    let mut hydrated_courses = Vec::with_capacity(ids.len());
-
-    for chunk in ids.chunks(MAX_FS_CONCURRENCY) {
-        let mut future_set = Vec::with_capacity(MAX_FS_CONCURRENCY);
-
-        for uuid in chunk {
-            future_set.push(get_hydrated_course(state, *uuid));
-        }
-
-        let results = try_join_all(future_set).await?;
-
-        for result in results {
-            hydrated_courses.push((result.0, result.2));
-        }
-    }
-
-    Ok(hydrated_courses)
-}
-
-async fn get_course_maps(
-    state: &State,
-    ids: &[Uuid],
-) -> Result<Vec<(CourseMap, String)>, ErrorWrapper> {
-    let mut course_maps = Vec::with_capacity(ids.len());
-
-    for chunk in ids.chunks(MAX_FS_CONCURRENCY) {
-        let mut future_set = Vec::with_capacity(MAX_FS_CONCURRENCY);
-
-        for uuid in chunk {
-            future_set.push(async {
-                let uuid = *uuid;
-
-                state
-                    .datastore
-                    .get_course_map(uuid)
-                    .await
-                    .map_err(|e| ErrorWrapper::new(format!("Unable to get Course Map {uuid}"), &e))
-            });
-        }
-
-        let mut results = try_join_all(future_set).await?;
-
-        course_maps.append(&mut results);
-    }
-
-    Ok(course_maps)
-}
-
 #[tauri::command]
 pub async fn get_course(
     app_handle: tauri::AppHandle,
     state: tauri::State<'_, State>,
     id: Uuid,
 ) -> Result<(Course, CourseCompletion), ErrorWrapper> {
-    let (course, completion, _) = get_hydrated_course(&state, id).await?;
+    let (course, completion, _) = util::get_course(&state, id).await?;
 
     let scope = app_handle.asset_protocol_scope();
 
@@ -208,18 +114,6 @@ pub async fn set_course_completion(
 }
 
 #[tauri::command]
-pub async fn get_active_courses(
-    state: tauri::State<'_, State>,
-) -> Result<Vec<(Course, CourseProgress)>, ErrorWrapper> {
-    let active_courses =
-        state.database.get_active_courses().await.map_err(|e| {
-            ErrorWrapper::new("Unable to get list of active Courses".to_string(), &e)
-        })?;
-
-    get_courses(&state, &active_courses).await
-}
-
-#[tauri::command]
 pub async fn set_active_courses(
     state: tauri::State<'_, State>,
     data: Vec<Uuid>,
@@ -232,20 +126,22 @@ pub async fn set_active_courses(
 }
 
 #[tauri::command]
-pub async fn get_all(state: tauri::State<'_, State>) -> Result<ListingResult, ErrorWrapper> {
+pub async fn get_listing(state: tauri::State<'_, State>) -> Result<ListingResult, ErrorWrapper> {
     let scan =
         state.datastore.scan().await.map_err(|e| {
             ErrorWrapper::new("Unable to get Course/CourseMap list".to_string(), &e)
         })?;
 
-    let (courses, course_maps) = try_join!(
-        get_courses(&state, &scan.courses),
-        get_course_maps(&state, &scan.course_maps)
+    let (courses, course_maps, settings) = try_join!(
+        util::get_courses(&state, &scan.courses),
+        util::get_course_maps(&state, &scan.course_maps),
+        util::get_settings(&state)
     )?;
 
     Ok(ListingResult {
         courses,
         course_maps,
+        settings,
     })
 }
 
@@ -253,26 +149,39 @@ pub async fn get_all(state: tauri::State<'_, State>) -> Result<ListingResult, Er
 pub struct ListingResult {
     courses: Vec<(Course, CourseProgress)>,
     course_maps: Vec<(CourseMap, String)>,
+    settings: Settings,
 }
 
 #[tauri::command]
-pub async fn get_overall_progress(
-    state: tauri::State<'_, State>,
-) -> Result<OverallProgress, ErrorWrapper> {
-    state
-        .database
-        .get_overall_progress()
-        .await
-        .map_err(|e| ErrorWrapper::new("Unable to get overall progress".to_string(), &e))
+pub async fn get_overview(state: tauri::State<'_, State>) -> Result<OverviewResult, ErrorWrapper> {
+    let scan =
+        state.database.get_active_courses().await.map_err(|e| {
+            ErrorWrapper::new("Unable to get list of active Courses".to_string(), &e)
+        })?;
+
+    let (active_courses, overall_progress, settings) = try_join!(
+        util::get_courses(&state, &scan),
+        util::get_overall_progress(&state),
+        util::get_settings(&state)
+    )?;
+
+    Ok(OverviewResult {
+        active_courses,
+        overall_progress,
+        settings,
+    })
+}
+
+#[derive(Serialize)]
+pub struct OverviewResult {
+    active_courses: Vec<(Course, CourseProgress)>,
+    overall_progress: OverallProgress,
+    settings: Settings,
 }
 
 #[tauri::command]
 pub async fn get_settings(state: tauri::State<'_, State>) -> Result<Settings, ErrorWrapper> {
-    state
-        .database
-        .get_settings()
-        .await
-        .map_err(|e| ErrorWrapper::new("Unable to get Settings".to_string(), &e))
+    util::get_settings(&state).await
 }
 
 #[tauri::command]
