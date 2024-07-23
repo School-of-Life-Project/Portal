@@ -5,6 +5,7 @@ use sled::{
     Config, Db,
 };
 use thiserror::Error;
+use uuid::Uuid;
 
 use super::{CourseCompletion, CourseProgress, OverallProgress, Settings};
 
@@ -110,6 +111,19 @@ impl Database {
         } else {
             Ok(OverallProgress::default())
         }
+    }
+    pub fn get_active_courses(&self) -> Result<Vec<Uuid>, Error> {
+        if let Some(data) = self.root.get(ACTIVE_COURSES_KEY)? {
+            Ok(bincode::deserialize(&data)?)
+        } else {
+            Ok(Vec::new())
+        }
+    }
+    pub fn set_active_courses(&self, data: &[Uuid]) -> Result<(), Error> {
+        self.root
+            .insert(ACTIVE_COURSES_KEY, bincode::serialize(data)?)?;
+
+        Ok(())
     }
     pub fn get_settings(&self) -> Result<Settings, Error> {
         if let Some(data) = self.root.get(SETTINGS_KEY)? {
