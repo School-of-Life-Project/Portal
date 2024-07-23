@@ -1,9 +1,9 @@
 #![allow(clippy::used_underscore_binding)]
 
 use anyhow::anyhow;
-use futures_util::try_join;
 use serde::Serialize;
 use tauri::{AppHandle, Manager};
+use tokio::try_join;
 use uuid::Uuid;
 
 mod util;

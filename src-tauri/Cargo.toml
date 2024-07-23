@@ -25,6 +25,7 @@ uuid = { version = "1.10.0", features = [
 toml = "0.8.14"
 tokio = { version = "1.38.0", features = [
 	"fs",
+	"macros",
 ] }
 open = "5.3.0"
 anyhow = "1.0.86"
