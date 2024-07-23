@@ -176,10 +176,10 @@ pub struct DataStore {
 }
 
 impl DataStore {
-    pub async fn get_course(&self, id: Uuid) -> Result<Course, Error> {
+    pub async fn get_course(&self, id: &Uuid) -> Result<Course, Error> {
         let root = self
             .root
-            .join(Simple::from_uuid(id).encode_lower(&mut Uuid::encode_buffer()));
+            .join(Simple::from_uuid(*id).encode_lower(&mut Uuid::encode_buffer()));
 
         let index_path = root.join("course.toml");
 
@@ -187,7 +187,7 @@ impl DataStore {
         let deserializer = Deserializer::new(&data);
 
         let mut index = Course::deserialize(deserializer)?;
-        index.uuid = id;
+        index.uuid = *id;
         index.make_paths_relative();
 
         for book in &mut index.books {
@@ -197,17 +197,17 @@ impl DataStore {
         Ok(index)
     }
 
-    pub async fn get_course_map(&self, id: Uuid) -> Result<CourseMap, Error> {
+    pub async fn get_course_map(&self, id: &Uuid) -> Result<CourseMap, Error> {
         let mut path = self
             .root
-            .join(Simple::from_uuid(id).encode_lower(&mut Uuid::encode_buffer()));
+            .join(Simple::from_uuid(*id).encode_lower(&mut Uuid::encode_buffer()));
         path.set_extension("toml");
 
         let data = fs::read_to_string(path).await?;
         let deserializer = Deserializer::new(&data);
 
         let mut data = CourseMap::deserialize(deserializer)?;
-        data.uuid = id;
+        data.uuid = *id;
 
         Ok(data)
     }
@@ -228,7 +228,7 @@ impl DataStore {
                 let mut future_set = Vec::with_capacity(MAX_FS_CONCURRENCY);
 
                 for uuid in chunk {
-                    future_set.push(async { self.get_course(*uuid).await });
+                    future_set.push(async { self.get_course(uuid).await });
                 }
 
                 let mut results = try_join_all(future_set).await?;
@@ -242,7 +242,7 @@ impl DataStore {
                 let mut future_set = Vec::with_capacity(MAX_FS_CONCURRENCY);
 
                 for uuid in chunk {
-                    future_set.push(async { self.get_course_map(*uuid).await });
+                    future_set.push(async { self.get_course_map(uuid).await });
                 }
 
                 let mut results = try_join_all(future_set).await?;

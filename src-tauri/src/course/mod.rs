@@ -17,7 +17,7 @@ use layout::{
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-mod storage;
+pub mod storage;
 
 pub fn into_relative_path(path: &Path) -> PathBuf {
     let mut new = PathBuf::new();

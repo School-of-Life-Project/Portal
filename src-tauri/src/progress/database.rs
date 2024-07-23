@@ -7,9 +7,7 @@ use sled::{
 use thiserror::Error;
 use uuid::Uuid;
 
-use super::{CourseCompletion, CourseProgress, OverallProgress, Settings};
-
-use crate::course::Course;
+use super::{super::course::Course, CourseCompletion, CourseProgress, OverallProgress, Settings};
 
 #[derive(Error, Debug)]
 pub enum Error {

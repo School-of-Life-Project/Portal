@@ -3,9 +3,9 @@ use std::collections::{hash_map::Entry, HashMap, HashSet};
 use chrono::{Local, NaiveDate};
 use serde::{Deserialize, Serialize};
 
-use crate::course::Course;
+use super::course::Course;
 
-mod database;
+pub mod database;
 
 /// The raw data used to keep track of ``Course`` completion
 #[derive(Serialize, Deserialize, Debug, Default)]
