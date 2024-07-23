@@ -2,7 +2,6 @@
 #![warn(clippy::pedantic)]
 
 use anyhow::{Context, Result};
-use api::State;
 use tauri::Manager;
 
 mod api;
@@ -19,7 +18,7 @@ const PROJECT_SOURCE_REPO: &str = "https://github.com/School-of-Life-Project/Por
 fn main() -> Result<()> {
     tauri::Builder::default()
         .setup(|app| {
-            app.manage(State::new(&app.handle())?);
+            app.manage(api::State::new(&app.handle())?);
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
