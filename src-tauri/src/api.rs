@@ -174,10 +174,22 @@ async fn get_course_maps(
 
 #[tauri::command]
 pub async fn get_course(
+    app_handle: tauri::AppHandle,
     state: tauri::State<'_, State>,
     id: Uuid,
 ) -> Result<(Course, CourseCompletion), ErrorWrapper> {
     let (course, completion, _) = get_hydrated_course(&state, id).await?;
+
+    let scope = app_handle.asset_protocol_scope();
+
+    for book in &course.books {
+        scope.allow_directory(&book.file, true).map_err(|e| {
+            ErrorWrapper::new(
+                format!("Unable to update permissions for path {:?}", book.file),
+                &e,
+            )
+        })?;
+    }
 
     Ok((course, completion))
 }
