@@ -191,7 +191,7 @@ impl DataStore {
         index.make_paths_relative();
 
         for book in &mut index.books {
-            book.file = root.join(&book.file);
+            book.file = fs::canonicalize(root.join(&book.file)).await?;
         }
 
         Ok(index)

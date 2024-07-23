@@ -4,7 +4,9 @@
 use anyhow::{Context, Result};
 
 mod api;
+mod course;
 mod data;
+mod progress;
 
 use api::wrapper;
 
