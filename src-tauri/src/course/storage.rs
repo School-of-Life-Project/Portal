@@ -18,8 +18,6 @@ use crate::MAX_FS_CONCURRENCY;
 
 use super::{Course, CourseMap};
 
-// TODO: Improve memory management
-
 #[derive(Error, Debug)]
 pub enum Error {
     #[error(transparent)]
