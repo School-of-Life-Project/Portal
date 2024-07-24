@@ -178,6 +178,7 @@ export class ViewManager {
 				if (label) {
 					const is_completed = completed.has(chapter.root);
 					const checkbox = buildCheckbox(is_completed);
+					checkbox.id = "section-" + chapter.root;
 
 					checkboxes.set(chapter.root, checkbox);
 					label.parentElement?.appendChild(checkbox);
@@ -191,6 +192,7 @@ export class ViewManager {
 					if (label) {
 						const is_completed = completed.has(section);
 						const checkbox = buildCheckbox(is_completed);
+						checkbox.id = "section-" + section;
 
 						checkboxes.set(section, checkbox);
 						label.parentElement?.appendChild(checkbox);
@@ -202,14 +204,11 @@ export class ViewManager {
 		listing.addEventListener("change", (event) => {
 			const target = event.target as HTMLElement;
 
-			if (
-				target.tagName == "INPUT" &&
-				target.parentElement &&
-				target.parentElement.tagName == "A" &&
-				target.parentElement.id
-			) {
+			if (target.tagName == "INPUT" && target.id) {
 				const checked = (target as HTMLInputElement).checked;
-				const identifier = target.parentElement.id;
+				const identifier = target.id.substring(8);
+
+				console.log(checked, identifier);
 
 				if (checked) {
 					completed.add(identifier);
