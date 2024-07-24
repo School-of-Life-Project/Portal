@@ -22,10 +22,7 @@ const folderButton = document.getElementById("folderOpener");
 
 function openFolder() {
 	openDataDir().catch((error) => {
-		displayError({
-			message: "Unable to open Data folder",
-			cause: JSON.stringify(error),
-		});
+		displayError(error);
 	});
 }
 

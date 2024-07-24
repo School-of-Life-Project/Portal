@@ -10,10 +10,7 @@ import { DocumentViewer, ProgressManager, ViewManager } from "./shared.ts";
 import { ePubViewer } from "./epub.ts";
 
 const settingsPromise = getSettings().catch((error) => {
-	displayError({
-		message: "Unable to get Settings",
-		cause: JSON.stringify(error),
-	});
+	displayError(error);
 });
 
 const params = new URLSearchParams(window.location.search);
@@ -108,7 +105,7 @@ async function loadCourse(
 			} catch (error) {
 				displayError({
 					message: "Unable to display document",
-					cause: JSON.stringify(error),
+					cause: String(error),
 				});
 			}
 		})

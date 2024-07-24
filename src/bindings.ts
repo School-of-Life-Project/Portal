@@ -143,7 +143,7 @@ function convertBackendAsyncError(error: Error | string | unknown): Error {
 	} else {
 		return {
 			message: "Unable to perform internal API call",
-			cause: JSON.stringify(error),
+			cause: String(error),
 		};
 	}
 }

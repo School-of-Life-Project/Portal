@@ -199,7 +199,7 @@ export class ProgressManager {
 
 		this.#completion = course[1];
 		this.#completedSections = new Set(
-			course[1].books[document_index].completed_sections,
+			course[1].books[document_index]?.completed_sections,
 		);
 		this.#buildListingProgressTracker(
 			{ course: course[0], progress: this.#completion },
@@ -278,10 +278,8 @@ export class ProgressManager {
 									} else {
 										this.#completedSections.delete(chapter.root);
 									}
-									this.#completion.books[document_index].completed_sections =
-										Array.from(this.#completedSections);
+									this.#updateCompletionData(course.course, document_index);
 									this.#showNextChapter(textbook, chapter.root);
-									updateCompletion(course.course, this.#completion);
 								}
 							},
 						),
@@ -320,9 +318,7 @@ export class ProgressManager {
 										this.#completedSections.delete(section);
 									}
 									this.#updateChapterCompletion(textbook, chapter);
-									this.#completion.books[document_index].completed_sections =
-										Array.from(this.#completedSections);
-									updateCompletion(course, this.#completion);
+									this.#updateCompletionData(course, document_index);
 								}
 							},
 						),
@@ -343,6 +339,20 @@ export class ProgressManager {
 		}
 
 		return checkbox;
+	}
+	#updateCompletionData(course: Course, document_index: number) {
+		if (this.#completion) {
+			if (!this.#completion.books[document_index]) {
+				this.#completion.books[document_index] = {
+					completed_sections: Array.from(this.#completedSections),
+				};
+			} else {
+				this.#completion.books[document_index].completed_sections = Array.from(
+					this.#completedSections,
+				);
+			}
+			updateCompletion(course, this.#completion);
+		}
 	}
 	#updateChapterCompletion(textbook: Textbook, chapter: Chapter) {
 		if (!this.#completedSections) {
@@ -483,6 +493,11 @@ export class ProgressManager {
 	}
 	savePosition(document_index: number, position: string) {
 		if (this.#completion && this.rendered) {
+			if (!this.#completion.books[document_index]) {
+				this.#completion.books[document_index] = {
+					completed_sections: [],
+				};
+			}
 			this.#completion.books[document_index].position = position;
 		}
 	}
