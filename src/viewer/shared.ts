@@ -225,9 +225,9 @@ export class ProgressManager {
 				}
 			}
 		}, 1000);
-		window.addEventListener("beforeunload", () => {
+		window.addEventListener("beforeunload", async () => {
 			if (this.#completion) {
-				updateCompletion(course[0], this.#completion);
+				await updateCompletion(course[0], this.#completion);
 			}
 		});
 
