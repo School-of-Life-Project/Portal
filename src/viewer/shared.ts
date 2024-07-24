@@ -6,6 +6,7 @@ import {
 	Error,
 	Settings,
 	getCurrentBackendDate,
+	Chapter,
 } from "../bindings.ts";
 import { TimeProgressMeter } from "../graphing/main.ts";
 
@@ -166,8 +167,8 @@ export class ViewManager {
 		const completed = new Set(
 			course.completion.books[course.document_index].completed_sections,
 		);
-		const groups = new Map();
-		const checkboxes = new Map();
+		const chapters: Map<string, Chapter> = new Map();
+		const checkboxes: Map<string, HTMLInputElement> = new Map();
 
 		const textbook = course.course.books[course.document_index];
 
@@ -182,8 +183,9 @@ export class ViewManager {
 
 					checkboxes.set(chapter.root, checkbox);
 					label.parentElement?.appendChild(checkbox);
+
+					chapters.set(chapter.root, chapter);
 				}
-				groups.set(chapter.root, chapter.groups);
 			}
 			for (const group of chapter.groups) {
 				for (const section of group.sections) {
@@ -196,6 +198,8 @@ export class ViewManager {
 
 						checkboxes.set(section, checkbox);
 						label.parentElement?.appendChild(checkbox);
+
+						chapters.set(section, chapter);
 					}
 				}
 			}
@@ -205,20 +209,57 @@ export class ViewManager {
 			const target = event.target as HTMLElement;
 
 			if (target.tagName == "INPUT" && target.id) {
-				const checked = (target as HTMLInputElement).checked;
 				const identifier = target.id.substring(8);
+				const chapter = chapters.get(identifier);
 
-				console.log(checked, identifier);
+				if (chapter) {
+					const checked = (target as HTMLInputElement).checked;
 
-				if (checked) {
-					completed.add(identifier);
-				} else {
-					completed.delete(identifier);
+					if (checked) {
+						completed.add(identifier);
+
+						let chapter_completed = true;
+						if (identifier != chapter.root) {
+							outer: for (const group of chapter.groups) {
+								for (const section of group.sections) {
+									if (!completed.has(section)) {
+										chapter_completed = false;
+										break outer;
+									}
+								}
+							}
+						}
+
+						if (chapter_completed && chapter.root) {
+							completed.add(chapter.root);
+
+							const chapter_checkbox = checkboxes.get(chapter.root);
+
+							if (chapter_checkbox) {
+								chapter_checkbox.checked = true;
+							}
+						}
+					} else {
+						completed.delete(identifier);
+
+						if (chapter.root && completed.has(chapter.root)) {
+							completed.delete(chapter.root);
+
+							const chapter_checkbox = checkboxes.get(chapter.root);
+
+							if (chapter_checkbox) {
+								chapter_checkbox.checked = false;
+							}
+						}
+					}
+
+					console.log(chapter);
+
+					// TODO: Implement displayNext()
+
+					course.completion.books[course.document_index].completed_sections =
+						Array.from(completed);
 				}
-
-				course.completion.books[course.document_index].completed_sections =
-					Array.from(completed);
-
 				event.preventDefault();
 			}
 		});
