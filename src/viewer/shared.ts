@@ -45,6 +45,7 @@ export class ViewManager {
 	rendered = false;
 	settings: Settings;
 	savePosition?: (position: string) => void;
+	#labels: Map<string, HTMLAnchorElement> = new Map();
 	constructor(container: ViewContainer, settings: Settings) {
 		this.container = container;
 		this.settings = settings;
@@ -71,13 +72,11 @@ export class ViewManager {
 		}
 
 		const rootSelector = "#" + CSS.escape(this.container.listing.id);
-
 		const selector = "#" + CSS.escape(identifier);
-
 		this.container.style.innerHTML =
 			rootSelector + " " + selector + " {font-weight: bold}";
 
-		const initialElement = this.container.listing.querySelector(selector);
+		const initialElement = this.#labels.get(identifier);
 		let currentElement = initialElement?.parentElement?.parentElement;
 		while (
 			currentElement &&
@@ -125,6 +124,8 @@ export class ViewManager {
 				label.setAttribute("tabindex", "0");
 				label.setAttribute("role", "button");
 				label.setAttribute("id", item.identifier);
+
+				this.#labels.set(item.identifier, label);
 			} else {
 				label = document.createElement("span");
 			}
@@ -169,7 +170,7 @@ export class ViewManager {
 
 		for (const chapter of textbook.chapters) {
 			if (chapter.root) {
-				const label = listing.querySelector("#" + CSS.escape(chapter.root));
+				const label = this.#labels.get(chapter.root);
 
 				if (label) {
 					const is_completed = completed.has(chapter.root);
@@ -184,7 +185,7 @@ export class ViewManager {
 			}
 			for (const group of chapter.groups) {
 				for (const section of group.sections) {
-					const label = listing.querySelector("#" + CSS.escape(section));
+					const label = this.#labels.get(section);
 
 					if (label) {
 						const is_completed = completed.has(section);
@@ -220,7 +221,13 @@ export class ViewManager {
 					);
 
 					if (active_chapter_changed) {
-						showNextChapter(listing, textbook, completed, identifier);
+						showNextChapter(
+							listing,
+							this.#labels,
+							textbook,
+							completed,
+							identifier,
+						);
 					}
 				}
 				event.preventDefault();
@@ -262,7 +269,14 @@ export class ViewManager {
 
 		this.container.listing.append(listing);
 
-		showNextChapter(listing, textbook, completed, undefined, true);
+		showNextChapter(
+			listing,
+			this.#labels,
+			textbook,
+			completed,
+			undefined,
+			true,
+		);
 	}
 }
 
@@ -346,10 +360,9 @@ function handleProgressUpdate(
 	return updated_chapter_completion;
 }
 
-// TODO: Cleanup and attempt to further optimize showNextChapter()
-
 function showNextChapter(
 	listing: HTMLOListElement,
+	labels: Map<string, HTMLElement>,
 	textbook: Textbook,
 	completed: Set<string>,
 	identifier?: string,
@@ -359,11 +372,11 @@ function showNextChapter(
 
 	for (const chapter of textbook.chapters) {
 		if (chapter.root) {
-			const element = listing.querySelector("#" + CSS.escape(chapter.root));
+			const element = labels.get(chapter.root);
 			if (element) {
 				handleListingItemVisibility(
 					listing,
-					element as HTMLElement,
+					element,
 					completed.has(chapter.root),
 					firstIncomplete,
 					identifier == chapter.root,
@@ -379,11 +392,11 @@ function showNextChapter(
 
 			for (const group of chapter.groups) {
 				for (const section of group.sections) {
-					const element = listing.querySelector("#" + CSS.escape(section));
+					const element = labels.get(section);
 					if (element) {
 						handleListingItemVisibility(
 							listing,
-							element as HTMLElement,
+							element,
 							completed.has(section),
 							firstIncomplete,
 							identifier == section,
