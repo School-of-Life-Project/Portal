@@ -1,12 +1,6 @@
 # Planned Features
 subject to change
 
-## Short-term
-
-### Front-end
-- performance
-	- use documentFragment to minimize DOM updates on first page load
-
 ## Course Building
 
 ### Short-term
@@ -33,6 +27,7 @@ write instructions on how to build a course manually using Sigil (to view the eP
 ## Course Management
 
 - interactively enabling/disabling courses
+	- list *active* courses on homescreen, rather than listing all courses on homescreen
 - interactively marking courses as complete/incomplete
 - viewing additional course metadata (author, year created, title & description, etc...)
 - create a centralized hub to find and download courses?
