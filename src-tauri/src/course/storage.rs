@@ -237,8 +237,8 @@ impl DataStore {
         let scan = scan_dir(self.root.clone()).await?;
 
         Ok(ScanResult {
-            courses: scan.files.into_iter().collect(),
-            course_maps: scan.folders.into_iter().collect(),
+            courses: scan.folders.into_iter().collect(),
+            course_maps: scan.files.into_iter().collect(),
         })
     }
 }
