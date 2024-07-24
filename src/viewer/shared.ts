@@ -215,7 +215,7 @@ export class ViewManager {
 				if (chapter) {
 					const checked = (target as HTMLInputElement).checked;
 
-					handleProgressUpdate(
+					const active_chapter_changed = handleProgressUpdate(
 						course,
 						chapter,
 						completed,
@@ -223,6 +223,10 @@ export class ViewManager {
 						identifier,
 						checked,
 					);
+
+					console.log(active_chapter_changed);
+
+					// TODO: Implement displayNext()
 				}
 				event.preventDefault();
 			}
@@ -288,10 +292,13 @@ function handleProgressUpdate(
 	identifier: string,
 	checked: boolean,
 ) {
+	let updated_chapter_completion = false;
+
 	if (checked) {
 		completed.add(identifier);
 
 		let chapter_completed = true;
+
 		if (identifier != chapter.root) {
 			outer: for (const group of chapter.groups) {
 				for (const section of group.sections) {
@@ -302,6 +309,8 @@ function handleProgressUpdate(
 				}
 			}
 		}
+
+		updated_chapter_completion = chapter_completed;
 
 		if (chapter_completed && chapter.root) {
 			completed.add(chapter.root);
@@ -315,23 +324,27 @@ function handleProgressUpdate(
 	} else {
 		completed.delete(identifier);
 
-		if (chapter.root && completed.has(chapter.root)) {
-			completed.delete(chapter.root);
+		if (chapter.root) {
+			if (completed.has(chapter.root)) {
+				completed.delete(chapter.root);
 
-			const chapter_checkbox = checkboxes.get(chapter.root);
+				const chapter_checkbox = checkboxes.get(chapter.root);
 
-			if (chapter_checkbox) {
-				chapter_checkbox.checked = false;
+				if (chapter_checkbox) {
+					chapter_checkbox.checked = false;
+				}
+
+				updated_chapter_completion = true;
+			} else {
+				updated_chapter_completion = identifier == chapter.root;
 			}
 		}
 	}
 
-	console.log(chapter);
-
-	// TODO: Implement displayNext()
-
 	course.completion.books[course.document_index].completed_sections =
 		Array.from(completed);
+
+	return updated_chapter_completion;
 }
 
 /*
