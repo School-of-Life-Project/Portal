@@ -1,30 +1,21 @@
 import {
 	displayError,
-	getCourseMaps,
-	getCourses,
+	getActiveCourses,
+	getAll,
 	getSettings,
 	openDataDir,
 } from "../bindings.ts";
 
 const settingsPromise = getSettings().catch((error) => {
-	displayError({
-		message: "Unable to get Settings",
-		cause: JSON.stringify(error),
-	});
+	displayError(error);
 });
 
-const coursePromise = getCourses().catch((error) => {
-	displayError({
-		message: "Unable to get Courses",
-		cause: JSON.stringify(error),
-	});
+const listingPromise = getAll().catch((error) => {
+	displayError(error);
 });
 
-const courseMapPromise = getCourseMaps().catch((error) => {
-	displayError({
-		message: "Unable to get Course Maps",
-		cause: JSON.stringify(error),
-	});
+const activePromise = getActiveCourses().catch((error) => {
+	displayError(error);
 });
 
 const folderButton = document.getElementById("folderOpener");
@@ -44,9 +35,9 @@ if (folderButton) {
 }
 
 const settings = await settingsPromise;
-const courses = await coursePromise;
-const courseMaps = await courseMapPromise;
+const listing = await listingPromise;
+const activeCourses = await activePromise;
 
 console.log("settings", settings);
-console.log("courses", courses);
-console.log("course maps", courseMaps);
+console.log("listing", listing);
+console.log("active", activeCourses);

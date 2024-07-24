@@ -3,7 +3,6 @@ import {
 	CourseProgress,
 	OverallProgress,
 	parseBackendDate,
-	Result,
 	Settings,
 } from "../bindings.ts";
 import {
@@ -49,19 +48,18 @@ function sortProgressData(data: Record<string, number>) {
 	return sortedTimeData;
 }
 
-export function sortCourses(courses: Result<[Course, CourseProgress]>[]) {
+export function sortCourses(courses: [Course, CourseProgress][]) {
 	courses.sort((a, b) => {
-		if (a.Ok && b.Ok) {
-			const newA = a.Ok[0].title;
-			const newB = b.Ok[0].title;
+		const newA = a[0].title;
+		const newB = b[0].title;
 
-			if (newA < newB) {
-				return -1;
-			} else if (newA > newB) {
-				return 1;
-			}
+		if (newA < newB) {
+			return -1;
+		} else if (newA > newB) {
+			return 1;
+		} else {
+			return 0;
 		}
-		return 0;
 	});
 }
 
@@ -109,6 +107,23 @@ export function graphCourse(
 	return element;
 }
 
+export function displayEmptyCourseNotice() {
+	const element = document.createElement("section");
+	element.className = "course";
+
+	const title = document.createElement("h3");
+	title.innerText = "No courses found!";
+
+	const description = document.createElement("p");
+	description.innerText =
+		"Try using the Course Navigator to update your list of active courses.";
+
+	element.appendChild(title);
+	element.appendChild(description);
+
+	return element;
+}
+
 const dayMappings = [6, 5, 4, 3, 2, 1, 0];
 
 export function graphProgress(
@@ -120,14 +135,20 @@ export function graphProgress(
 	const timeData = sortProgressData(progress.time_spent);
 	const chapterData = sortProgressData(progress.chapters_completed);
 
-	const daysSinceLastTimeData = daysBetween(
-		currentDate,
-		timeData[timeData.length - 1][0],
-	);
-	const daysSinceLastChapterData = daysBetween(
-		currentDate,
-		chapterData[chapterData.length - 1][0],
-	);
+	let daysSinceLastTimeData = 0;
+	if (timeData.length > 0) {
+		daysSinceLastTimeData = daysBetween(
+			currentDate,
+			timeData[timeData.length - 1][0],
+		);
+	}
+	let daysSinceLastChapterData = 0;
+	if (chapterData.length > 0) {
+		daysSinceLastChapterData = daysBetween(
+			currentDate,
+			chapterData[chapterData.length - 1][0],
+		);
+	}
 
 	const currentDayIndex = dayMappings[currentDate.getDay()];
 

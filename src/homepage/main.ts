@@ -1,31 +1,34 @@
 import {
 	displayError,
-	getCourses,
+	//getActive,
+	getAll,
 	getOverallProgress,
 	getSettings,
 } from "../bindings.ts";
-import { graphCourse, graphProgress, sortCourses } from "./shared.ts";
+import {
+	displayEmptyCourseNotice,
+	graphCourse,
+	graphProgress,
+	sortCourses,
+} from "./shared.ts";
 
 const settingsPromise = getSettings().catch((error) => {
-	displayError({
-		message: "Unable to get Settings",
-		cause: JSON.stringify(error),
-	});
+	displayError(error);
 });
 
-// TODO: Replace getCourses() with getActiveCourses()
-const coursePromise = getCourses().catch((error) => {
-	displayError({
-		message: "Unable to get active Courses",
-		cause: JSON.stringify(error),
-	});
+const coursePromise = getAll()
+	.then((result) => result.courses)
+	.catch((error) => displayError(error));
+
+// ! TEMPORARY
+/*
+const coursePromise = getActive().catch((error) => {
+	displayError(error);
 });
+*/
 
 const progressPromise = getOverallProgress().catch((error) => {
-	displayError({
-		message: "Unable to get overall Progress",
-		cause: JSON.stringify(error),
-	});
+	displayError(error);
 });
 
 const courseContainer = document.getElementById("activeCourses");
@@ -38,20 +41,23 @@ if (courseContainer && progressContainer && settings) {
 			return;
 		}
 
-		sortCourses(courses);
+		if (courses.length == 0) {
+			const element = displayEmptyCourseNotice();
 
-		const fragment = document.createDocumentFragment();
+			courseContainer.innerHTML = "";
+			courseContainer.appendChild(element);
+		} else {
+			sortCourses(courses);
 
-		for (const course of courses) {
-			if (course.Ok) {
-				fragment.appendChild(graphCourse(settings, course.Ok[0], course.Ok[1]));
-			} else if (course.Err) {
-				displayError(course.Err);
+			const fragment = document.createDocumentFragment();
+
+			for (const course of courses) {
+				fragment.appendChild(graphCourse(settings, course[0], course[1]));
 			}
-		}
 
-		courseContainer.innerHTML = "";
-		courseContainer.appendChild(fragment);
+			courseContainer.innerHTML = "";
+			courseContainer.appendChild(fragment);
+		}
 	});
 
 	progressPromise.then((progress) => {

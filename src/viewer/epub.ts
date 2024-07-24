@@ -147,7 +147,7 @@ export class ePubViewer implements DocumentViewer {
 					);
 
 					return rendition
-						.display(initialProgress.position[this.document_index])
+						.display(initialProgress.books[this.document_index].position)
 						.then(() => {
 							rendition.on("locationChanged", (location: EventLocation) => {
 								if (location.start) {

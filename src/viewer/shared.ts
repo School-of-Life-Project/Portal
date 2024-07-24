@@ -169,8 +169,8 @@ export class ViewManager {
 	}
 }
 
-function updateCompletion(uuid: string, completion: CourseCompletionData) {
-	setCourseCompletion(uuid, completion).catch((error: Error) => {
+function updateCompletion(course: Course, completion: CourseCompletionData) {
+	setCourseCompletion(course, completion).catch((error: Error) => {
 		displayError(error);
 	});
 }
@@ -198,7 +198,9 @@ export class ProgressManager {
 		}
 
 		this.#completion = course[1];
-		this.#completedSections = new Set(course[1].book_sections[document_index]);
+		this.#completedSections = new Set(
+			course[1].books[document_index].completed_sections,
+		);
 		this.#buildListingProgressTracker(
 			{ course: course[0], progress: this.#completion },
 			document_index,
@@ -225,7 +227,7 @@ export class ProgressManager {
 						this.#completion.time_spent[getCurrentBackendDate()] = 5;
 					}
 				}
-				updateCompletion(course[0].uuid, this.#completion);
+				updateCompletion(course[0], this.#completion);
 				if (timeDisplay) {
 					timeDisplay.update(
 						this.#completion.time_spent[getCurrentBackendDate()],
@@ -276,11 +278,10 @@ export class ProgressManager {
 									} else {
 										this.#completedSections.delete(chapter.root);
 									}
-									this.#completion.book_sections[document_index] = Array.from(
-										this.#completedSections,
-									);
+									this.#completion.books[document_index].completed_sections =
+										Array.from(this.#completedSections);
 									this.#showNextChapter(textbook, chapter.root);
-									updateCompletion(course.course.uuid, this.#completion);
+									updateCompletion(course.course, this.#completion);
 								}
 							},
 						),
@@ -288,7 +289,7 @@ export class ProgressManager {
 				}
 			}
 			this.#buildSectionProgressTracker(
-				course.course.uuid,
+				course.course,
 				textbook,
 				chapter,
 				document_index,
@@ -298,7 +299,7 @@ export class ProgressManager {
 		this.#showNextChapter(textbook, undefined, true);
 	}
 	#buildSectionProgressTracker(
-		uuid: string,
+		course: Course,
 		textbook: Textbook,
 		chapter: Chapter,
 		document_index: number,
@@ -319,10 +320,9 @@ export class ProgressManager {
 										this.#completedSections.delete(section);
 									}
 									this.#updateChapterCompletion(textbook, chapter);
-									this.#completion.book_sections[document_index] = Array.from(
-										this.#completedSections,
-									);
-									updateCompletion(uuid, this.#completion);
+									this.#completion.books[document_index].completed_sections =
+										Array.from(this.#completedSections);
+									updateCompletion(course, this.#completion);
 								}
 							},
 						),
@@ -483,7 +483,7 @@ export class ProgressManager {
 	}
 	savePosition(document_index: number, position: string) {
 		if (this.#completion && this.rendered) {
-			this.#completion.position[document_index] = position;
+			this.#completion.books[document_index].position = position;
 		}
 	}
 }
