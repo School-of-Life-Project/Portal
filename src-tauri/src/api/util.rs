@@ -8,7 +8,7 @@ use crate::MAX_FS_CONCURRENCY;
 use super::{
     super::{
         course::{Course, CourseMap},
-        progress::{CourseCompletion, CourseProgress, OverallProgress, Settings},
+        progress::{CourseCompletion, CourseProgress},
     },
     State,
 };
@@ -112,20 +112,4 @@ pub(super) async fn get_course_maps(
     }
 
     Ok(course_maps)
-}
-
-pub async fn get_overall_progress(state: &State) -> Result<OverallProgress, ErrorWrapper> {
-    state
-        .database
-        .get_overall_progress()
-        .await
-        .map_err(|e| ErrorWrapper::new("Unable to get overall progress".to_string(), &e))
-}
-
-pub(super) async fn get_settings(state: &State) -> Result<Settings, ErrorWrapper> {
-    state
-        .database
-        .get_settings()
-        .await
-        .map_err(|e| ErrorWrapper::new("Unable to get Settings".to_string(), &e))
 }

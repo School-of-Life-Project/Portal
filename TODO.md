@@ -10,17 +10,11 @@
 - [ ] Write unit tests with vitest
 - [ ] Determine necessary polyfills
 
-## full-stack TODOs
-
-- [X] Design Course Map object
-- [ ] Design Settings object
-- [ ] Improve handling of floating-point rounding errors
-
 ## backend TODOs
 
 - [ ] Write unit tests
 - [ ] Write documentation for internals via Rustdoc
-- [ ] Prune dependencies
+- [X] Prune dependencies
 - [ ] Add additional Clippy lints
 - [X] Automatically decompress ePubs
 - [X] Implement concurrent decompression of Courses / Course Files

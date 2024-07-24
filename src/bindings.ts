@@ -201,6 +201,14 @@ export async function setCourseCompletion(
 	}
 }
 
+export async function getActiveCourses(): Promise<string[]> {
+	try {
+		return await invoke("get_active_courses");
+	} catch (error) {
+		throw convertBackendAsyncError(error);
+	}
+}
+
 export async function setActiveCourses(courses: string[]): Promise<null> {
 	try {
 		return await invoke("set_active_courses", {
@@ -211,9 +219,9 @@ export async function setActiveCourses(courses: string[]): Promise<null> {
 	}
 }
 
-export async function getListing(): Promise<ListingResult> {
+export async function getAll(): Promise<ListingResult> {
 	try {
-		return await invoke("get_listing");
+		return await invoke("get_all");
 	} catch (error) {
 		throw convertBackendAsyncError(error);
 	}
@@ -222,22 +230,22 @@ export async function getListing(): Promise<ListingResult> {
 export interface ListingResult {
 	courses: Array<[Course, CourseProgress]>;
 	course_maps: Array<[CourseMap, string]>;
-	active_courses: Array<string>;
-	settings: Settings;
 }
 
-export async function getOverview(): Promise<OverviewResult> {
+export async function getActive(): Promise<Array<[Course, CourseProgress]>> {
 	try {
-		return await invoke("get_overview");
+		return await invoke("get_active");
 	} catch (error) {
 		throw convertBackendAsyncError(error);
 	}
 }
 
-export interface OverviewResult {
-	active_courses: Array<[Course, CourseProgress]>;
-	overall_progress: OverallProgress;
-	settings: Settings;
+export async function getOverallProgress(): Promise<OverallProgress> {
+	try {
+		return await invoke("get_overall_progress");
+	} catch (error) {
+		throw convertBackendAsyncError(error);
+	}
 }
 
 export async function getSettings(): Promise<Settings> {
