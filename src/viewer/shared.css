@@ -36,7 +36,9 @@ header,
 	bottom: 0;
 	width: calc(100vw - (1.6lh + 30ch));
 	color: black;
-	background-color: white;
+	background-color: oklch(
+		from var(--background-color) calc(l * 3) calc(c / 3) h
+	);
 	overflow: auto;
 }
 
