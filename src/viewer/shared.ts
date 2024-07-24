@@ -1,9 +1,7 @@
 import {
 	Course,
-	Textbook,
 	setCourseCompletion,
 	CourseCompletionData,
-	Chapter,
 	displayError,
 	Error,
 	Settings,
@@ -67,6 +65,8 @@ export class ViewManager {
 		this.#buildProgressTracker(course, listing);
 
 		this.container.listing.append(listing);
+
+		this.rendered = true;
 	}
 	highlightListingItem(identifier: string) {
 		if (!this.rendered || !this.container.style) {
@@ -162,9 +162,11 @@ export class ViewManager {
 			};
 		}
 
-		let completed = new Set(
+		const completed = new Set(
 			course.completion.books[course.document_index].completed_sections,
 		);
+		const groups = new Map();
+		const checkboxes = new Map();
 
 		const textbook = course.course.books[course.document_index];
 
@@ -174,9 +176,12 @@ export class ViewManager {
 
 				if (label) {
 					const is_completed = completed.has(chapter.root);
+					const checkbox = buildCheckbox(is_completed);
 
-					label.parentElement?.appendChild(buildCheckbox(is_completed));
+					checkboxes.set(chapter.root, checkbox);
+					label.parentElement?.appendChild(checkbox);
 				}
+				groups.set(chapter.root, chapter.groups);
 			}
 			for (const group of chapter.groups) {
 				for (const section of group.sections) {
@@ -184,8 +189,10 @@ export class ViewManager {
 
 					if (label) {
 						const is_completed = completed.has(section);
+						const checkbox = buildCheckbox(is_completed);
 
-						label.parentElement?.appendChild(buildCheckbox(is_completed));
+						checkboxes.set(section, checkbox);
+						label.parentElement?.appendChild(checkbox);
 					}
 				}
 			}
@@ -194,10 +201,55 @@ export class ViewManager {
 		listing.addEventListener("change", (event) => {
 			const target = event.target as HTMLElement;
 
-			if (target.tagName == "INPUT") {
-				/*callback(target.id);
-				event.preventDefault();*/
+			if (
+				target.tagName == "INPUT" &&
+				target.parentElement &&
+				target.parentElement.tagName == "A" &&
+				target.parentElement.id
+			) {
+				const checked = (target as HTMLInputElement).checked;
+				const identifier = target.parentElement.id;
+
+				if (checked) {
+					completed.add(identifier);
+				} else {
+					completed.delete(identifier);
+				}
+
+				course.completion.books[course.document_index].completed_sections =
+					Array.from(completed);
+
+				event.preventDefault();
 			}
+		});
+
+		let timeDisplay: TimeProgressMeter | undefined;
+		if (this.settings.show_course_clock) {
+			timeDisplay = new TimeProgressMeter(
+				0,
+				this.settings.maximum_course_time * 60,
+			);
+			timeDisplay.update(course.completion.time_spent[getCurrentBackendDate()]);
+			this.container.timer.appendChild(timeDisplay.element);
+		}
+
+		window.setInterval(() => {
+			if (!document.hidden) {
+				if (course.completion.time_spent[getCurrentBackendDate()]) {
+					course.completion.time_spent[getCurrentBackendDate()] += 1;
+				} else {
+					course.completion.time_spent[getCurrentBackendDate()] = 1;
+				}
+			}
+			updateCompletion(course.course, course.completion);
+			if (timeDisplay) {
+				timeDisplay.update(
+					course.completion.time_spent[getCurrentBackendDate()],
+				);
+			}
+		}, 1000);
+		window.addEventListener("beforeunload", () => {
+			updateCompletion(course.course, course.completion);
 		});
 	}
 }
@@ -219,6 +271,7 @@ function buildCheckbox(checked: boolean) {
 	return checkbox;
 }
 
+/*
 export class ProgressManager {
 	#completion: CourseCompletionData | undefined = undefined;
 	#completedSections: Set<string> = new Set();
@@ -516,6 +569,7 @@ export class ProgressManager {
 		}
 	}
 }
+	*/
 
 export interface DocumentViewer {
 	course: Course;
@@ -523,7 +577,6 @@ export interface DocumentViewer {
 	rendered: boolean;
 	render(
 		view: ViewManager,
-		progress: ProgressManager,
 		initialProgress: CourseCompletionData,
 	): Promise<null | void>;
 }
