@@ -1,10 +1,5 @@
 import { Course, CourseCompletionData } from "../bindings.ts";
-import {
-	ListingItem,
-	ViewManager,
-	ProgressManager,
-	DocumentViewer,
-} from "./shared.ts";
+import { ListingItem, ViewManager, DocumentViewer } from "./shared.ts";
 import Epub, { Book, EpubCFI } from "epubjs";
 import { NavItem } from "epubjs/types/navigation";
 
@@ -104,7 +99,6 @@ export class ePubViewer implements DocumentViewer {
 	}
 	async render(
 		view: ViewManager,
-		progress: ProgressManager,
 		initialProgress: CourseCompletionData,
 	): Promise<null | void> {
 		const path = this.course.books[this.document_index].file;
@@ -116,7 +110,7 @@ export class ePubViewer implements DocumentViewer {
 						book,
 					};
 
-					const rendition = this.#inner.book.renderTo(view.contentContainer, {
+					const rendition = this.#inner.book.renderTo(view.container.content, {
 						view: "iframe",
 						flow: "scrolled-doc",
 						width: "100%",
@@ -128,16 +122,19 @@ export class ePubViewer implements DocumentViewer {
 					const renderPromise = new Promise(
 						(resolve: (value: void) => void) => {
 							view.render(
-								convertNavItems(navigation.toc),
-								(identifier) => {
-									rendition.display(identifier);
+								{
+									course: this.course,
+									completion: initialProgress,
+									document_index: this.document_index,
 								},
-								metadata.title,
-								metadata.language,
-							);
-							progress.render(
-								[this.course, initialProgress],
-								this.document_index,
+								{
+									title: metadata.title,
+									language: metadata.language,
+									items: convertNavItems(navigation.toc),
+									callback: (identifier) => {
+										rendition.display(identifier);
+									},
+								},
 							);
 
 							resolve();
@@ -159,7 +156,9 @@ export class ePubViewer implements DocumentViewer {
 											view.highlightListingItem(chapter.id);
 										}
 
-										progress.savePosition(this.document_index, location.start);
+										if (view.savePosition) {
+											view.savePosition(location.start);
+										}
 									}
 								}
 							});
@@ -169,7 +168,7 @@ export class ePubViewer implements DocumentViewer {
 									// @ts-expect-error need to call rendition.resize() with zero arguments to resize without providing a specific length and height
 									rendition.resize();
 								});
-								this.#inner.resizeObserver.observe(view.contentContainer);
+								this.#inner.resizeObserver.observe(view.container.content);
 							}
 
 							this.rendered = true;

@@ -6,7 +6,7 @@ import {
 	getCourse,
 	getSettings,
 } from "../bindings.ts";
-import { ProgressManager, ViewManager } from "./shared.ts";
+import { ViewManager } from "./shared.ts";
 import { ePubViewer } from "./epub.ts";
 
 const settingsPromise = getSettings().catch((error) => {
@@ -59,14 +59,12 @@ if (
 	coursePromise
 ) {
 	const viewManager = new ViewManager(
-		titleContainer,
-		listingContainer,
-		<HTMLDivElement>contentContainer,
-	);
-
-	const progressManager = new ProgressManager(
-		viewManager,
-		timerContainer,
+		{
+			title: titleContainer,
+			listing: listingContainer,
+			content: <HTMLDivElement>contentContainer,
+			timer: timerContainer,
+		},
 		settings,
 	);
 
@@ -79,7 +77,6 @@ if (
 			try {
 				return await new ePubViewer(result[0], document_index).render(
 					viewManager,
-					progressManager,
 					result[1],
 				);
 			} catch (error) {

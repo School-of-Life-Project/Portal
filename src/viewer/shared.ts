@@ -46,6 +46,7 @@ export class ViewManager {
 	container: ViewContainer;
 	rendered = false;
 	settings: Settings;
+	savePosition?: (position: string) => void;
 	constructor(container: ViewContainer, settings: Settings) {
 		this.container = container;
 		this.settings = settings;
@@ -251,6 +252,10 @@ export class ViewManager {
 		window.addEventListener("beforeunload", () => {
 			updateCompletion(course.course, course.completion);
 		});
+
+		this.savePosition = function (position: string) {
+			course.completion.books[course.document_index].position = position;
+		};
 	}
 }
 
