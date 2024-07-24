@@ -11,6 +11,10 @@ import {
 } from "../bindings.ts";
 import { TimeProgressMeter } from "../graphing/main.ts";
 
+// TODO:
+// - Reduce DOM updates by combining viewManager.render() and listingManager.render()
+// - Optimize event listners using event delegation and event.stopPropagation()
+
 export interface ListingItem {
 	label: string;
 	identifier?: string;
@@ -19,92 +23,115 @@ export interface ListingItem {
 
 export type ListingCallback = (identifier: string) => void;
 
-// TODO:
-// - Reduce DOM updates by combining viewManager.render() and listingManager.render()
-// - Optimize event listners using event delegation and event.stopPropagation()
+export interface ViewContainer {
+	title: HTMLElement;
+	timer: HTMLElement;
+	listing: HTMLElement;
+	content: HTMLDivElement;
+	style?: HTMLStyleElement;
+}
+
+export interface DocumentMetadata {
+	title: string;
+	language: string;
+	items: ListingItem[];
+	callback: ListingCallback;
+}
+
+export interface EncapsulatedCourseTextbook {
+	course: Course;
+	document_index: number;
+	completion: CourseCompletionData;
+}
 
 export class ViewManager {
-	titleContainer: HTMLElement;
-	listingContainer: HTMLElement;
-	contentContainer: HTMLDivElement;
-	#styleContainer: HTMLStyleElement;
+	container: ViewContainer;
 	rendered = false;
-	constructor(
-		titleContainer: HTMLElement,
-		listingContainer: HTMLElement,
-		contentContainer: HTMLDivElement,
-	) {
-		this.titleContainer = titleContainer;
-		this.listingContainer = listingContainer;
-		this.contentContainer = contentContainer;
+	settings: Settings;
+	constructor(container: ViewContainer, settings: Settings) {
+		this.container = container;
+		this.settings = settings;
 
-		this.#styleContainer = document.createElement("style");
-		window.document.head.appendChild(this.#styleContainer);
-
-		this.rendered = false;
+		if (!this.container.style) {
+			this.container.style = document.createElement("style");
+			window.document.head.appendChild(this.container.style);
+		}
 	}
-	render(
-		listing?: ListingItem[],
-		callback?: ListingCallback,
-		title?: string,
-		language?: string,
-	) {
-		if (language) {
-			this.titleContainer.setAttribute("lang", language);
-			this.listingContainer.setAttribute("lang", language);
-			this.contentContainer.setAttribute("lang", language);
-		}
+	render(course: EncapsulatedCourseTextbook, metadata: DocumentMetadata) {
+		this.container.title.setAttribute("lang", metadata.language);
+		this.container.listing.setAttribute("lang", metadata.language);
+		this.container.content.setAttribute("lang", metadata.language);
+		this.container.title.innerText = metadata.title;
 
-		if (title) {
-			this.titleContainer.innerText = title;
-		} else {
-			this.titleContainer.innerText = "Untitled Book";
-		}
+		const listing = this.#buildListing(metadata.items, metadata.callback);
+		this.#buildProgressTracker(course, listing);
 
-		if (listing && callback) {
-			this.listingContainer.appendChild(this.#buildListing(listing, callback));
-		}
-
-		this.rendered = true;
+		this.container.listing.append(listing);
 	}
-	#buildListingLabel(
-		item: ListingItem,
-		callback: ListingCallback,
-	): HTMLAnchorElement | HTMLSpanElement {
-		let element;
-		if (item.identifier) {
-			element = document.createElement("a");
-			element.setAttribute("tabindex", "0");
-			element.setAttribute("role", "button");
-			element.addEventListener("click", (event) => {
-				if (item.identifier) {
-					callback(item.identifier);
-					event.preventDefault();
-				}
-			});
-			element.addEventListener("keydown", (event) => {
-				if (event.code == "Enter" && item.identifier) {
-					callback(item.identifier);
-					event.preventDefault();
-				}
-			});
-			element.setAttribute("id", item.identifier);
-		} else {
-			element = document.createElement("span");
+	highlightListingItem(identifier: string) {
+		if (!this.rendered || !this.container.style) {
+			return;
 		}
-		element.innerText = item.label;
 
-		return element;
+		const rootSelector = "#" + CSS.escape(this.container.listing.id);
+
+		const selector = "#" + CSS.escape(identifier);
+
+		this.container.style.innerHTML =
+			rootSelector + " " + selector + " {font-weight: bold}";
+
+		const initialElement = this.container.listing.querySelector(selector);
+		let currentElement = initialElement?.parentElement?.parentElement;
+		while (
+			currentElement &&
+			currentElement.parentElement &&
+			currentElement.parentElement != this.container.listing
+		) {
+			currentElement = currentElement.parentElement;
+
+			if (currentElement.tagName == "DETAILS") {
+				currentElement.setAttribute("open", "");
+			}
+		}
 	}
 	#buildListing(
-		listing: ListingItem[],
-		callback: ListingCallback,
+		items: ListingItem[],
+		callback?: ListingCallback,
 	): HTMLOListElement {
 		const root = document.createElement("ol");
 
-		for (const item of listing) {
+		if (callback) {
+			root.addEventListener("click", (event) => {
+				const target = event.target as HTMLElement;
+
+				if (target.tagName == "A" && target.id) {
+					callback(target.id);
+					event.preventDefault();
+				}
+			});
+			root.addEventListener("keydown", (event) => {
+				const target = event.target as HTMLElement;
+
+				if (event.code == "Enter" && target.tagName == "A" && target.id) {
+					callback(target.id);
+					event.preventDefault();
+				}
+			});
+		}
+
+		for (const item of items) {
 			const container = document.createElement("li");
-			const label = this.#buildListingLabel(item, callback);
+
+			let label;
+			if (item.identifier) {
+				label = document.createElement("a");
+				label.setAttribute("tabindex", "0");
+				label.setAttribute("role", "button");
+				label.setAttribute("id", item.identifier);
+			} else {
+				label = document.createElement("span");
+			}
+			label.innerText = item.label;
 
 			if (item.subitems) {
 				const subcontainer = document.createElement("details");
@@ -113,7 +140,7 @@ export class ViewManager {
 				subcontainer_title.appendChild(label);
 				subcontainer.appendChild(subcontainer_title);
 
-				subcontainer.appendChild(this.#buildListing(item.subitems, callback));
+				subcontainer.appendChild(this.#buildListing(item.subitems));
 
 				container.appendChild(subcontainer);
 			} else {
@@ -125,35 +152,53 @@ export class ViewManager {
 
 		return root;
 	}
-	highlightListingItem(identifier: string) {
-		if (!this.rendered) {
-			return;
+	#buildProgressTracker(
+		course: EncapsulatedCourseTextbook,
+		listing: HTMLOListElement,
+	) {
+		if (!course.completion.books[course.document_index]) {
+			course.completion.books[course.document_index] = {
+				completed_sections: [],
+			};
 		}
 
-		const rootSelector = "#" + CSS.escape(this.listingContainer.id);
+		let completed = new Set(
+			course.completion.books[course.document_index].completed_sections,
+		);
 
-		const selector = "#" + CSS.escape(identifier);
+		const textbook = course.course.books[course.document_index];
 
-		this.#styleContainer.innerHTML =
-			rootSelector + " " + selector + " {font-weight: bold}";
+		for (const chapter of textbook.chapters) {
+			if (chapter.root) {
+				const label = listing.querySelector("#" + CSS.escape(chapter.root));
 
-		const initialElement = this.listingContainer.querySelector(selector);
-		let currentElement = initialElement?.parentElement?.parentElement;
-		while (
-			currentElement &&
-			currentElement.parentElement &&
-			currentElement.parentElement != this.listingContainer
-		) {
-			currentElement = currentElement.parentElement;
+				if (label) {
+					const is_completed = completed.has(chapter.root);
 
-			if (currentElement.tagName == "DETAILS") {
-				currentElement.setAttribute("open", "");
+					label.parentElement?.appendChild(buildCheckbox(is_completed));
+				}
+			}
+			for (const group of chapter.groups) {
+				for (const section of group.sections) {
+					const label = listing.querySelector("#" + CSS.escape(section));
+
+					if (label) {
+						const is_completed = completed.has(section);
+
+						label.parentElement?.appendChild(buildCheckbox(is_completed));
+					}
+				}
 			}
 		}
 
-		/*if (initialElement) {
-			initialElement.scrollIntoView({ block: "center" });
-		}*/
+		listing.addEventListener("change", (event) => {
+			const target = event.target as HTMLElement;
+
+			if (target.tagName == "INPUT") {
+				/*callback(target.id);
+				event.preventDefault();*/
+			}
+		});
 	}
 }
 
@@ -163,10 +208,21 @@ function updateCompletion(course: Course, completion: CourseCompletionData) {
 	});
 }
 
+function buildCheckbox(checked: boolean) {
+	const checkbox = document.createElement("input");
+	checkbox.setAttribute("type", "checkbox");
+
+	if (checked) {
+		checkbox.setAttribute("checked", "");
+	}
+
+	return checkbox;
+}
+
 export class ProgressManager {
 	#completion: CourseCompletionData | undefined = undefined;
 	#completedSections: Set<string> = new Set();
-	manager: ViewManager;
+	manager: ViewManagerOld;
 	timerContainer: HTMLElement;
 	settings: Settings;
 	rendered = false;
