@@ -95,14 +95,12 @@ export class ePubViewer implements DocumentViewer {
 	course: Course;
 	document_index: number;
 	rendered: boolean;
-	destroyed: boolean;
 	#inner: InnerData | undefined = undefined;
 	constructor(course: Course, document_index: number) {
 		this.course = course;
 		this.document_index = document_index;
 
 		this.rendered = false;
-		this.destroyed = false;
 	}
 	async render(
 		view: ViewManager,
@@ -181,18 +179,5 @@ export class ePubViewer implements DocumentViewer {
 				},
 			);
 		});
-	}
-	async destroy(
-		view: ViewManager,
-		progress: ProgressManager,
-	): Promise<null | void> {
-		this.#inner?.book.destroy();
-		this.#inner?.resizeObserver?.unobserve(view.contentContainer);
-
-		view.reset();
-		progress.reset();
-
-		this.rendered = false;
-		this.destroyed = true;
 	}
 }

@@ -67,18 +67,6 @@ export class ViewManager {
 
 		this.rendered = true;
 	}
-	reset() {
-		this.titleContainer.innerHTML = "";
-		this.listingContainer.innerHTML = "";
-		this.contentContainer.innerHTML = "";
-		this.#styleContainer.innerHTML = "";
-
-		this.titleContainer.removeAttribute("lang");
-		this.listingContainer.removeAttribute("lang");
-		this.contentContainer.removeAttribute("lang");
-
-		this.rendered = false;
-	}
 	#buildListingLabel(
 		item: ListingItem,
 		callback: ListingCallback,
@@ -176,7 +164,6 @@ function updateCompletion(course: Course, completion: CourseCompletionData) {
 }
 
 export class ProgressManager {
-	#intervalId: number | undefined = undefined;
 	#completion: CourseCompletionData | undefined = undefined;
 	#completedSections: Set<string> = new Set();
 	manager: ViewManager;
@@ -221,8 +208,8 @@ export class ProgressManager {
 			this.timerContainer.appendChild(timeDisplay.element);
 		}
 
-		this.#intervalId = window.setInterval(() => {
-			if (this.#completion && typeof this.#completion.time_spent == "object") {
+		window.setInterval(() => {
+			if (this.#completion) {
 				if (!document.hidden) {
 					if (this.#completion.time_spent[getCurrentBackendDate()]) {
 						this.#completion.time_spent[getCurrentBackendDate()] += 1;
@@ -238,22 +225,13 @@ export class ProgressManager {
 				}
 			}
 		}, 1000);
+		window.addEventListener("beforeunload", () => {
+			if (this.#completion) {
+				updateCompletion(course[0], this.#completion);
+			}
+		});
 
 		this.rendered = true;
-	}
-	reset() {
-		if (this.manager.rendered) {
-			return;
-		}
-
-		this.#completion = undefined;
-		this.#completedSections = new Set();
-		if (this.#intervalId) {
-			window.clearInterval(this.#intervalId);
-			this.#intervalId = undefined;
-		}
-		this.timerContainer.innerHTML = "";
-		this.rendered = false;
 	}
 	#getListingElement(identifier: string): HTMLElement | null {
 		const selector = "#" + CSS.escape(identifier);
@@ -487,15 +465,9 @@ export interface DocumentViewer {
 	course: Course;
 	document_index: number;
 	rendered: boolean;
-	destroyed: boolean;
 	render(
 		view: ViewManager,
 		progress: ProgressManager,
 		initialProgress: CourseCompletionData,
 	): Promise<null | void>;
-	destroy(view: ViewManager, progress: ProgressManager): Promise<null | void>;
-}
-
-export interface DocumentViewerConstructor {
-	new (course: Course, document_index: number): DocumentViewer;
 }

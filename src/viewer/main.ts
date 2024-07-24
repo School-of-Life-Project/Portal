@@ -6,7 +6,7 @@ import {
 	getCourse,
 	getSettings,
 } from "../bindings.ts";
-import { DocumentViewer, ProgressManager, ViewManager } from "./shared.ts";
+import { ProgressManager, ViewManager } from "./shared.ts";
 import { ePubViewer } from "./epub.ts";
 
 const settingsPromise = getSettings().catch((error) => {
@@ -43,8 +43,6 @@ if (identifier) {
 	});
 }
 
-let viewer: DocumentViewer | undefined;
-
 const titleContainer = document.getElementById("contentTitle");
 const listingContainer = document.getElementById("contentListing");
 const contentContainer = document.getElementById("contentViewer");
@@ -72,36 +70,18 @@ if (
 		settings,
 	);
 
-	loadCourse(viewManager, progressManager, coursePromise, document_index);
-} else if (settings && coursePromise) {
-	displayError({
-		message: "Unable to initalize document viewer",
-		cause: "Could not find HTMLElement",
-	});
-}
-
-async function loadCourse(
-	view: ViewManager,
-	progress: ProgressManager,
-	coursePromise: Promise<void | [Course, CourseCompletionData]>,
-	document_index: number,
-) {
-	if (viewer) {
-		await viewer.destroy(view, progress).then(() => {
-			viewer = undefined;
-		});
-	}
-
 	coursePromise
 		.then(async (result) => {
 			if (!result) {
 				return;
 			}
 
-			const viewer = new ePubViewer(result[0], document_index);
-
 			try {
-				return await viewer.render(view, progress, result[1]);
+				return await new ePubViewer(result[0], document_index).render(
+					viewManager,
+					progressManager,
+					result[1],
+				);
 			} catch (error) {
 				displayError({
 					message: "Unable to display document",
@@ -112,4 +92,9 @@ async function loadCourse(
 		.catch((error: Error) => {
 			displayError(error);
 		});
+} else if (settings && coursePromise) {
+	displayError({
+		message: "Unable to initalize document viewer",
+		cause: "Could not find HTMLElement",
+	});
 }
