@@ -6,7 +6,7 @@ import {
 	getCourse,
 	getSettings,
 } from "../bindings.ts";
-import { ViewManager } from "./shared.ts";
+import { DocumentViewer, ViewManager } from "./shared.ts";
 import { ePubViewer } from "./epub.ts";
 
 const settingsPromise = getSettings().catch((error) => {
@@ -74,11 +74,10 @@ if (
 				return;
 			}
 
+			const viewer: DocumentViewer = new ePubViewer(result[0], document_index);
+
 			try {
-				return await new ePubViewer(result[0], document_index).render(
-					viewManager,
-					result[1],
-				);
+				return await viewer.render(viewManager, result[1]);
 			} catch (error) {
 				displayError({
 					message: "Unable to display document",
