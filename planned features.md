@@ -1,13 +1,11 @@
 # Planned Features
-subject to change; this is *not* a set-in-stone roadmap, this is a list of ideas
+subject to change
 
 ## Short-term
 
 ### Front-end
 - performance
 	- use documentFragment to minimize DOM updates on first page load
-- bug fixes
-	- properly handle the case when the user has no courses installed
 
 ## Course Building
 
