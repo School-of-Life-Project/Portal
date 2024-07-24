@@ -55,7 +55,9 @@ impl Database {
         let progress_tree = self.root.open_tree(PROGRESS_TREE_KEY)?;
 
         task::spawn_blocking(move || {
-            let completion = if let Some(data) = progress_tree.get(course.uuid.as_bytes())? {
+            let uuid = course.uuid.unwrap();
+
+            let completion = if let Some(data) = progress_tree.get(uuid.as_bytes())? {
                 bincode::deserialize(&data)?
             } else {
                 CourseCompletion::default()
@@ -76,18 +78,19 @@ impl Database {
 
         task::spawn_blocking(move || {
             progress_tree.transaction(|progress_tree| {
-                let old_completion =
-                    if let Some(data) = progress_tree.get(course.uuid.as_bytes())? {
-                        bincode::deserialize(&data).map_err(ConflictableTransactionError::Abort)?
-                    } else {
-                        CourseCompletion::default()
-                    };
+                let uuid = course.uuid.unwrap();
+
+                let old_completion = if let Some(data) = progress_tree.get(uuid.as_bytes())? {
+                    bincode::deserialize(&data).map_err(ConflictableTransactionError::Abort)?
+                } else {
+                    CourseCompletion::default()
+                };
 
                 let old_progress = CourseProgress::calculate(&course, &old_completion);
                 let new_progress = CourseProgress::calculate(&course, &data);
 
                 progress_tree.insert(
-                    course.uuid.as_bytes(),
+                    uuid.as_bytes(),
                     bincode::serialize(&data).map_err(ConflictableTransactionError::Abort)?,
                 )?;
 

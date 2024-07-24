@@ -205,8 +205,7 @@ impl CourseMap {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Course {
     /// The unique ID of the course.
-    #[serde(skip_deserializing)]
-    pub uuid: Uuid,
+    pub uuid: Option<Uuid>,
     /// Title for the course
     pub title: String,
     /// Optional description for the course

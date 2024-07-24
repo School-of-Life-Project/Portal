@@ -109,7 +109,10 @@ pub async fn set_course_completion(
     course: Course,
     completion: CourseCompletion,
 ) -> Result<(), ErrorWrapper> {
-    let uuid = course.uuid;
+    let uuid = course.uuid.ok_or(ErrorWrapper {
+        message: "Unable to parse Course!".to_string(),
+        cause: "Missing field uuid".to_string(),
+    })?;
 
     state
         .database
