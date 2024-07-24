@@ -7,12 +7,9 @@ import {
 	Settings,
 	getCurrentBackendDate,
 	Chapter,
+	Textbook,
 } from "../bindings.ts";
 import { TimeProgressMeter } from "../graphing/main.ts";
-
-// TODO:
-// - Reduce DOM updates by combining viewManager.render() and listingManager.render()
-// - Optimize event listners using event delegation and event.stopPropagation()
 
 export interface ListingItem {
 	label: string;
@@ -65,8 +62,6 @@ export class ViewManager {
 
 		const listing = this.#buildListing(metadata.items, metadata.callback);
 		this.#buildProgressTracker(course, listing);
-
-		this.container.listing.append(listing);
 
 		this.rendered = true;
 	}
@@ -224,9 +219,9 @@ export class ViewManager {
 						checked,
 					);
 
-					console.log(active_chapter_changed);
-
-					// TODO: Implement displayNext()
+					if (active_chapter_changed) {
+						showNextChapter(listing, textbook, completed, identifier);
+					}
 				}
 				event.preventDefault();
 			}
@@ -264,6 +259,10 @@ export class ViewManager {
 		this.savePosition = function (position: string) {
 			course.completion.books[course.document_index].position = position;
 		};
+
+		this.container.listing.append(listing);
+
+		showNextChapter(listing, textbook, completed, undefined, true);
 	}
 }
 
@@ -345,6 +344,120 @@ function handleProgressUpdate(
 		Array.from(completed);
 
 	return updated_chapter_completion;
+}
+
+// TODO: Cleanup and attempt to further optimize showNextChapter()
+
+function showNextChapter(
+	listing: HTMLOListElement,
+	textbook: Textbook,
+	completed: Set<string>,
+	identifier?: string,
+	autoscroll = false,
+) {
+	let firstIncomplete = true;
+
+	for (const chapter of textbook.chapters) {
+		if (chapter.root) {
+			const element = listing.querySelector("#" + CSS.escape(chapter.root));
+			if (element) {
+				handleListingItemVisibility(
+					listing,
+					element as HTMLElement,
+					completed.has(chapter.root),
+					firstIncomplete,
+					identifier == chapter.root,
+					autoscroll,
+				);
+			}
+
+			if (!completed.has(chapter.root)) {
+				firstIncomplete = false;
+			}
+		} else {
+			// If the chapter has no root, treat individual sections as if they were chapters
+
+			for (const group of chapter.groups) {
+				for (const section of group.sections) {
+					const element = listing.querySelector("#" + CSS.escape(section));
+					if (element) {
+						handleListingItemVisibility(
+							listing,
+							element as HTMLElement,
+							completed.has(section),
+							firstIncomplete,
+							identifier == section,
+							autoscroll,
+						);
+					}
+
+					if (!completed.has(section)) {
+						firstIncomplete = false;
+					}
+				}
+			}
+		}
+	}
+}
+
+function handleListingItemVisibility(
+	listing: HTMLOListElement,
+	element: HTMLElement,
+	completed: boolean,
+	firstIncomplete: boolean,
+	currentItem: boolean,
+	scroll: boolean,
+) {
+	if (firstIncomplete) {
+		updateListingItemVisibility(
+			listing,
+			element,
+			!completed,
+			!completed,
+			!completed && scroll,
+		);
+	} else if (!(currentItem && !completed)) {
+		updateListingItemVisibility(listing, element, false);
+	}
+}
+
+function updateListingItemVisibility(
+	listing: HTMLOListElement,
+	element: HTMLElement,
+	showItem?: boolean,
+	showItemList?: boolean,
+	scroll?: boolean,
+) {
+	const itemContainer = element?.parentElement?.parentElement;
+
+	if (showItem !== undefined) {
+		if (itemContainer && itemContainer.tagName == "DETAILS") {
+			(<HTMLDetailsElement>itemContainer).open = showItem;
+		}
+	}
+
+	if (showItemList !== undefined) {
+		let currentElement = element?.parentElement?.parentElement?.parentElement;
+		while (
+			currentElement &&
+			currentElement.parentElement &&
+			currentElement.parentElement != listing
+		) {
+			currentElement = currentElement.parentElement;
+
+			if (currentElement.tagName == "DETAILS") {
+				(<HTMLDetailsElement>currentElement).open = showItemList;
+			}
+		}
+	}
+
+	if (scroll) {
+		if (itemContainer && itemContainer.tagName == "DETAILS") {
+			itemContainer.scrollIntoView({ block: "center" });
+		} else {
+			element.parentElement?.scrollIntoView({ block: "start" });
+		}
+	}
 }
 
 /*
