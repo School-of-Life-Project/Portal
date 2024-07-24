@@ -225,9 +225,9 @@ export class ProgressManager {
 			if (this.#completion && typeof this.#completion.time_spent == "object") {
 				if (!document.hidden) {
 					if (this.#completion.time_spent[getCurrentBackendDate()]) {
-						this.#completion.time_spent[getCurrentBackendDate()] += 5;
+						this.#completion.time_spent[getCurrentBackendDate()] += 1;
 					} else {
-						this.#completion.time_spent[getCurrentBackendDate()] = 5;
+						this.#completion.time_spent[getCurrentBackendDate()] = 1;
 					}
 				}
 				updateCompletion(course[0], this.#completion);
@@ -237,7 +237,7 @@ export class ProgressManager {
 					);
 				}
 			}
-		}, 5000);
+		}, 1000);
 
 		this.rendered = true;
 	}
@@ -281,7 +281,8 @@ export class ProgressManager {
 									} else {
 										this.#completedSections.delete(chapter.root);
 									}
-									this.#updateCompletionData(course.course, document_index);
+									this.#completion.books[document_index].completed_sections =
+										Array.from(this.#completedSections);
 									this.#showNextChapter(textbook, chapter.root);
 								}
 							},
@@ -289,18 +290,12 @@ export class ProgressManager {
 					);
 				}
 			}
-			this.#buildSectionProgressTracker(
-				course.course,
-				textbook,
-				chapter,
-				document_index,
-			);
+			this.#buildSectionProgressTracker(textbook, chapter, document_index);
 		}
 
 		this.#showNextChapter(textbook, undefined, true);
 	}
 	#buildSectionProgressTracker(
-		course: Course,
 		textbook: Textbook,
 		chapter: Chapter,
 		document_index: number,
@@ -321,7 +316,8 @@ export class ProgressManager {
 										this.#completedSections.delete(section);
 									}
 									this.#updateChapterCompletion(textbook, chapter);
-									this.#updateCompletionData(course, document_index);
+									this.#completion.books[document_index].completed_sections =
+										Array.from(this.#completedSections);
 								}
 							},
 						),
@@ -342,14 +338,6 @@ export class ProgressManager {
 		}
 
 		return checkbox;
-	}
-	#updateCompletionData(course: Course, document_index: number) {
-		if (this.#completion) {
-			this.#completion.books[document_index].completed_sections = Array.from(
-				this.#completedSections,
-			);
-			updateCompletion(course, this.#completion);
-		}
 	}
 	#updateChapterCompletion(textbook: Textbook, chapter: Chapter) {
 		if (!this.#completedSections) {
