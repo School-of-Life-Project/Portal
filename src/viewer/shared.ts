@@ -198,15 +198,18 @@ export class ProgressManager {
 		}
 
 		this.#completion = course[1];
+		if (!this.#completion.books[document_index]) {
+			this.#completion.books[document_index] = {
+				completed_sections: [],
+			};
+		}
 		this.#completedSections = new Set(
-			course[1].books[document_index]?.completed_sections,
+			course[1].books[document_index].completed_sections,
 		);
 		this.#buildListingProgressTracker(
 			{ course: course[0], progress: this.#completion },
 			document_index,
 		);
-
-		this.#completion.time_spent = course[1].time_spent;
 
 		let timeDisplay: TimeProgressMeter | undefined;
 		if (this.settings.show_course_clock) {
@@ -342,15 +345,9 @@ export class ProgressManager {
 	}
 	#updateCompletionData(course: Course, document_index: number) {
 		if (this.#completion) {
-			if (!this.#completion.books[document_index]) {
-				this.#completion.books[document_index] = {
-					completed_sections: Array.from(this.#completedSections),
-				};
-			} else {
-				this.#completion.books[document_index].completed_sections = Array.from(
-					this.#completedSections,
-				);
-			}
+			this.#completion.books[document_index].completed_sections = Array.from(
+				this.#completedSections,
+			);
 			updateCompletion(course, this.#completion);
 		}
 	}
@@ -493,11 +490,6 @@ export class ProgressManager {
 	}
 	savePosition(document_index: number, position: string) {
 		if (this.#completion && this.rendered) {
-			if (!this.#completion.books[document_index]) {
-				this.#completion.books[document_index] = {
-					completed_sections: [],
-				};
-			}
 			this.#completion.books[document_index].position = position;
 		}
 	}
