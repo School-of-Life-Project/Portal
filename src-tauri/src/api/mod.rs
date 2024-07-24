@@ -127,14 +127,16 @@ pub async fn set_active_courses(
 
 #[tauri::command]
 pub async fn get_listing(state: tauri::State<'_, State>) -> Result<ListingResult, ErrorWrapper> {
-    let scan =
-        state.datastore.scan().await.map_err(|e| {
-            ErrorWrapper::new("Unable to get Course/CourseMap list".to_string(), &e)
-        })?;
-
-    let (courses, course_maps, active_courses, settings) = try_join!(
-        util::get_courses(&state, &scan.courses),
-        util::get_course_maps(&state, &scan.course_maps),
+    let ((courses, course_maps), active_courses, settings) = try_join!(
+        async {
+            let scan = state.datastore.scan().await.map_err(|e| {
+                ErrorWrapper::new("Unable to get Course/CourseMap list".to_string(), &e)
+            })?;
+            try_join!(
+                util::get_courses(&state, &scan.courses),
+                util::get_course_maps(&state, &scan.course_maps)
+            )
+        },
         util::get_active_courses(&state),
         util::get_settings(&state)
     )?;
@@ -157,10 +159,11 @@ pub struct ListingResult {
 
 #[tauri::command]
 pub async fn get_overview(state: tauri::State<'_, State>) -> Result<OverviewResult, ErrorWrapper> {
-    let scan = util::get_active_courses(&state).await?;
-
     let (active_courses, overall_progress, settings) = try_join!(
-        util::get_courses(&state, &scan),
+        async {
+            let scan = util::get_active_courses(&state).await?;
+            util::get_courses(&state, &scan).await
+        },
         util::get_overall_progress(&state),
         util::get_settings(&state)
     )?;

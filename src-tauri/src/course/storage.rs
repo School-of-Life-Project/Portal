@@ -52,7 +52,6 @@ async fn unpack_dir(root: PathBuf) -> Result<(), Error> {
         let mut join_set = JoinSet::new();
 
         for path in path_chunk {
-            let root = root.clone();
             let path = path.clone();
             let extension = path
                 .extension()
@@ -61,6 +60,8 @@ async fn unpack_dir(root: PathBuf) -> Result<(), Error> {
             let extension = extension.to_string_lossy();
 
             if extension == "zip" {
+                let root = root.clone();
+
                 join_set.spawn_blocking(move || -> Result<(), Error> {
                     if path.metadata()?.is_file() {
                         let file = File::open(&path)?;
