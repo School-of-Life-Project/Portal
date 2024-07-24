@@ -23,6 +23,7 @@ fn main() -> Result<()> {
         })
         .invoke_handler(tauri::generate_handler![
             api::open_data_dir,
+            api::open_internal_data_dir,
             api::open_project_issue_tracker,
             api::open_project_repo,
             api::get_course,

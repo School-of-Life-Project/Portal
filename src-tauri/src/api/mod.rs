@@ -43,7 +43,20 @@ impl State {
 
 #[tauri::command]
 #[allow(clippy::needless_pass_by_value)]
-pub fn open_data_dir(handle: AppHandle) -> Result<(), ErrorWrapper> {
+pub fn open_data_dir(state: tauri::State<'_, State>) -> Result<(), ErrorWrapper> {
+    open::that_detached(&state.datastore.root).map_err(|e| {
+        ErrorWrapper::new(
+            format!("Unable to launch OS opener for {:?}", &state.datastore.root),
+            &e,
+        )
+    })?;
+
+    Ok(())
+}
+
+#[tauri::command]
+#[allow(clippy::needless_pass_by_value)]
+pub fn open_internal_data_dir(handle: AppHandle) -> Result<(), ErrorWrapper> {
     if let Some(path) = handle.path_resolver().app_data_dir() {
         open::that_detached(&path).map_err(|e| {
             ErrorWrapper::new(format!("Unable to launch OS opener for {:?}", &path), &e)
@@ -83,7 +96,7 @@ pub fn open_project_repo() -> Result<(), ErrorWrapper> {
 
 #[tauri::command]
 pub async fn get_course(
-    app_handle: tauri::AppHandle,
+    app_handle: AppHandle,
     state: tauri::State<'_, State>,
     uuid: Uuid,
 ) -> Result<(Course, CourseCompletion), ErrorWrapper> {
