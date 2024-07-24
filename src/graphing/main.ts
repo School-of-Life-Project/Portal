@@ -267,7 +267,7 @@ export class LongTermProgressGraph {
 
 			if (i >= progress.length) {
 				element.className = "";
-				continue;
+				break;
 			}
 
 			if (Number.isNaN(progress[i])) {

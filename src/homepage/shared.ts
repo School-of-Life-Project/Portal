@@ -197,6 +197,14 @@ export function graphProgress(
 		chapterProgress.push(data);
 	}
 
+	if (timeData.length == 0) {
+		timeProgress.push(0);
+	}
+
+	if (chapterData.length == 0) {
+		chapterProgress.push(0);
+	}
+
 	const timeGraph = new LongTermProgressGraph(
 		"time",
 		settings.weeks_displayed,
