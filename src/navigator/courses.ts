@@ -27,7 +27,7 @@ export function buildCourseListing(
 		return fragment;
 	}
 
-	sortCourses(courses);
+	sortCourses(courses, active);
 
 	const header = document.createElement("h2");
 	header.innerText = "Your Courses";
