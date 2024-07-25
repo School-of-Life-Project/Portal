@@ -11,6 +11,9 @@
 - [ ] Determine additional necessary polyfills
 - [ ] Ensure CSP blocks external origins
 
+## full-stack TODOs
+- [ ] properly handle missing active courses
+
 ## backend TODOs
 
 - [ ] Write unit tests
