@@ -259,8 +259,10 @@ export class ViewManager {
 				);
 			}
 		}, 1000);
-		window.addEventListener("beforeunload", () => {
-			updateCompletion(course.course, course.completion);
+		window.addEventListener("visibilitychange", () => {
+			if (document.visibilityState == "hidden") {
+				updateCompletion(course.course, course.completion);
+			}
 		});
 
 		this.savePosition = function (position: string) {
