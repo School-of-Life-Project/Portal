@@ -206,11 +206,11 @@ pub async fn get_settings(state: tauri::State<'_, State>) -> Result<Settings, Er
 #[tauri::command]
 pub async fn set_settings(
     state: tauri::State<'_, State>,
-    settings: Settings,
+    settings: Option<Settings>,
 ) -> Result<(), ErrorWrapper> {
     state
         .database
-        .set_settings(settings)
+        .set_settings(settings.unwrap_or_default())
         .await
         .map_err(|e| ErrorWrapper::new("Unable to update Settings".to_string(), &e))
 }

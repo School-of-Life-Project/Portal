@@ -13,9 +13,6 @@
 			<p>Cause: <span id="cause">unknown</span></p>
 			<footer>
 				<p>
-					It is recommended (but not required) that you restart the application.
-				</p>
-				<p>
 					If you believe this error was caused by a bug in the application,
 					please
 					<a
@@ -23,7 +20,6 @@
 						>file an issue</a
 					>.
 				</p>
-				<p>Other useful links:</p>
 				<ul>
 					<li><a href="/index.html">🚪 Return to application homepage</a></li>
 					<li>
@@ -54,6 +50,42 @@
 						>
 					</li>
 				</ul>
+				<details>
+					<summary>🛠️ Database Actions (<strong>irreversible</strong>)</summary>
+					<p>
+						Warning: The listed database actions will apply
+						<strong>without further confirmation</strong>.
+					</p>
+					<ul>
+						<li>
+							<a
+								href="javascript:window.__TAURI_INVOKE__('set_active_courses', {courses: []})"
+								>📚 Reset active course list</a
+							>
+						</li>
+						<li>
+							<a href="javascript:window.__TAURI_INVOKE__('set_settings')"
+								>⚙️ Reset settings to defaults</a
+							>
+						</li>
+					</ul>
+					<p>
+						If you believe the application's database is corrupted (and the
+						above actions have not corrected the issue), open the
+						<a
+							href="javascript:window.__TAURI_INVOKE__('open_internal_data_dir')"
+							>application's data folder</a
+						>
+						and delete the "Internal Database" folder,
+						<em>then restart the application</em>. This will
+						<strong>wipe all progress data and user settings</strong>.
+					</p>
+					<p>
+						<strong>Application database corruptions are rare</strong>. Most
+						common errors are caused by a malformed course / course map, or an
+						active course that cannot be found.
+					</p>
+				</details>
 			</footer>
 		</section>
 	</body>
