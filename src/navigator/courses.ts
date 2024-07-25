@@ -67,7 +67,10 @@ export function buildCourseListing(
 
 		completed.appendChild(completedList);
 
-		list.appendChild(completed);
+		const completedContainer = document.createElement("li");
+		completedContainer.appendChild(completed);
+
+		list.appendChild(completedContainer);
 	}
 
 	list.addEventListener("change", (event) => {

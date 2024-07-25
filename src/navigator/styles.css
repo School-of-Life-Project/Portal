@@ -41,5 +41,5 @@ footer button[type="button"] {
 }
 
 #contentListing details {
-	padding-top: 0.4lh;
+	padding-top: calc(0.5lh - 0.5ch);
 }
