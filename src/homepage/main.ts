@@ -1,7 +1,6 @@
 import {
 	displayError,
-	//getActive,
-	getAll,
+	getActive,
 	getOverallProgress,
 	getSettings,
 } from "../bindings.ts";
@@ -16,16 +15,9 @@ const settingsPromise = getSettings().catch((error) => {
 	displayError(error);
 });
 
-const coursePromise = getAll()
-	.then((result) => result.courses)
-	.catch((error) => displayError(error));
-
-// ! TEMPORARY
-/*
 const coursePromise = getActive().catch((error) => {
 	displayError(error);
 });
-*/
 
 const progressPromise = getOverallProgress().catch((error) => {
 	displayError(error);

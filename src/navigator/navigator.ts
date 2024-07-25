@@ -6,6 +6,7 @@ import {
 	getActiveCourses,
 	getAll,
 	openDataDir,
+	setActiveCourses,
 } from "../bindings.ts";
 
 const listingPromise = getAll().catch((error) => {
@@ -61,10 +62,6 @@ if (contentListing) {
 
 		contentListing.innerHTML = "";
 		contentListing.appendChild(fragment);
-
-		console.log("listing", listing);
-
-		console.log("active", activeCourses);
 	});
 }
 
@@ -141,6 +138,25 @@ function buildCourseListing(
 
 		list.appendChild(element);
 	}
+
+	list.addEventListener("change", (event) => {
+		const target = event.target as HTMLElement;
+
+		if (target.tagName == "INPUT" && target.parentElement) {
+			const identifier = target.parentElement.id.substring(7);
+			const checked = (target as HTMLInputElement).checked;
+
+			if (checked) {
+				active.add(identifier);
+			} else {
+				active.delete(identifier);
+			}
+
+			setActiveCourses(Array.from(active)).catch((error) => {
+				displayError(error);
+			});
+		}
+	});
 
 	fragment.appendChild(list);
 
