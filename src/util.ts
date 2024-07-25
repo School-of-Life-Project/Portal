@@ -59,6 +59,12 @@ export function isCompletable(course: Course): boolean {
 	for (const textbook of course.books) {
 		if (textbook.chapters.length == 0) {
 			completable = false;
+		} else {
+			for (const chapter of textbook.chapters) {
+				if (chapter.groups.length == 0 && !chapter.root) {
+					completable = false;
+				}
+			}
 		}
 	}
 
