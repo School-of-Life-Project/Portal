@@ -71,10 +71,8 @@ export class ViewManager {
 			return;
 		}
 
-		const rootSelector = "#" + CSS.escape(this.container.listing.id);
-		const selector = "#" + CSS.escape(identifier);
 		this.container.style.innerHTML =
-			rootSelector + " " + selector + " {font-weight: bold}";
+			"#label-" + CSS.escape(identifier) + " {font-weight: bold}";
 
 		const initialElement = this.#labels.get(identifier);
 		let currentElement = initialElement?.parentElement?.parentElement;
@@ -101,7 +99,7 @@ export class ViewManager {
 				const target = event.target as HTMLElement;
 
 				if (target.tagName == "A" && target.id) {
-					callback(target.id);
+					callback(target.id.substring(6));
 					event.preventDefault();
 				}
 			});
@@ -109,7 +107,7 @@ export class ViewManager {
 				const target = event.target as HTMLElement;
 
 				if (event.code == "Enter" && target.tagName == "A" && target.id) {
-					callback(target.id);
+					callback(target.id.substring(6));
 					event.preventDefault();
 				}
 			});
@@ -123,7 +121,7 @@ export class ViewManager {
 				label = document.createElement("a");
 				label.setAttribute("tabindex", "0");
 				label.setAttribute("role", "button");
-				label.setAttribute("id", item.identifier);
+				label.id = "label-" + item.identifier;
 
 				this.#labels.set(item.identifier, label);
 			} else {
