@@ -39,7 +39,3 @@ li button[type="button"] {
 footer button[type="button"] {
 	margin: var(--button-padding) var(--button-padding) 0 0;
 }
-
-#contentListing details {
-	padding-top: calc(0.5lh - 0.5ch);
-}
