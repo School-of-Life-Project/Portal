@@ -4,6 +4,7 @@ import {
 	displayError,
 	setActiveCourses,
 } from "../bindings.ts";
+import { isComplete, sortCourses } from "../util.ts";
 
 export function buildCourseListing(
 	courses: [Course, CourseProgress][],
@@ -26,6 +27,8 @@ export function buildCourseListing(
 		return fragment;
 	}
 
+	sortCourses(courses);
+
 	const header = document.createElement("h2");
 	header.innerText = "Your Courses";
 
@@ -33,22 +36,38 @@ export function buildCourseListing(
 
 	const list = document.createElement("ul");
 
-	for (const [course, _courseProgress] of courses) {
-		const element = document.createElement("li");
-		element.id = "course-" + course.uuid;
+	const completedCourses: Course[] = [];
 
-		const label = document.createElement("span");
-		label.innerText = course.title;
-		element.appendChild(label);
-
-		const checkbox = document.createElement("input");
-		checkbox.setAttribute("type", "checkbox");
-		if (active.has(course.uuid)) {
-			checkbox.checked = true;
+	for (const [course, courseProgress] of courses) {
+		if (isComplete(courseProgress)) {
+			completedCourses.push(course);
+		} else {
+			list.appendChild(buildCourseListItem(course, active.has(course.uuid)));
 		}
-		element.appendChild(checkbox);
+	}
 
-		list.appendChild(element);
+	if (completedCourses.length > 0) {
+		const completed = document.createElement("details");
+
+		const completedTitle = document.createElement("summary");
+		completedTitle.innerText = "Completed Courses";
+		completed.appendChild(completedTitle);
+
+		const completedList = document.createElement("ul");
+
+		for (const course of completedCourses) {
+			completedList.appendChild(
+				buildCourseListItem(course, active.has(course.uuid)),
+			);
+
+			if (active.has(course.uuid)) {
+				completed.open = true;
+			}
+		}
+
+		completed.appendChild(completedList);
+
+		list.appendChild(completed);
 	}
 
 	list.addEventListener("change", (event) => {
@@ -73,4 +92,22 @@ export function buildCourseListing(
 	fragment.appendChild(list);
 
 	return fragment;
+}
+
+function buildCourseListItem(course: Course, active: boolean) {
+	const element = document.createElement("li");
+	element.id = "course-" + course.uuid;
+
+	const label = document.createElement("span");
+	label.innerText = course.title;
+	element.appendChild(label);
+
+	const checkbox = document.createElement("input");
+	checkbox.setAttribute("type", "checkbox");
+	if (active) {
+		checkbox.checked = true;
+	}
+	element.appendChild(checkbox);
+
+	return element;
 }

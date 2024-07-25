@@ -4,11 +4,11 @@ import {
 	getOverallProgress,
 	getSettings,
 } from "../bindings.ts";
+import { sortCourses } from "../util.ts";
 import {
 	displayEmptyCourseNotice,
 	graphCourse,
 	graphProgress,
-	sortCourses,
 } from "./shared.ts";
 
 const settingsPromise = getSettings().catch((error) => {
