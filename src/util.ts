@@ -40,3 +40,27 @@ export function isComplete(progress: CourseProgress): boolean {
 
 	return completed;
 }
+
+export function isStarted(progress: CourseProgress): boolean {
+	let started = false;
+
+	for (const textbookProgress of progress.completion) {
+		if (textbookProgress.overall_completion > 0) {
+			started = true;
+		}
+	}
+
+	return started;
+}
+
+export function isCompletable(course: Course): boolean {
+	let completable = course.books.length > 0;
+
+	for (const textbook of course.books) {
+		if (textbook.chapters.length == 0) {
+			completable = false;
+		}
+	}
+
+	return completable;
+}

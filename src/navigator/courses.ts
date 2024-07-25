@@ -4,7 +4,7 @@ import {
 	displayError,
 	setActiveCourses,
 } from "../bindings.ts";
-import { isComplete, sortCourses } from "../util.ts";
+import { isCompletable, isComplete, isStarted, sortCourses } from "../util.ts";
 
 export function buildCourseListing(
 	courses: [Course, CourseProgress][],
@@ -36,41 +36,63 @@ export function buildCourseListing(
 
 	const list = document.createElement("ul");
 
+	const startedCourses: Course[] = [];
+	const completableCourses: Course[] = [];
+	const incompletableCourses: Course[] = [];
 	const completedCourses: Course[] = [];
+	let openCompletedCourses = false;
 
 	for (const [course, courseProgress] of courses) {
 		if (isComplete(courseProgress)) {
 			completedCourses.push(course);
+			if (active.has(course.uuid)) {
+				openCompletedCourses = true;
+			}
 		} else {
-			list.appendChild(buildCourseListItem(course, active.has(course.uuid)));
+			if (isCompletable(course)) {
+				if (isStarted(courseProgress)) {
+					startedCourses.push(course);
+				} else {
+					completableCourses.push(course);
+				}
+			} else {
+				incompletableCourses.push(course);
+			}
 		}
 	}
 
 	if (completedCourses.length > 0) {
-		const completed = document.createElement("details");
+		list.appendChild(
+			buildCourseCategory(
+				"Completed Courses",
+				completedCourses,
+				active,
+				openCompletedCourses,
+			),
+		);
+	}
 
-		const completedTitle = document.createElement("summary");
-		completedTitle.innerText = "Completed Courses";
-		completed.appendChild(completedTitle);
+	if (startedCourses.length > 0) {
+		list.appendChild(
+			buildCourseCategory("Started Courses", startedCourses, active, true),
+		);
+	}
 
-		const completedList = document.createElement("ul");
+	if (completableCourses.length > 0) {
+		list.appendChild(
+			buildCourseCategory("New Courses", completableCourses, active, true),
+		);
+	}
 
-		for (const course of completedCourses) {
-			completedList.appendChild(
-				buildCourseListItem(course, active.has(course.uuid)),
-			);
-
-			if (active.has(course.uuid)) {
-				completed.open = true;
-			}
-		}
-
-		completed.appendChild(completedList);
-
-		const completedContainer = document.createElement("li");
-		completedContainer.appendChild(completed);
-
-		list.appendChild(completedContainer);
+	if (incompletableCourses.length > 0) {
+		list.appendChild(
+			buildCourseCategory(
+				"Incompletable Courses (missing metadata)",
+				incompletableCourses,
+				active,
+				true,
+			),
+		);
 	}
 
 	list.addEventListener("change", (event) => {
@@ -97,20 +119,50 @@ export function buildCourseListing(
 	return fragment;
 }
 
-function buildCourseListItem(course: Course, active: boolean) {
-	const element = document.createElement("li");
-	element.id = "course-" + course.uuid;
+function buildCourseCategory(
+	label: string,
+	courses: Course[],
+	active: Set<string>,
+	open?: boolean,
+) {
+	const category = document.createElement("details");
 
-	const label = document.createElement("span");
-	label.innerText = course.title;
-	element.appendChild(label);
+	const title = document.createElement("summary");
+	title.innerText = label;
+	category.appendChild(title);
 
-	const checkbox = document.createElement("input");
-	checkbox.setAttribute("type", "checkbox");
-	if (active) {
-		checkbox.checked = true;
+	category.appendChild(buildCourseSubListing(courses, active));
+
+	if (open) {
+		category.open = true;
 	}
-	element.appendChild(checkbox);
 
-	return element;
+	const container = document.createElement("li");
+	container.appendChild(category);
+
+	return container;
+}
+
+function buildCourseSubListing(courses: Course[], active: Set<string>) {
+	const list = document.createElement("ul");
+
+	for (const course of courses) {
+		const element = document.createElement("li");
+		element.id = "course-" + course.uuid;
+
+		const label = document.createElement("span");
+		label.innerText = course.title;
+		element.appendChild(label);
+
+		const checkbox = document.createElement("input");
+		checkbox.setAttribute("type", "checkbox");
+		if (active.has(course.uuid)) {
+			checkbox.checked = true;
+		}
+		element.appendChild(checkbox);
+
+		list.appendChild(element);
+	}
+
+	return list;
 }
