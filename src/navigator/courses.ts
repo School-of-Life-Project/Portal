@@ -41,6 +41,8 @@ export function buildCourseListing(
 	const incompletableCourses: Course[] = [];
 	const completedCourses: Course[] = [];
 	let openCompletedCourses = false;
+	let openCompletableCourses = false;
+	let openIncompletableCourses = false;
 
 	for (const [course, courseProgress] of courses) {
 		if (isComplete(courseProgress)) {
@@ -53,9 +55,15 @@ export function buildCourseListing(
 				if (isStarted(courseProgress)) {
 					startedCourses.push(course);
 				} else {
+					if (active.has(course.uuid)) {
+						openCompletableCourses = true;
+					}
 					completableCourses.push(course);
 				}
 			} else {
+				if (active.has(course.uuid)) {
+					openIncompletableCourses = true;
+				}
 				incompletableCourses.push(course);
 			}
 		}
@@ -80,7 +88,12 @@ export function buildCourseListing(
 
 	if (completableCourses.length > 0) {
 		list.appendChild(
-			buildCourseCategory("New Courses", completableCourses, active, true),
+			buildCourseCategory(
+				"New Courses",
+				completableCourses,
+				active,
+				openCompletableCourses,
+			),
 		);
 	}
 
@@ -90,7 +103,7 @@ export function buildCourseListing(
 				"Incompletable Courses (missing metadata)",
 				incompletableCourses,
 				active,
-				true,
+				openIncompletableCourses,
 			),
 		);
 	}
