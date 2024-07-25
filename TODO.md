@@ -8,7 +8,8 @@
 - [X] Optimize ePub viewer loading
 - [X] Optimize shared viewer code
 - [ ] Write unit tests with vitest
-- [ ] Determine necessary polyfills
+- [ ] Determine additional necessary polyfills
+- [ ] Ensure CSP blocks external origins
 
 ## backend TODOs
 
