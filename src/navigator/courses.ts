@@ -37,7 +37,7 @@ export function buildCourseListing(
 
 	const list = document.createElement("ul");
 
-	const courseMap: Map<string, Course> = new Map();
+	const courseMap: Map<string, [Course, CourseProgress]> = new Map();
 	const startedCourses: Course[] = [];
 	const completableCourses: Course[] = [];
 	const incompletableCourses: Course[] = [];
@@ -47,7 +47,7 @@ export function buildCourseListing(
 	let openIncompletableCourses = false;
 
 	for (const [course, courseProgress] of courses) {
-		courseMap.set(course.uuid, course);
+		courseMap.set(course.uuid, [course, courseProgress]);
 		if (isComplete(courseProgress)) {
 			completedCourses.push(course);
 			if (active.has(course.uuid)) {
@@ -139,7 +139,7 @@ export function buildCourseListing(
 
 			if (course) {
 				contentViewer.innerHTML = "";
-				contentViewer.appendChild(buildCourseInfo(course));
+				contentViewer.appendChild(buildCourseInfo(course[0], course[1]));
 			}
 		}
 	};
@@ -207,7 +207,7 @@ function buildCourseSubListing(courses: Course[], active: Set<string>) {
 	return list;
 }
 
-function buildCourseInfo(course: Course) {
+function buildCourseInfo(course: Course, progress: CourseProgress) {
 	const root = document.createDocumentFragment();
 
 	const title = document.createElement("h2");
@@ -221,19 +221,34 @@ function buildCourseInfo(course: Course) {
 	}
 
 	const bookListTitle = document.createElement("h3");
-	bookListTitle.innerText = "Textbooks";
+	bookListTitle.innerText = "Contents";
 	root.appendChild(bookListTitle);
 
 	const bookList = document.createElement("ul");
 
+	let i = 0;
 	for (const textbook of course.books) {
 		const item = document.createElement("li");
 		item.innerText = textbook.label;
 
 		if (textbook.chapters.length > 0) {
+			let completion = 0;
+			if (progress.completion.length > i) {
+				completion = progress.completion[i].overall_completion;
+			}
+
 			item.innerText += " (" + textbook.chapters.length + " chapters)";
+
+			if (completion == 1) {
+				item.innerText += " ✔️";
+			} else if (completion > 0) {
+				item.innerText += " [" + Math.floor(completion * 100) + "% complete]";
+			}
+		} else {
+			item.innerText += " (missing metadata)";
 		}
 
+		i++;
 		bookList.appendChild(item);
 	}
 
