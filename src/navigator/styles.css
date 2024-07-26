@@ -6,6 +6,10 @@
 	font-size: 1lh;
 }
 
+#contentViewer h2 {
+	margin-top: 0;
+}
+
 #contentListing footer {
 	position: absolute;
 	bottom: 0;

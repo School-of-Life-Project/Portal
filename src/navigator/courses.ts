@@ -220,5 +220,24 @@ function buildCourseInfo(course: Course) {
 		root.appendChild(description);
 	}
 
+	const bookListTitle = document.createElement("h3");
+	bookListTitle.innerText = "Textbooks";
+	root.appendChild(bookListTitle);
+
+	const bookList = document.createElement("ul");
+
+	for (const textbook of course.books) {
+		const item = document.createElement("li");
+		item.innerText = textbook.label;
+
+		if (textbook.chapters.length > 0) {
+			item.innerText += " (" + textbook.chapters.length + " chapters)";
+		}
+
+		bookList.appendChild(item);
+	}
+
+	root.appendChild(bookList);
+
 	return root;
 }
