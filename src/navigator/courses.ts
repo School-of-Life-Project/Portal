@@ -211,7 +211,7 @@ function buildCourseInfo(course: Course, progress: CourseProgress) {
 	const root = document.createDocumentFragment();
 
 	const title = document.createElement("h2");
-	title.innerText = course.title;
+	title.innerText = "📚 " + course.title;
 	root.appendChild(title);
 
 	if (course.description) {
@@ -229,7 +229,7 @@ function buildCourseInfo(course: Course, progress: CourseProgress) {
 	let i = 0;
 	for (const textbook of course.books) {
 		const item = document.createElement("li");
-		item.innerText = textbook.label;
+		item.innerText = "📖 " + textbook.label;
 
 		if (textbook.chapters.length > 0) {
 			let completion = 0;
@@ -240,12 +240,10 @@ function buildCourseInfo(course: Course, progress: CourseProgress) {
 			item.innerText += " (" + textbook.chapters.length + " chapters)";
 
 			if (completion == 1) {
-				item.innerText += " ✔️";
+				item.innerText += " [✔️]";
 			} else if (completion > 0) {
 				item.innerText += " [" + Math.floor(completion * 100) + "% complete]";
 			}
-		} else {
-			item.innerText += " (missing metadata)";
 		}
 
 		i++;
@@ -253,6 +251,14 @@ function buildCourseInfo(course: Course, progress: CourseProgress) {
 	}
 
 	root.appendChild(bookList);
+
+	if (!isCompletable(course)) {
+		const notice = document.createElement("p");
+		notice.innerText =
+			"⚠️ One or more textbooks within this course are missing chapter metadata.";
+
+		root.appendChild(notice);
+	}
 
 	return root;
 }
