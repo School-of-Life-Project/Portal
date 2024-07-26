@@ -18,6 +18,7 @@ const activePromise = getActiveCourses().catch((error) => {
 const folderButton = document.getElementById("folderOpener");
 const refreshButton = document.getElementById("refreshButton");
 const contentListing = document.getElementById("listingInner");
+const contentViewer = document.getElementById("contentViewer");
 
 function openFolder() {
 	openDataDir().catch((error) => {
@@ -39,7 +40,7 @@ if (refreshButton) {
 	});
 }
 
-if (contentListing) {
+if (contentListing && contentViewer) {
 	listingPromise.then(async (listing) => {
 		if (!listing) {
 			return;
@@ -54,7 +55,11 @@ if (contentListing) {
 		const activeCourses = await activePromise;
 		if (activeCourses) {
 			fragment.appendChild(
-				buildCourseListing(listing.courses, new Set(activeCourses)),
+				buildCourseListing(
+					listing.courses,
+					new Set(activeCourses),
+					contentViewer,
+				),
 			);
 		}
 

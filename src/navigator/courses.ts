@@ -9,6 +9,7 @@ import { isCompletable, isComplete, isStarted, sortCourses } from "../util.ts";
 export function buildCourseListing(
 	courses: [Course, CourseProgress][],
 	active: Set<string>,
+	contentViewer: HTMLElement,
 ): DocumentFragment {
 	const fragment = document.createDocumentFragment();
 
@@ -36,6 +37,7 @@ export function buildCourseListing(
 
 	const list = document.createElement("ul");
 
+	const courseMap: Map<string, Course> = new Map();
 	const startedCourses: Course[] = [];
 	const completableCourses: Course[] = [];
 	const incompletableCourses: Course[] = [];
@@ -45,6 +47,7 @@ export function buildCourseListing(
 	let openIncompletableCourses = false;
 
 	for (const [course, courseProgress] of courses) {
+		courseMap.set(course.uuid, course);
 		if (isComplete(courseProgress)) {
 			completedCourses.push(course);
 			if (active.has(course.uuid)) {
@@ -127,6 +130,27 @@ export function buildCourseListing(
 		}
 	});
 
+	const clickListener = (event: Event) => {
+		const target = event.target as HTMLElement;
+
+		if (target.tagName == "A" && target.parentElement) {
+			const identifier = target.parentElement.id.substring(7);
+			const course = courseMap.get(identifier);
+
+			if (course) {
+				contentViewer.innerHTML = "";
+				contentViewer.appendChild(buildCourseInfo(course));
+			}
+		}
+	};
+
+	list.addEventListener("click", clickListener);
+	list.addEventListener("keydown", (event) => {
+		if (event.code == "Enter") {
+			clickListener(event);
+		}
+	});
+
 	fragment.appendChild(list);
 
 	return fragment;
@@ -163,8 +187,11 @@ function buildCourseSubListing(courses: Course[], active: Set<string>) {
 		const element = document.createElement("li");
 		element.id = "course-" + course.uuid;
 
-		const label = document.createElement("span");
+		const label = document.createElement("a");
+		label.setAttribute("tabindex", "0");
+		label.setAttribute("role", "button");
 		label.innerText = course.title;
+
 		element.appendChild(label);
 
 		const checkbox = document.createElement("input");
@@ -178,4 +205,20 @@ function buildCourseSubListing(courses: Course[], active: Set<string>) {
 	}
 
 	return list;
+}
+
+function buildCourseInfo(course: Course) {
+	const root = document.createDocumentFragment();
+
+	const title = document.createElement("h2");
+	title.innerText = course.title;
+	root.appendChild(title);
+
+	if (course.description) {
+		const description = document.createElement("p");
+		description.innerText = course.description;
+		root.appendChild(description);
+	}
+
+	return root;
 }
