@@ -55,27 +55,25 @@ export function buildCourseListing(
 
 	for (const [course, courseProgress] of courses) {
 		courseMap.set(course.uuid, [course, courseProgress]);
-		if (isComplete(courseProgress)) {
-			completedCourses.push(course);
-			if (active.has(course.uuid)) {
-				openCompletedCourses = true;
-			}
-		} else {
-			if (isCompletable(course)) {
-				if (isStarted(courseProgress)) {
-					startedCourses.push(course);
-				} else {
-					if (active.has(course.uuid)) {
-						openCompletableCourses = true;
-					}
-					completableCourses.push(course);
+		if (isCompletable(course)) {
+			if (isComplete(courseProgress)) {
+				completedCourses.push(course);
+				if (active.has(course.uuid)) {
+					openCompletedCourses = true;
 				}
+			} else if (isStarted(courseProgress)) {
+				startedCourses.push(course);
 			} else {
 				if (active.has(course.uuid)) {
-					openIncompletableCourses = true;
+					openCompletableCourses = true;
 				}
-				incompletableCourses.push(course);
+				completableCourses.push(course);
 			}
+		} else {
+			if (active.has(course.uuid)) {
+				openIncompletableCourses = true;
+			}
+			incompletableCourses.push(course);
 		}
 	}
 
