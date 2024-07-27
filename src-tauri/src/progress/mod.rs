@@ -127,10 +127,19 @@ impl CourseProgress {
                         chapter_completion: chapter_progress,
                     }
                 }
-                None => TextbookProgress {
-                    overall_completion: 0.0,
-                    chapter_completion: Vec::new(),
-                },
+                None => {
+                    if book.chapters.is_empty() {
+                        TextbookProgress {
+                            overall_completion: 1.0,
+                            chapter_completion: Vec::new(),
+                        }
+                    } else {
+                        TextbookProgress {
+                            overall_completion: 0.0,
+                            chapter_completion: Vec::new(),
+                        }
+                    }
+                }
             });
         }
 

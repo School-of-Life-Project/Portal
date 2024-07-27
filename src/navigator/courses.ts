@@ -5,13 +5,7 @@ import {
 	setActiveCourses,
 } from "../bindings.ts";
 import { BookChapterGraph } from "../graphing/main.ts";
-import {
-	isCompletable,
-	isCompletableTextbook,
-	isComplete,
-	isStarted,
-	sortCourses,
-} from "../util.ts";
+import { isCompletable, isComplete, isStarted, sortCourses } from "../util.ts";
 
 export function buildCourseListing(
 	courses: [Course, CourseProgress][],
@@ -38,7 +32,7 @@ export function buildCourseListing(
 	sortCourses(courses, active);
 
 	const header = document.createElement("h2");
-	header.innerText = "Your Courses";
+	header.innerText = "📚 Courses";
 
 	fragment.appendChild(header);
 
@@ -80,7 +74,7 @@ export function buildCourseListing(
 	if (completedCourses.length > 0) {
 		list.appendChild(
 			buildCourseCategory(
-				"Completed Courses",
+				"🏆 Completed",
 				completedCourses,
 				active,
 				openCompletedCourses,
@@ -90,14 +84,14 @@ export function buildCourseListing(
 
 	if (startedCourses.length > 0) {
 		list.appendChild(
-			buildCourseCategory("Started Courses", startedCourses, active, true),
+			buildCourseCategory("✏️ Started", startedCourses, active, true),
 		);
 	}
 
 	if (completableCourses.length > 0) {
 		list.appendChild(
 			buildCourseCategory(
-				"New Courses",
+				"📕 New",
 				completableCourses,
 				active,
 				openCompletableCourses,
@@ -108,7 +102,7 @@ export function buildCourseListing(
 	if (incompletableCourses.length > 0) {
 		list.appendChild(
 			buildCourseCategory(
-				"Incompletable Courses (missing metadata)",
+				"📒 Reference",
 				incompletableCourses,
 				active,
 				openIncompletableCourses,
@@ -229,13 +223,8 @@ function buildCourseInfo(course: Course, progress: CourseProgress) {
 	bookListTitle.innerText = "Contents";
 	root.appendChild(bookListTitle);
 
-	let completable = course.books.length > 0;
-
 	for (let i = 0; i < course.books.length; i++) {
 		const book = course.books[i];
-		if (!isCompletableTextbook(book)) {
-			completable = false;
-		}
 
 		const params = new URLSearchParams();
 		params.set("uuid", course.uuid);
@@ -254,19 +243,6 @@ function buildCourseInfo(course: Course, progress: CourseProgress) {
 
 		root.appendChild(section);
 		root.appendChild(document.createElement("br"));
-	}
-
-	if (course.books.length == 0) {
-		const notice = document.createElement("p");
-		notice.innerText = "⚠️ This course is empty.";
-
-		root.appendChild(notice);
-	} else if (!completable) {
-		const notice = document.createElement("p");
-		notice.innerText =
-			"⚠️ One or more textbooks within this course are missing chapter metadata.";
-
-		root.appendChild(notice);
 	}
 
 	return root;

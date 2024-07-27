@@ -6,7 +6,7 @@ export function buildCourseMapListing(
 	const fragment = document.createDocumentFragment();
 
 	const header = document.createElement("h2");
-	header.innerText = "Your Course Maps";
+	header.innerText = "📍 Course Maps";
 
 	fragment.appendChild(header);
 

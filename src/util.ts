@@ -1,4 +1,4 @@
-import { Course, CourseProgress, Textbook } from "./bindings";
+import { Course, CourseProgress } from "./bindings";
 
 export function sortCourses(
 	courses: [Course, CourseProgress][],
@@ -45,7 +45,10 @@ export function isStarted(progress: CourseProgress): boolean {
 	let started = false;
 
 	for (const textbookProgress of progress.completion) {
-		if (textbookProgress.overall_completion > 0) {
+		if (
+			textbookProgress.overall_completion > 0 &&
+			textbookProgress.chapter_completion.length > 0
+		) {
 			started = true;
 		}
 	}
@@ -54,28 +57,14 @@ export function isStarted(progress: CourseProgress): boolean {
 }
 
 export function isCompletable(course: Course): boolean {
-	let completable = course.books.length > 0;
+	let completable = false;
 
 	for (const textbook of course.books) {
-		if (!isCompletableTextbook(textbook)) {
-			completable = false;
+		if (textbook.chapters.length > 0) {
+			completable = true;
 			break;
 		}
 	}
 
 	return completable;
-}
-
-export function isCompletableTextbook(textbook: Textbook) {
-	if (textbook.chapters.length == 0) {
-		return false;
-	} else {
-		for (const chapter of textbook.chapters) {
-			if (chapter.groups.length == 0 && !chapter.root) {
-				return false;
-			}
-		}
-	}
-
-	return true;
 }

@@ -3,6 +3,11 @@ subject to change
 
 ## Courses
 - add support for README.md files
+- add authors field to courses
+- prevent invalid states from being representable
+	- empty courses
+	- uncompletable chapters
+	- uncompletable section groups
 
 ## Course Building
 
@@ -38,7 +43,9 @@ write instructions on how to build a course manually using Sigil (to view the eP
 
 
 ### Course Maps
-how should Course Maps be best displayed?
+- prevent invalid states from being representable
+	- empty course maps
+- how should Course Maps be best displayed?
 
 ### Course Map Building
 

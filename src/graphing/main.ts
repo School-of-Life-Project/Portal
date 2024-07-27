@@ -63,7 +63,12 @@ export class BookChapterGraph {
 		root.setAttribute("class", "progress-map chapter-map");
 		if (this.title) {
 			const caption = document.createElement("caption");
-			caption.innerText = "📖 " + this.title;
+			if (chapters == 0) {
+				caption.innerText = "📒 " + this.title;
+			} else {
+				caption.innerText = "📖 " + this.title;
+			}
+
 			root.appendChild(caption);
 		}
 
