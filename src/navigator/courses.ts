@@ -4,7 +4,14 @@ import {
 	displayError,
 	setActiveCourses,
 } from "../bindings.ts";
-import { isCompletable, isComplete, isStarted, sortCourses } from "../util.ts";
+import { BookChapterGraph } from "../graphing/main.ts";
+import {
+	isCompletable,
+	isCompletableTextbook,
+	isComplete,
+	isStarted,
+	sortCourses,
+} from "../util.ts";
 
 export function buildCourseListing(
 	courses: [Course, CourseProgress][],
@@ -224,35 +231,34 @@ function buildCourseInfo(course: Course, progress: CourseProgress) {
 	bookListTitle.innerText = "Contents";
 	root.appendChild(bookListTitle);
 
-	const bookList = document.createElement("ul");
+	let completable = course.books.length > 0;
 
-	let i = 0;
-	for (const textbook of course.books) {
-		const item = document.createElement("li");
-		item.innerText = "📖 " + textbook.label;
-
-		if (textbook.chapters.length > 0) {
-			let completion = 0;
-			if (progress.completion.length > i) {
-				completion = progress.completion[i].overall_completion;
-			}
-
-			item.innerText += " (" + textbook.chapters.length + " chapters)";
-
-			if (completion == 1) {
-				item.innerText += " [✔️]";
-			} else if (completion > 0) {
-				item.innerText += " [" + Math.floor(completion * 100) + "% complete]";
-			}
+	for (let i = 0; i < course.books.length; i++) {
+		const book = course.books[i];
+		if (!isCompletableTextbook(book)) {
+			completable = false;
 		}
 
-		i++;
-		bookList.appendChild(item);
+		const params = new URLSearchParams();
+		params.set("uuid", course.uuid);
+		params.set("document_index", String(i));
+
+		const section = document.createElement("section");
+
+		const wrapper = document.createElement("a");
+		wrapper.href = "/viewer.html?" + params.toString();
+
+		const chapterGraph = new BookChapterGraph(book.chapters.length, book.label);
+		chapterGraph.update(progress.completion[i].chapter_completion);
+
+		wrapper.appendChild(chapterGraph.element);
+		section.appendChild(wrapper);
+
+		root.appendChild(section);
+		root.appendChild(document.createElement("br"));
 	}
 
-	root.appendChild(bookList);
-
-	if (!isCompletable(course)) {
+	if (!completable) {
 		const notice = document.createElement("p");
 		notice.innerText =
 			"⚠️ One or more textbooks within this course are missing chapter metadata.";

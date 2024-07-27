@@ -1,4 +1,5 @@
 @import "../viewer/shared.css";
+@import "../graphing/styles.css";
 
 #contentListing h2 {
 	margin-top: 0;
@@ -42,4 +43,17 @@ li button[type="button"] {
 
 footer button[type="button"] {
 	margin: var(--button-padding) var(--button-padding) 0 0;
+}
+
+section {
+	width: max-content;
+	min-width: 25ch;
+	background-color: var(--secondary-card-color);
+	padding: var(--small-card-padding);
+	border: var(--primary-border);
+	border-radius: var(--card-border-radius);
+}
+
+section table {
+	min-width: 100% !important;
 }
