@@ -44,7 +44,7 @@ export function buildCourseListing(
 	const incompletableCourses: Course[] = [];
 	const completedCourses: Course[] = [];
 	let openCompletedCourses = false;
-	let openCompletableCourses = false;
+	let openCompletableCourses = active.size == 0;
 	let openIncompletableCourses = false;
 
 	for (const [course, courseProgress] of courses) {
