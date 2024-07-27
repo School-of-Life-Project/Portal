@@ -1,11 +1,11 @@
 import {
-	CourseMap,
 	displayError,
 	getActiveCourses,
 	getAll,
 	openDataDir,
 } from "../bindings.ts";
 import { buildCourseListing } from "./courses.ts";
+import { buildCourseMapListing } from "./maps.ts";
 
 const listingPromise = getAll().catch((error) => {
 	displayError(error);
@@ -48,7 +48,7 @@ if (contentListing && contentViewer) {
 
 		const fragment = document.createDocumentFragment();
 
-		if (listing.course_maps.length != 0 && listing.courses.length != 0) {
+		if (listing.course_maps.length > 0 && listing.courses.length > 0) {
 			fragment.appendChild(buildCourseMapListing(listing.course_maps));
 		}
 
@@ -66,32 +66,4 @@ if (contentListing && contentViewer) {
 		contentListing.innerHTML = "";
 		contentListing.appendChild(fragment);
 	});
-}
-
-function buildCourseMapListing(
-	courseMaps: [CourseMap, string][],
-): DocumentFragment {
-	const fragment = document.createDocumentFragment();
-
-	const header = document.createElement("h2");
-	header.innerText = "Your Course Maps";
-
-	fragment.appendChild(header);
-
-	const list = document.createElement("ul");
-
-	for (const [courseMap, _] of courseMaps) {
-		const element = document.createElement("li");
-		element.innerText = courseMap.title;
-
-		list.appendChild(element);
-	}
-
-	fragment.appendChild(list);
-
-	if (courseMaps.length != 0) {
-		fragment.appendChild(document.createElement("br"));
-	}
-
-	return fragment;
 }
