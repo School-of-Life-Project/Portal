@@ -1,6 +1,9 @@
 # Planned Features
 subject to change
 
+## Courses
+- add support for README.md files
+
 ## Course Building
 
 ### Short-term
