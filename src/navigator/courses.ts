@@ -258,7 +258,12 @@ function buildCourseInfo(course: Course, progress: CourseProgress) {
 		root.appendChild(document.createElement("br"));
 	}
 
-	if (!completable) {
+	if (course.books.length == 0) {
+		const notice = document.createElement("p");
+		notice.innerText = "⚠️ This course is empty.";
+
+		root.appendChild(notice);
+	} else if (!completable) {
 		const notice = document.createElement("p");
 		notice.innerText =
 			"⚠️ One or more textbooks within this course are missing chapter metadata.";
