@@ -101,7 +101,7 @@ export function displayEmptyCourseNotice() {
 
 	const description = document.createElement("p");
 	description.innerHTML =
-		"Use the 🗺️&nbsp;Course&nbsp;Navigator to update your &nbsp;Active&nbsp;Courses.";
+		"Use the &nbsp;Course&nbsp;Navigator to update your &nbsp;Active&nbsp;Courses.";
 
 	element.appendChild(title);
 	element.appendChild(description);
