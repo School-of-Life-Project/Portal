@@ -66,7 +66,7 @@ export class BookChapterGraph {
 			if (chapters == 0) {
 				caption.innerText = "📒 " + this.title;
 			} else {
-				caption.innerText = "📖 " + this.title;
+				caption.innerText = "📕 " + this.title;
 			}
 
 			root.appendChild(caption);

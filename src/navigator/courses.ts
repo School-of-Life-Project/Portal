@@ -219,10 +219,6 @@ function buildCourseInfo(course: Course, progress: CourseProgress) {
 		root.appendChild(description);
 	}
 
-	const bookListTitle = document.createElement("h3");
-	bookListTitle.innerText = "Contents";
-	root.appendChild(bookListTitle);
-
 	for (let i = 0; i < course.books.length; i++) {
 		const book = course.books[i];
 

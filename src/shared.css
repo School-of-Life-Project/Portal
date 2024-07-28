@@ -27,3 +27,7 @@
 	--form-card-color: oklch(95% 0.03 75);
 	--form-card-title-color: oklch(92.5% 0.03 calc(360 - 75));
 }
+
+body {
+	font: 16.5px/1.2 sans-serif;
+}
