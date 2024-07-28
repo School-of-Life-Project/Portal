@@ -208,7 +208,7 @@ export function graphProgress(
 	const timeSection = document.createElement("section");
 
 	const timeTitle = document.createElement("h3");
-	timeTitle.innerText = "⏳ Time Spent Studying Per Day";
+	timeTitle.innerText = "⌛️ Time Spent Studying Per Day";
 
 	timeSection.appendChild(timeTitle);
 	timeSection.appendChild(timeGraph.element);
@@ -216,7 +216,7 @@ export function graphProgress(
 	const chapterSection = document.createElement("section");
 
 	const chapterTitle = document.createElement("h3");
-	chapterTitle.innerText = "📚 Chapters Completed Per Day";
+	chapterTitle.innerText = "📑 Chapters Completed Per Day";
 
 	chapterSection.appendChild(chapterTitle);
 	chapterSection.appendChild(chapterGraph.element);

@@ -10,6 +10,7 @@
 - [ ] Write unit tests with vitest
 - [ ] Determine additional necessary polyfills
 - [ ] Ensure CSP blocks external origins
+- [ ] Subset embedded emoji font
 
 ## full-stack TODOs
 - [ ] properly handle missing active courses

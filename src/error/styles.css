@@ -1,3 +1,8 @@
+@font-face {
+	font-family: openmoji;
+	src: url("/openmoji.woff2");
+}
+
 body {
 	margin: 2em;
 	background-color: slategray;
@@ -11,8 +16,14 @@ a {
 	color: darkblue;
 }
 
+li {
+	margin: calc((1lh - 1ch) / 2) 0;
+}
+
 section {
-	font: 1em monospace;
+	font:
+		16px/1.2 monospace,
+		openmoji;
 	background-color: lightcoral;
 	border: 0.15em solid black;
 	border-radius: 0.5em;
@@ -26,4 +37,8 @@ section {
 section footer {
 	margin-top: 2em;
 	border-top: 0.2em solid black;
+}
+
+details summary {
+	cursor: pointer;
 }
