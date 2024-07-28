@@ -97,11 +97,11 @@ export function displayEmptyCourseNotice() {
 	element.className = "course";
 
 	const title = document.createElement("h3");
-	title.innerText = "No courses found!";
+	title.innerText = "⚠️ No courses found!";
 
 	const description = document.createElement("p");
-	description.innerText =
-		"Try using the Course Navigator to update your list of active courses.";
+	description.innerHTML =
+		"Use the 🗺️&nbsp;Course&nbsp;Navigator to update your &nbsp;Active&nbsp;Courses.";
 
 	element.appendChild(title);
 	element.appendChild(description);
@@ -208,7 +208,7 @@ export function graphProgress(
 	const timeSection = document.createElement("section");
 
 	const timeTitle = document.createElement("h3");
-	timeTitle.innerText = "⌛️ Time Spent Studying Per Day";
+	timeTitle.innerText = "⌛️ Time Spent Studying";
 
 	timeSection.appendChild(timeTitle);
 	timeSection.appendChild(timeGraph.element);
@@ -216,7 +216,7 @@ export function graphProgress(
 	const chapterSection = document.createElement("section");
 
 	const chapterTitle = document.createElement("h3");
-	chapterTitle.innerText = "📑 Chapters Completed Per Day";
+	chapterTitle.innerText = "📑 Chapters Completed";
 
 	chapterSection.appendChild(chapterTitle);
 	chapterSection.appendChild(chapterGraph.element);

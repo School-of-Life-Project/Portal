@@ -16,13 +16,13 @@ export function buildCourseListing(
 
 	if (courses.length == 0) {
 		const header = document.createElement("h2");
-		header.innerText = "No courses found!";
+		header.innerText = "⚠️ No courses found!";
 
 		fragment.appendChild(header);
 
 		const message = document.createElement("span");
-		message.innerText =
-			"Try importing some courses into the resource folder, and then refreshing the navigator.";
+		message.innerHTML =
+			"📥&nbsp;Import 📚&nbsp;Courses into the </br>📂&nbsp;Resource&nbsp;Folder, then </br>🔄&nbsp;Refresh the navigator.";
 
 		fragment.appendChild(message);
 
