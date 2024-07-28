@@ -57,7 +57,7 @@ export function graphCourse(
 	element.className = "course";
 
 	const title = document.createElement("h3");
-	title.innerText = course.title;
+	title.innerText = "📚 " + course.title;
 
 	element.appendChild(title);
 

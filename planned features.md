@@ -4,6 +4,7 @@ subject to change
 ## Courses
 - add support for README.md files
 - add authors field to courses
+- add language field to courses
 - implement optional textbooks
 - prevent invalid states from being representable
 	- empty courses
