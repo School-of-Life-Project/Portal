@@ -14,8 +14,10 @@ subject to change
 ## Course Building
 
 ### Short-term
-write instructions on how to build a course manually using Sigil (to view the ePub's ToC), a file manager, and a text editor
-- note: app only supports up to ePub 3.2, ePub 3.3 is not fully supported
+- improve error handling
+- documentation
+	- write instructions on how to build a course manually using Sigil (to view the ePub's ToC), a file manager, and a text editor
+	- note: app only supports up to ePub 3.2, ePub 3.3 is not fully supported
 
 ### Long-term
 - make a Sigil plugin for generating a sidecar JSON file from an ePub file

@@ -3,7 +3,6 @@
 ## front-end TODOs
 
 - [ ] Get code from [frontend-test](https://github.com/transkatgirl/frontend-test) working as frontend
-	- [ ] Implement Course Navigator
 	- [ ] Implement Settings
 - [X] Optimize ePub viewer loading
 - [X] Optimize shared viewer code
