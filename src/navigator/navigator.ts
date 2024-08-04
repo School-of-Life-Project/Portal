@@ -49,7 +49,9 @@ if (contentListing && contentViewer) {
 		const fragment = document.createDocumentFragment();
 
 		if (listing.course_maps.length > 0 && listing.courses.length > 0) {
-			fragment.appendChild(buildCourseMapListing(listing.course_maps));
+			fragment.appendChild(
+				buildCourseMapListing(listing.course_maps, contentViewer),
+			);
 		}
 
 		const activeCourses = await activePromise;
