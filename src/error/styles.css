@@ -22,7 +22,7 @@ li {
 
 section {
 	font:
-		16px/1.2 monospace,
+		1rem/1.2 monospace,
 		openmoji;
 	background-color: lightcoral;
 	border: 0.15em solid black;
