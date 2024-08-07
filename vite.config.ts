@@ -49,6 +49,7 @@ export default defineConfig({
 				viewer: resolve(__dirname, "viewer.html"),
 				error: resolve(__dirname, "error.html"),
 				navigator: resolve(__dirname, "navigator.html"),
+				settings: resolve(__dirname, "settings.html"),
 			},
 		},
 	},
