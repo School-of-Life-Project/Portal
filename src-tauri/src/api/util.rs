@@ -78,11 +78,32 @@ pub(super) async fn get_courses(
 }
 
 pub(super) async fn get_active_courses(state: &State) -> Result<Vec<Uuid>, ErrorWrapper> {
-    state
-        .database
-        .get_active_courses()
-        .await
-        .map_err(|e| ErrorWrapper::new("Unable to get list of active Courses".to_string(), &e))
+    let active =
+        state.database.get_active_courses().await.map_err(|e| {
+            ErrorWrapper::new("Unable to get list of active Courses".to_string(), &e)
+        })?;
+
+    let mut ids = Vec::with_capacity(active.len());
+
+    for chunk in active.chunks(MAX_FS_CONCURRENCY) {
+        let mut future_set = Vec::with_capacity(MAX_FS_CONCURRENCY);
+
+        for uuid in chunk {
+            future_set.push(state.datastore.has_course(*uuid));
+        }
+
+        let results = try_join_all(future_set)
+            .await
+            .map_err(|e| ErrorWrapper::new("Unable to check if Course exists".to_string(), &e))?;
+
+        for (index, exists) in results.into_iter().enumerate() {
+            if exists {
+                ids.push(chunk[index]);
+            }
+        }
+    }
+
+    Ok(ids)
 }
 
 pub(super) async fn get_course_maps(

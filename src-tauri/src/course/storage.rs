@@ -210,6 +210,18 @@ impl DataStore {
         })
         .await?
     }
+    pub async fn has_course(&self, id: Uuid) -> Result<bool, Error> {
+        let root = self
+            .root
+            .join(Simple::from_uuid(id).encode_lower(&mut Uuid::encode_buffer()));
+
+        task::spawn_blocking(move || {
+            let index_path = root.join("course.toml");
+
+            Ok(index_path.exists())
+        })
+        .await?
+    }
 
     pub async fn get_course_map(&self, id: Uuid) -> Result<(CourseMap, String), Error> {
         let mut path = self
