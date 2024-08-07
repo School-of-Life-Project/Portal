@@ -14,8 +14,6 @@ subject to change
 ## Course Building
 
 ### Short-term
-- improve error handling
-	- gracefully handle missing active courses
 - documentation
 	- write instructions on how to build a course manually using Sigil (to view the ePub's ToC), a file manager, and a text editor
 	- note: app only supports up to ePub 3.2, ePub 3.3 is not fully supported

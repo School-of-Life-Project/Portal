@@ -11,9 +11,6 @@
 - [ ] Ensure CSP blocks external origins
 - [ ] Subset embedded emoji font
 
-## full-stack TODOs
-- [ ] properly handle missing active courses
-
 ## backend TODOs
 
 - [ ] Write unit tests
