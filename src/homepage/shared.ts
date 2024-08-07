@@ -97,7 +97,7 @@ export function displayEmptyCourseNotice() {
 	element.className = "course";
 
 	const title = document.createElement("h3");
-	title.innerText = "⚠️ No courses found!";
+	title.innerText = "⚠️ No Courses Found!";
 
 	const description = document.createElement("p");
 	description.innerHTML =

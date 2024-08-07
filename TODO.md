@@ -3,7 +3,11 @@
 ## front-end TODOs
 
 - [ ] Get code from [frontend-test](https://github.com/transkatgirl/frontend-test) working as frontend
+	- [ ] Finish implementing Course Maps
 	- [ ] Implement Settings
+- [ ] Improve UI clarity
+	- [ ] Better distingush interactable elements
+	- [ ] Better distingush element actions
 - [X] Optimize ePub viewer loading
 - [X] Optimize shared viewer code
 - [ ] Write unit tests with vitest

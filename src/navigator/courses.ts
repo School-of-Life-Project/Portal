@@ -16,7 +16,7 @@ export function buildCourseListing(
 
 	if (courses.length == 0) {
 		const header = document.createElement("h2");
-		header.innerText = "⚠️ No courses found!";
+		header.innerText = "⚠️ No Courses Found!";
 
 		fragment.appendChild(header);
 
