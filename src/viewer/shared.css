@@ -29,7 +29,7 @@ header,
 
 #contentListing,
 #contentViewer {
-	height: calc(100vh - 3lh);
+	height: calc(100vh - (2lh + 1lh));
 }
 
 #contentViewer {
@@ -59,7 +59,7 @@ header {
 	top: 0;
 	left: 0;
 	width: 100vw;
-	height: 3lh;
+	height: calc(2lh + 1lh);
 	background-color: var(--top-navbar-color);
 	border-bottom: var(--secondary-border);
 	padding: 0 0.8lh;
@@ -87,6 +87,7 @@ header nav a {
 	padding: var(--button-padding);
 	margin-left: 0.8lh;
 	white-space: nowrap;
+	display: block;
 }
 
 #contentListing a:hover {

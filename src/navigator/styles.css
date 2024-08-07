@@ -32,6 +32,7 @@ button[type="button"] {
 	font-size: 0.8em;
 	padding: var(--button-padding);
 	cursor: pointer;
+	display: block;
 }
 
 svg button[type="button"],
