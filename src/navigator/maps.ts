@@ -77,7 +77,13 @@ function buildCourseMapInfo(courseMap: CourseMap, svg: string) {
 	}
 
 	const image = document.createElement("div");
+	image.classList.add("image");
 	image.innerHTML = svg;
+
+	/*const svgElement = image.getElementsByTagName("svg")[0];
+
+	console.log(svgElement);*/
+
 	root.appendChild(image);
 
 	return root;

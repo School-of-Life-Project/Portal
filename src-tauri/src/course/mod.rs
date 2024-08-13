@@ -108,9 +108,11 @@ impl CourseMap {
     /// Creates a visual representation of a ``CourseMap`` as an SVG.
     pub fn generate_svg(&self) -> String {
         const SIZE: f64 = 128.0;
-        const PADDING: f64 = 16.0;
+        const RATIO: f64 = 1.2;
+        const PADDING: f64 = 14.0;
         const LINE_WIDTH: usize = 2;
         const FONT_SIZE: usize = 16;
+        static SVG_HEADER: &str = r#"<?xml version="1.0" encoding="UTF-8" standalone="no"?>"#;
 
         let mut graph = VisualGraph::new(Orientation::TopToBottom);
 
@@ -145,7 +147,7 @@ impl CourseMap {
                 orientation: Orientation::TopToBottom,
                 pos: Position::new(
                     Point::zero(),
-                    Point::new(SIZE, SIZE),
+                    Point::new(SIZE * RATIO, SIZE / RATIO),
                     Point::zero(),
                     Point::splat(PADDING),
                 ),
@@ -197,7 +199,7 @@ impl CourseMap {
 
         graph.do_it(false, false, false, &mut writer);
 
-        writer.finalize()
+        writer.finalize()[SVG_HEADER.len()..].to_string() // ugly hack
     }
 }
 
