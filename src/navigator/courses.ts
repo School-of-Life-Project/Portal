@@ -1,8 +1,10 @@
 import {
 	Course,
+	CourseCompletionTextbookData,
 	CourseProgress,
 	displayError,
 	setActiveCourses,
+	setCourseCompletion,
 } from "../bindings.ts";
 import { BookChapterGraph } from "../graphing/main.ts";
 import { isCompletable, isComplete, isStarted, sortCourses } from "../util.ts";
@@ -241,7 +243,7 @@ function buildCourseInfo(course: Course, progress: CourseProgress) {
 		root.appendChild(document.createElement("br"));
 	}
 
-	/*if (course.books.length > 0 && isCompletable(course)) {
+	if (course.books.length > 0 && isCompletable(course)) {
 		const optionsWrapper = document.createElement("details");
 
 		const title = document.createElement("summary");
@@ -256,15 +258,71 @@ function buildCourseInfo(course: Course, progress: CourseProgress) {
 		const completeButton = document.createElement("button");
 		completeButton.type = "button";
 		completeButton.innerText = "🏆 Mark As Complete";
+		completeButton.addEventListener("click", () => {
+			updateCourseCompletion(course, true);
+		});
+		completeButton.addEventListener("keydown", (event) => {
+			if (event.code == "Enter") {
+				updateCourseCompletion(course, true);
+			}
+		});
+
 		optionsWrapper.appendChild(completeButton);
 
 		const resetButton = document.createElement("button");
 		resetButton.type = "button";
 		resetButton.innerText = " Clear All Progress";
+		resetButton.addEventListener("click", () => {
+			updateCourseCompletion(course, false);
+		});
+		resetButton.addEventListener("keydown", (event) => {
+			if (event.code == "Enter") {
+				updateCourseCompletion(course, false);
+			}
+		});
 		optionsWrapper.appendChild(resetButton);
 
 		root.appendChild(optionsWrapper);
-	}*/
+	}
 
 	return root;
+}
+
+function updateCourseCompletion(course: Course, completed: boolean) {
+	if (completed) {
+		const books: Record<number, CourseCompletionTextbookData> = {};
+
+		let i = 0;
+		for (const textbook of course.books) {
+			const sections: string[] = [];
+
+			for (const chapter of textbook.chapters) {
+				if (chapter.root) {
+					sections.push(chapter.root);
+				}
+
+				for (const group of chapter.groups) {
+					sections.push.apply(group.sections);
+				}
+			}
+
+			books[i] = {
+				completed_sections: sections,
+			};
+
+			i++;
+		}
+
+		setCourseCompletion(course, {
+			time_spent: {},
+			books,
+		});
+	} else {
+		setCourseCompletion(course, {
+			time_spent: {},
+			books: {},
+		});
+	}
+
+	location.reload();
 }
