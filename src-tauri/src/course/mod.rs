@@ -6,7 +6,6 @@ use std::{
 };
 
 use layout::{
-    backends::svg::SVGWriter,
     core::{
         base::Orientation,
         color::Color,
@@ -20,6 +19,7 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 pub mod storage;
+mod svg;
 
 fn into_relative_path(path: &Path) -> PathBuf {
     let mut new = PathBuf::new();
@@ -106,14 +106,11 @@ pub enum CourseMapRelationType {
 
 impl CourseMap {
     /// Creates a visual representation of a ``CourseMap`` as an SVG.
-    ///
-    /// Note: The rendered SVG will require additional processing to be useful.
     pub fn generate_svg(&self) -> String {
         const SIZE: f64 = 128.0;
         const RATIO: f64 = 1.2;
         const PADDING: f64 = 14.0;
         const LINE_WIDTH: usize = 2;
-        static SVG_HEADER: &str = r#"<?xml version="1.0" encoding="UTF-8" standalone="no"?>"#;
 
         let mut graph = VisualGraph::new(Orientation::TopToBottom);
 
@@ -200,11 +197,11 @@ impl CourseMap {
             }
         }
 
-        let mut writer = SVGWriter::new();
+        let mut writer = svg::SVGWriter::new();
 
         graph.do_it(false, false, false, &mut writer);
 
-        writer.finalize()[SVG_HEADER.len()..].to_string() // ugly hack
+        writer.finalize()
     }
 }
 

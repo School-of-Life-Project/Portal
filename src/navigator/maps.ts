@@ -92,12 +92,12 @@ function buildCourseMapInfo(courseMap: CourseMap, svg: string) {
 function stylizeCourseMapSvg(root: SVGSVGElement) {
 	//root.getElementsByTagName("style")[0].innerHTML = "";
 
-	console.log(getCourseMapBoxes(root));
+	//console.log(getCourseMapBoxes(root));
 
 	console.log(root);
 }
 
-interface BoundingBox {
+/*interface BoundingBox {
 	x: number;
 	y: number;
 	width: number;
@@ -109,7 +109,7 @@ interface Point {
 	y: number;
 }
 
-function within_bounding_box(box: BoundingBox, point: Point) {
+function withinBoundingBox(box: BoundingBox, point: Point) {
 	const max_x = box.x + box.width;
 	const max_y = box.y + box.height;
 
@@ -166,14 +166,16 @@ function getCourseMapBoxes(root: SVGSVGElement) {
 			}
 
 			for (const box of boundingBoxes) {
-				if (within_bounding_box(box, location)) {
+				if (withinBoundingBox(box, location)) {
 					courseBoxes.set(identifier, box);
-					element.remove();
 					break;
 				}
 			}
+
+			element.remove();
 		}
 	}
 
 	return courseBoxes;
 }
+*/
