@@ -58,3 +58,9 @@ section {
 section table {
 	min-width: 100% !important;
 }
+
+#contentViewer .image {
+	display: block;
+	overflow: auto;
+	height: calc(100% - (1.5em + 1.5lh));
+}
