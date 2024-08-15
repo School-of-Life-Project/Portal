@@ -13,9 +13,9 @@ use layout::{
     std_shapes::shapes::{Arrow, Element, LineEndKind, ShapeKind},
     topo::layout::VisualGraph,
 };
-use uuid::Uuid;
+use serde_json::{from_str, to_string};
 
-use super::{CourseMap, CourseMapRelationType};
+use super::{CourseMap, CourseMapCourse, CourseMapRelationType};
 
 pub(super) const SIZE: f64 = 128.0;
 pub(super) const RATIO: f64 = 1.2;
@@ -50,8 +50,6 @@ impl CourseMap {
             font_size: 8,
         };
 
-        let mut encode_buffer = Uuid::encode_buffer();
-
         for course in &self.courses {
             let mut style = style.clone();
 
@@ -63,10 +61,8 @@ impl CourseMap {
                 }
             }
 
-            let identifier = course.uuid.hyphenated().encode_lower(&mut encode_buffer);
-
             let node = Element {
-                shape: ShapeKind::Box((*identifier).to_string()),
+                shape: ShapeKind::Box(to_string(course).unwrap()),
                 look: style,
                 orientation: Orientation::TopToBottom,
                 pos: Position::new(
@@ -185,17 +181,6 @@ impl SVGWriter {
     }
 }
 
-impl Default for SVGWriter {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// This trivial implementation of `drop` adds a print to a file.
-impl Drop for SVGWriter {
-    fn drop(&mut self) {}
-}
-
 impl SVGWriter {
     // Grow the viewable svg window to include the point \p point plus some
     // offset \p size.
@@ -269,6 +254,10 @@ impl RenderBackend for SVGWriter {
     }
 
     fn draw_text(&mut self, xy: Point, text: &str, look: &StyleAttr) {
+        if let Ok(course) = from_str::<CourseMapCourse>(text) {
+            println!("{course:?}");
+        }
+
         let len = text.len();
 
         let mut content = String::new();
