@@ -259,7 +259,7 @@ impl RenderBackend for SVGWriter {
             let height = SIZE / RATIO;
 
             self.content.push_str(&format!(
-                "<foreignObject x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" class=\"{}\"><p>{}</p></foreignObject>\n",
+                "<foreignObject x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" class=\"course-map-item-{}\"><p>{}</p></foreignObject>\n",
                 xy.x - (width / 2.),
                 xy.y - (height / 2.),
                 width,
