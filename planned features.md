@@ -38,9 +38,6 @@ subject to change
 
 ## Course Management
 
-- interactively enabling/disabling courses
-	- list *active* courses on homescreen, rather than listing all courses on homescreen
-- interactively marking courses as complete/incomplete
 - viewing additional course metadata (author, year created, title & description, etc...)
 - create a centralized hub to find and download courses?
 
