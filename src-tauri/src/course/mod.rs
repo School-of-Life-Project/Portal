@@ -106,12 +106,13 @@ pub enum CourseMapRelationType {
 
 impl CourseMap {
     /// Creates a visual representation of a ``CourseMap`` as an SVG.
+    ///
+    /// Note: The rendered SVG will require additional processing to be useful.
     pub fn generate_svg(&self) -> String {
         const SIZE: f64 = 128.0;
         const RATIO: f64 = 1.2;
         const PADDING: f64 = 14.0;
         const LINE_WIDTH: usize = 2;
-        const FONT_SIZE: usize = 16;
         static SVG_HEADER: &str = r#"<?xml version="1.0" encoding="UTF-8" standalone="no"?>"#;
 
         let mut graph = VisualGraph::new(Orientation::TopToBottom);
@@ -127,8 +128,10 @@ impl CourseMap {
             line_width: LINE_WIDTH,
             fill_color: None,
             rounded: SIZE as usize / 16,
-            font_size: FONT_SIZE,
+            font_size: 8,
         };
+
+        let mut encode_buffer = Uuid::encode_buffer();
 
         for course in &self.courses {
             let mut style = style.clone();
@@ -141,8 +144,10 @@ impl CourseMap {
                 }
             }
 
+            let identifier = course.uuid.hyphenated().encode_lower(&mut encode_buffer);
+
             let node = Element {
-                shape: ShapeKind::Box(course.label.clone()),
+                shape: ShapeKind::Box((*identifier).to_string()),
                 look: style,
                 orientation: Orientation::TopToBottom,
                 pos: Position::new(
