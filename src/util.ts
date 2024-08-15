@@ -1,4 +1,4 @@
-import { Course, CourseProgress } from "./bindings";
+import { Course, CourseMap, CourseProgress } from "./bindings";
 
 export function sortCourses(
 	courses: [Course, CourseProgress][],
@@ -16,6 +16,21 @@ export function sortCourses(
 			}
 		}
 
+		const titleA = a[0].title;
+		const titleB = b[0].title;
+
+		if (titleA < titleB) {
+			return -1;
+		} else if (titleA > titleB) {
+			return 1;
+		} else {
+			return 0;
+		}
+	});
+}
+
+export function sortCourseMaps(courseMaps: [CourseMap, string][]) {
+	courseMaps.sort((a, b) => {
 		const titleA = a[0].title;
 		const titleB = b[0].title;
 

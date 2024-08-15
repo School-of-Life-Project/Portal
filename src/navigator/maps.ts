@@ -1,4 +1,5 @@
 import { CourseMap } from "../bindings";
+import { sortCourseMaps } from "../util";
 
 export function buildCourseMapListing(
 	courseMaps: [CourseMap, string][],
@@ -10,6 +11,8 @@ export function buildCourseMapListing(
 	header.innerText = "🗺️ Course Maps";
 
 	fragment.appendChild(header);
+
+	sortCourseMaps(courseMaps);
 
 	const list = document.createElement("ul");
 
