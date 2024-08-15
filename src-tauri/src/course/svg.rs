@@ -255,7 +255,20 @@ impl RenderBackend for SVGWriter {
 
     fn draw_text(&mut self, xy: Point, text: &str, look: &StyleAttr) {
         if let Ok(course) = from_str::<CourseMapCourse>(text) {
-            println!("{course:?}");
+            let width = SIZE * RATIO;
+            let height = SIZE / RATIO;
+
+            self.content.push_str(&format!(
+                "<foreignObject x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" class=\"{}\"><p>{}</p></foreignObject>\n",
+                xy.x - (width / 2.),
+                xy.y - (height / 2.),
+                width,
+                height,
+				course.uuid,
+                course.label,
+            ));
+
+            return;
         }
 
         let len = text.len();
