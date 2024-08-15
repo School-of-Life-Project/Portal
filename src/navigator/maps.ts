@@ -90,7 +90,10 @@ function buildCourseMapInfo(courseMap: CourseMap, svg: string) {
 }
 
 function stylizeCourseMapSvg(root: SVGSVGElement) {
-	//root.getElementsByTagName("style")[0].innerHTML = "";
+	const style = document.createElementNS("http://www.w3.org/2000/svg", "style");
+	style.innerHTML = "p {padding: 1em}";
+
+	root.appendChild(style);
 
 	console.log(root);
 }
