@@ -1,12 +1,129 @@
-// Based heavily on layout-rs' SVGWriter
+#![allow(clippy::cast_precision_loss)]
 
-use layout::core::{
-    color::Color,
-    format::{ClipHandle, RenderBackend},
-    geometry::Point,
-    style::StyleAttr,
-};
 use std::collections::HashMap;
+
+use layout::{
+    core::{
+        base::Orientation,
+        color::Color,
+        format::{ClipHandle, RenderBackend},
+        geometry::{Point, Position},
+        style::{LineStyleKind, StyleAttr},
+    },
+    std_shapes::shapes::{Arrow, Element, LineEndKind, ShapeKind},
+    topo::layout::VisualGraph,
+};
+use uuid::Uuid;
+
+use super::{CourseMap, CourseMapRelationType};
+
+pub(super) const SIZE: f64 = 128.0;
+pub(super) const RATIO: f64 = 1.2;
+pub(super) const PADDING: f64 = 14.0;
+pub(super) const LINE_WIDTH: usize = 2;
+
+impl CourseMap {
+    /// Creates a visual representation of a ``CourseMap`` as an SVG.
+    pub fn generate_svg(&self) -> String {
+        let mut graph = self.generate_graph();
+
+        let mut writer = SVGWriter::new();
+
+        graph.do_it(false, false, false, &mut writer);
+
+        writer.finalize()
+    }
+    fn generate_graph(&self) -> VisualGraph {
+        let mut graph = VisualGraph::new(Orientation::TopToBottom);
+
+        let mut nodes = HashMap::with_capacity(self.courses.len());
+
+        let mut colors = HashMap::with_capacity(self.courses.len());
+
+        #[allow(clippy::cast_sign_loss)]
+        #[allow(clippy::cast_possible_truncation)]
+        let style = StyleAttr {
+            line_color: Color::from_name("black").unwrap(),
+            line_width: LINE_WIDTH,
+            fill_color: None,
+            rounded: SIZE as usize / 16,
+            font_size: 8,
+        };
+
+        let mut encode_buffer = Uuid::encode_buffer();
+
+        for course in &self.courses {
+            let mut style = style.clone();
+
+            if let Some(colorstring) = &course.color {
+                if let Some(color) = Color::from_name(&colorstring.to_ascii_lowercase()) {
+                    style.line_color = color;
+
+                    colors.insert(course.uuid, color);
+                }
+            }
+
+            let identifier = course.uuid.hyphenated().encode_lower(&mut encode_buffer);
+
+            let node = Element {
+                shape: ShapeKind::Box((*identifier).to_string()),
+                look: style,
+                orientation: Orientation::TopToBottom,
+                pos: Position::new(
+                    Point::zero(),
+                    Point::new(SIZE * RATIO, SIZE / RATIO),
+                    Point::zero(),
+                    Point::splat(PADDING),
+                ),
+            };
+
+            nodes.insert(course.uuid, graph.add_node(node));
+        }
+
+        for course in &self.courses {
+            if let Some(dest) = nodes.get(&course.uuid) {
+                for relation in &course.relations {
+                    if let Some(source) = nodes.get(&relation.uuid) {
+                        let mut style = style.clone();
+
+                        if let Some(color) = colors.get(&relation.uuid) {
+                            style.line_color = *color;
+                        }
+
+                        let end = match relation.r#type {
+                            CourseMapRelationType::Prerequisite => LineEndKind::Arrow,
+                            CourseMapRelationType::Corequisite => LineEndKind::None,
+                        };
+
+                        let line_style = if relation.optional {
+                            LineStyleKind::Dashed
+                        } else {
+                            LineStyleKind::Normal
+                        };
+
+                        graph.add_edge(
+                            Arrow {
+                                start: LineEndKind::None,
+                                end,
+                                line_style,
+                                text: " ".to_string(),
+                                look: style,
+                                src_port: None,
+                                dst_port: None,
+                            },
+                            *source,
+                            *dest,
+                        );
+                    }
+                }
+            }
+        }
+
+        graph
+    }
+}
+
+// Below code is based heavily on layout-rs' SVGWriter
 
 static SVG_DEFS: &str = r#"<defs>
 <marker id="startarrow" markerWidth="10" markerHeight="7"
@@ -53,8 +170,6 @@ pub struct SVGWriter {
     content: String,
     view_size: Point,
     counter: usize,
-    // Maps font sizes to their class name and class impl.
-    font_style_map: HashMap<usize, (String, String)>,
     // A list of clip regions to generate.
     clip_regions: Vec<String>,
 }
@@ -65,7 +180,6 @@ impl SVGWriter {
             content: String::new(),
             view_size: Point::zero(),
             counter: 0,
-            font_style_map: HashMap::new(),
             clip_regions: Vec::new(),
         }
     }
@@ -90,37 +204,6 @@ impl SVGWriter {
         self.view_size.y = self.view_size.y.max(point.y + size.y + 5.);
     }
 
-    // Gets or creates a font 'class' for the parameters. Returns the class
-    // name.
-    fn get_or_create_font_style(&mut self, font_size: usize) -> String {
-        if let Option::Some(x) = self.font_style_map.get(&font_size) {
-            return x.0.clone();
-        }
-        let class_name = format!("a{}", font_size);
-        let class_impl = format!(
-            ".a{} {{ font-size: {}px; font-family: Times, serif; }}",
-            font_size, font_size
-        );
-        let impl_ = (class_name.clone(), class_impl);
-        self.font_style_map.insert(font_size, impl_);
-        class_name
-    }
-
-    fn emit_svg_font_styles(&self) -> String {
-        let mut content = String::new();
-        content.push_str("<style>\n");
-        for p in self.font_style_map.iter() {
-            content.push_str(&p.1 .1);
-            content.push('\n');
-        }
-        content.push_str("</style>\n");
-        for p in self.clip_regions.iter() {
-            content.push_str(p);
-            content.push('\n');
-        }
-        content
-    }
-
     pub fn finalize(&self) -> String {
         let mut result = String::new();
 
@@ -131,7 +214,6 @@ impl SVGWriter {
         );
         result.push_str(&svg_line);
         result.push_str(SVG_DEFS);
-        result.push_str(&self.emit_svg_font_styles());
         result.push_str(&self.content);
         result.push_str(SVG_FOOTER);
         result
@@ -143,7 +225,7 @@ impl RenderBackend for SVGWriter {
 
         let mut clip_option = String::new();
         if let Option::Some(clip_id) = clip {
-            clip_option = format!("clip-path=\"url(#C{})\"", clip_id);
+            clip_option = format!("clip-path=\"url(#C{clip_id})\"");
         }
 
         let fill_color = look.fill_color.unwrap_or_else(Color::transparent);
@@ -189,8 +271,6 @@ impl RenderBackend for SVGWriter {
     fn draw_text(&mut self, xy: Point, text: &str, look: &StyleAttr) {
         let len = text.len();
 
-        let font_class = self.get_or_create_font_style(look.font_size);
-
         let mut content = String::new();
         let cnt = 1 + text.lines().count();
         let size_y = (cnt * look.font_size) as f64;
@@ -203,10 +283,9 @@ impl RenderBackend for SVGWriter {
         self.grow_window(xy, Point::new(10., len as f64 * 10.));
         let line = format!(
             "<text dominant-baseline=\"middle\" text-anchor=\"middle\"
-            x=\"{}\" y=\"{}\" class=\"{}\">{}</text>",
+            x=\"{}\" y=\"{}\">{}</text>",
             xy.x,
             xy.y - size_y / 2.,
-            font_class,
             &content
         );
 
@@ -288,12 +367,10 @@ impl RenderBackend for SVGWriter {
         );
         self.content.push_str(&line);
 
-        let font_class = self.get_or_create_font_style(look.font_size);
         let line = format!(
             "<text><textPath href=\"#arrow{}\" startOffset=\"50%\" \
-            text-anchor=\"middle\" class=\"{}\">{}</textPath></text>",
+            text-anchor=\"middle\">{}</textPath></text>",
             self.counter,
-            font_class,
             escape_string(text)
         );
         self.content.push_str(&line);

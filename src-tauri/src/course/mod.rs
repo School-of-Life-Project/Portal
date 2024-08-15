@@ -1,20 +1,7 @@
 #![allow(clippy::module_name_repetitions)]
 
-use std::{
-    collections::HashMap,
-    path::{Component, Path, PathBuf},
-};
+use std::path::{Component, Path, PathBuf};
 
-use layout::{
-    core::{
-        base::Orientation,
-        color::Color,
-        geometry::{Point, Position},
-        style::{LineStyleKind, StyleAttr},
-    },
-    std_shapes::shapes::{Arrow, Element, LineEndKind, ShapeKind},
-    topo::layout::VisualGraph,
-};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -102,107 +89,6 @@ pub enum CourseMapRelationType {
     Prerequisite,
     /// Corequisites are courses which should be taken either with a course or before it.
     Corequisite,
-}
-
-impl CourseMap {
-    /// Creates a visual representation of a ``CourseMap`` as an SVG.
-    pub fn generate_svg(&self) -> String {
-        const SIZE: f64 = 128.0;
-        const RATIO: f64 = 1.2;
-        const PADDING: f64 = 14.0;
-        const LINE_WIDTH: usize = 2;
-
-        let mut graph = VisualGraph::new(Orientation::TopToBottom);
-
-        let mut nodes = HashMap::with_capacity(self.courses.len());
-
-        let mut colors = HashMap::with_capacity(self.courses.len());
-
-        #[allow(clippy::cast_sign_loss)]
-        #[allow(clippy::cast_possible_truncation)]
-        let style = StyleAttr {
-            line_color: Color::from_name("black").unwrap(),
-            line_width: LINE_WIDTH,
-            fill_color: None,
-            rounded: SIZE as usize / 16,
-            font_size: 8,
-        };
-
-        let mut encode_buffer = Uuid::encode_buffer();
-
-        for course in &self.courses {
-            let mut style = style.clone();
-
-            if let Some(colorstring) = &course.color {
-                if let Some(color) = Color::from_name(&colorstring.to_ascii_lowercase()) {
-                    style.line_color = color;
-
-                    colors.insert(course.uuid, color);
-                }
-            }
-
-            let identifier = course.uuid.hyphenated().encode_lower(&mut encode_buffer);
-
-            let node = Element {
-                shape: ShapeKind::Box((*identifier).to_string()),
-                look: style,
-                orientation: Orientation::TopToBottom,
-                pos: Position::new(
-                    Point::zero(),
-                    Point::new(SIZE * RATIO, SIZE / RATIO),
-                    Point::zero(),
-                    Point::splat(PADDING),
-                ),
-            };
-
-            nodes.insert(course.uuid, graph.add_node(node));
-        }
-
-        for course in &self.courses {
-            if let Some(dest) = nodes.get(&course.uuid) {
-                for relation in &course.relations {
-                    if let Some(source) = nodes.get(&relation.uuid) {
-                        let mut style = style.clone();
-
-                        if let Some(color) = colors.get(&relation.uuid) {
-                            style.line_color = *color;
-                        }
-
-                        let end = match relation.r#type {
-                            CourseMapRelationType::Prerequisite => LineEndKind::Arrow,
-                            CourseMapRelationType::Corequisite => LineEndKind::None,
-                        };
-
-                        let line_style = if relation.optional {
-                            LineStyleKind::Dashed
-                        } else {
-                            LineStyleKind::Normal
-                        };
-
-                        graph.add_edge(
-                            Arrow {
-                                start: LineEndKind::None,
-                                end,
-                                line_style,
-                                text: " ".to_string(),
-                                look: style,
-                                src_port: None,
-                                dst_port: None,
-                            },
-                            *source,
-                            *dest,
-                        );
-                    }
-                }
-            }
-        }
-
-        let mut writer = svg::SVGWriter::new();
-
-        graph.do_it(false, false, false, &mut writer);
-
-        writer.finalize()
-    }
 }
 
 /// A Course bundle index
