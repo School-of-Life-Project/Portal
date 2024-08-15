@@ -1,5 +1,3 @@
-#![allow(clippy::cast_precision_loss)]
-
 use std::collections::HashMap;
 
 use layout::{
@@ -258,13 +256,17 @@ impl RenderBackend for SVGWriter {
             let width = SIZE * RATIO;
             let height = SIZE / RATIO;
 
+            #[allow(clippy::cast_possible_truncation)]
+            #[allow(clippy::cast_sign_loss)]
+            #[allow(clippy::cast_precision_loss)]
             self.content.push_str(&format!(
-                "<foreignObject x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" class=\"course-map-item-{}\"><p>{}</p></foreignObject>\n",
-                xy.x - (width / 2.),
-                xy.y - (height / 2.),
-                width,
-                height,
+                "<foreignObject x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\"><div class=\"course-map-item course-map-item-{}\" style=\"border-radius: {}px\"><p>{}</p></div></foreignObject>\n",
+                xy.x - (width / 2.) + (LINE_WIDTH as f64 / 2.),
+                xy.y - (height / 2.) + (LINE_WIDTH as f64 / 2.),
+                width - LINE_WIDTH as f64,
+                height - LINE_WIDTH as f64,
 				course.uuid,
+                SIZE as usize / 16,
                 course.label,
             ));
 
@@ -275,6 +277,7 @@ impl RenderBackend for SVGWriter {
 
         let mut content = String::new();
         let cnt = 1 + text.lines().count();
+        #[allow(clippy::cast_precision_loss)]
         let size_y = (cnt * look.font_size) as f64;
         for line in text.lines() {
             content.push_str(&format!("<tspan x = \"{}\" dy=\"1.0em\">", xy.x));
@@ -282,6 +285,7 @@ impl RenderBackend for SVGWriter {
             content.push_str("</tspan>");
         }
 
+        #[allow(clippy::cast_precision_loss)]
         self.grow_window(xy, Point::new(10., len as f64 * 10.));
         let line = format!(
             "<text dominant-baseline=\"middle\" text-anchor=\"middle\"

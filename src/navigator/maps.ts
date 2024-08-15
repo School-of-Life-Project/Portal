@@ -91,7 +91,8 @@ function buildCourseMapInfo(courseMap: CourseMap, svg: string) {
 
 function stylizeCourseMapSvg(root: SVGSVGElement) {
 	const style = document.createElementNS("http://www.w3.org/2000/svg", "style");
-	style.innerHTML = "p {padding: 1em};";
+	style.innerHTML =
+		"p {padding: 1em} div.course-map-item {width: 100%; height: 100%; background-color: var(--secondary-card-color)}";
 
 	root.appendChild(style);
 
