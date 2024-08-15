@@ -241,5 +241,30 @@ function buildCourseInfo(course: Course, progress: CourseProgress) {
 		root.appendChild(document.createElement("br"));
 	}
 
+	/*if (course.books.length > 0 && isCompletable(course)) {
+		const optionsWrapper = document.createElement("details");
+
+		const title = document.createElement("summary");
+		title.innerHTML = "🛠️ Progress Options";
+		optionsWrapper.appendChild(title);
+
+		const warning = document.createElement("p");
+		warning.innerHTML =
+			"⚠️ The below actions will apply <strong>without further confirmation</strong>.";
+		optionsWrapper.appendChild(warning);
+
+		const completeButton = document.createElement("button");
+		completeButton.type = "button";
+		completeButton.innerText = "🏆 Mark As Complete";
+		optionsWrapper.appendChild(completeButton);
+
+		const resetButton = document.createElement("button");
+		resetButton.type = "button";
+		resetButton.innerText = " Clear All Progress";
+		optionsWrapper.appendChild(resetButton);
+
+		root.appendChild(optionsWrapper);
+	}*/
+
 	return root;
 }

@@ -33,6 +33,7 @@ button[type="button"] {
 	padding: var(--button-padding);
 	cursor: pointer;
 	display: block;
+	margin: var(--button-padding) var(--button-padding) 0 0;
 }
 
 svg button[type="button"],
@@ -40,10 +41,6 @@ li button[type="button"] {
 	padding: 0.1lh;
 	font-size: 0.65em;
 	margin-left: 0.3em;
-}
-
-footer button[type="button"] {
-	margin: var(--button-padding) var(--button-padding) 0 0;
 }
 
 section {
