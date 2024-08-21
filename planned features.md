@@ -1,6 +1,9 @@
 # Planned Features
 subject to change
 
+## Interface
+- allow panel resizing
+
 ## Courses
 - add support for README.md files
 - add authors field to courses

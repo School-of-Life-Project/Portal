@@ -247,17 +247,17 @@ function buildCourseInfo(course: Course, progress: CourseProgress) {
 		const optionsWrapper = document.createElement("details");
 
 		const title = document.createElement("summary");
-		title.innerHTML = "🛠️ Progress Options";
+		title.innerHTML = "🛠️ Edit 🏆 Progress";
 		optionsWrapper.appendChild(title);
 
 		const warning = document.createElement("p");
 		warning.innerHTML =
-			"⚠️ The below actions will apply <strong>without further confirmation</strong>.";
+			"⚠️ These actions will apply <strong>without further confirmation</strong>.";
 		optionsWrapper.appendChild(warning);
 
 		const completeButton = document.createElement("button");
 		completeButton.type = "button";
-		completeButton.innerText = "🏆 Mark As Complete";
+		completeButton.innerText = "🏆 Mark As Completed";
 		completeButton.addEventListener("click", () => {
 			updateCourseCompletion(course, true);
 		});
@@ -271,7 +271,7 @@ function buildCourseInfo(course: Course, progress: CourseProgress) {
 
 		const resetButton = document.createElement("button");
 		resetButton.type = "button";
-		resetButton.innerText = " Clear All Progress";
+		resetButton.innerText = " Reset All Progress";
 		resetButton.addEventListener("click", () => {
 			updateCourseCompletion(course, false);
 		});
