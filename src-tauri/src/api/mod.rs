@@ -28,7 +28,7 @@ impl State {
             .ok_or_else(|| anyhow!("Unable to find data_dir"))?;
 
         let database_path = root.join("Internal Database");
-        let datastore_path = root.join("Courses and Course Maps");
+        let datastore_path = root.join("User Resources");
 
         std::fs::create_dir_all(&datastore_path)?;
 
