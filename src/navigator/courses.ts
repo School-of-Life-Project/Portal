@@ -247,7 +247,7 @@ function buildCourseInfo(course: Course, progress: CourseProgress) {
 		const optionsWrapper = document.createElement("details");
 
 		const title = document.createElement("summary");
-		title.innerHTML = "🛠️ Edit 🏆 Progress";
+		title.innerHTML = "🛠️ Edit Progress";
 		optionsWrapper.appendChild(title);
 
 		const warning = document.createElement("p");
@@ -271,7 +271,7 @@ function buildCourseInfo(course: Course, progress: CourseProgress) {
 
 		const resetButton = document.createElement("button");
 		resetButton.type = "button";
-		resetButton.innerText = " Reset All Progress";
+		resetButton.innerText = " Clear All Progress";
 		resetButton.addEventListener("click", () => {
 			updateCourseCompletion(course, false);
 		});

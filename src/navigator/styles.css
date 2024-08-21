@@ -61,3 +61,7 @@ section table {
 	overflow: auto;
 	height: calc(100% - (1.5em + 1.5lh));
 }
+
+#contentViewer > :first-child {
+	margin-top: 0;
+}

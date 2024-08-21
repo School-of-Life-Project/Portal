@@ -13,15 +13,14 @@
 			<p>Cause: <span id="cause">unknown</span></p>
 			<footer>
 				<p>
-					If you believe this error was caused by a bug in the application,
-					please
+					🐞 Believe this is a bug in the app? Please
 					<a
 						href="javascript:window.__TAURI_INVOKE__('open_project_issue_tracker', {data: true})"
-						>file an issue</a
+						>📝 file an issue</a
 					>.
 				</p>
 				<ul>
-					<li><a href="/index.html">🚪 Return to application homepage</a></li>
+					<li><a href="/index.html">🚪 Return to homepage</a></li>
 					<li>
 						<a href="javascript:history.back()"
 							>🔙 Return to previous page (not recommended)</a
@@ -35,25 +34,25 @@
 					<li>
 						<a
 							href="javascript:window.__TAURI_INVOKE__('open_internal_data_dir')"
-							>📂 Open application data folder</a
+							>📂 Open app data folder</a
 						>
 					</li>
 					<li>
 						<a href="javascript:window.__TAURI_INVOKE__('open_project_repo')"
-							>🔗 View the application's source code</a
+							>🔗 View the app's source code</a
 						>
 					</li>
 					<li>
 						<a
 							href="javascript:window.__TAURI_INVOKE__('open_project_issue_tracker', {data: false})"
-							>🔗 View the application's issue tracker</a
+							>🔗 View the app's issue tracker</a
 						>
 					</li>
 				</ul>
 				<details>
 					<summary>🛠️ Database Actions (<strong>irreversible</strong>)</summary>
 					<p>
-						Warning: The listed database actions will apply
+						⚠️ These actions will apply
 						<strong>without further confirmation</strong>.
 					</p>
 					<ul>
@@ -70,20 +69,19 @@
 						</li>
 					</ul>
 					<p>
-						If you believe the application's database is corrupted (and the
-						above actions have not corrected the issue), open the
+						If you believe the app's database is corrupted (and the above
+						actions have not corrected the issue), open the
 						<a
 							href="javascript:window.__TAURI_INVOKE__('open_internal_data_dir')"
-							>application's data folder</a
+							>app's data folder</a
 						>
 						and delete the "Internal Database" folder,
-						<em>then restart the application</em>. This will
+						<em>then restart the app</em>. This will
 						<strong>wipe all progress data and user settings</strong>.
 					</p>
 					<p>
 						<strong>Application database corruptions are rare</strong>. Most
-						common errors are caused by a malformed course / course map, or an
-						active course that cannot be found.
+						common errors are caused by a malformed course or course map.
 					</p>
 				</details>
 			</footer>
