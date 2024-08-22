@@ -4,6 +4,7 @@ import { sortCourseMaps } from "../util";
 export function buildCourseMapListing(
 	courseMaps: [CourseMap, string][],
 	contentViewer: HTMLElement,
+	styleContainer: HTMLStyleElement,
 ): DocumentFragment {
 	const fragment = document.createDocumentFragment();
 
@@ -42,7 +43,12 @@ export function buildCourseMapListing(
 			const courseMap = courseMapMap.get(identifier);
 
 			if (courseMap) {
-				displayCourseMap(courseMap[0], courseMap[1], contentViewer);
+				displayCourseMap(
+					courseMap[0],
+					courseMap[1],
+					contentViewer,
+					styleContainer,
+				);
 			}
 		}
 	};
@@ -103,9 +109,10 @@ export function displayCourseMap(
 	courseMap: CourseMap,
 	svg: string,
 	contentViewer: HTMLElement,
+	styleContainer: HTMLStyleElement,
 ) {
 	contentViewer.innerHTML = "";
 	contentViewer.appendChild(buildCourseMapInfo(courseMap, svg));
 
-	// TODO: Highlight active CourseMap
+	styleContainer.innerHTML = "#map-" + courseMap.uuid + " {font-weight: bold}";
 }

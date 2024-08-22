@@ -19,6 +19,8 @@ const folderButton = document.getElementById("folderOpener");
 const refreshButton = document.getElementById("refreshButton");
 const contentListing = document.getElementById("listingInner");
 const contentViewer = document.getElementById("contentViewer");
+const styleContainer = document.createElement("style");
+window.document.head.appendChild(styleContainer);
 
 function openFolder() {
 	openDataDir().catch((error) => {
@@ -58,7 +60,11 @@ if (contentListing && contentViewer) {
 
 		if (listing.course_maps.length > 0 && listing.courses.length > 0) {
 			fragment.appendChild(
-				buildCourseMapListing(listing.course_maps, contentViewer),
+				buildCourseMapListing(
+					listing.course_maps,
+					contentViewer,
+					styleContainer,
+				),
 			);
 		}
 
@@ -69,6 +75,7 @@ if (contentListing && contentViewer) {
 					listing.courses,
 					new Set(activeCourses),
 					contentViewer,
+					styleContainer,
 				),
 			);
 		}

@@ -13,6 +13,7 @@ export function buildCourseListing(
 	courses: [Course, CourseProgress][],
 	active: Set<string>,
 	contentViewer: HTMLElement,
+	styleContainer: HTMLStyleElement,
 ): DocumentFragment {
 	const fragment = document.createDocumentFragment();
 
@@ -139,7 +140,7 @@ export function buildCourseListing(
 			const course = courseMap.get(identifier);
 
 			if (course) {
-				displayCourse(course[0], course[1], contentViewer);
+				displayCourse(course[0], course[1], contentViewer, styleContainer);
 			}
 		}
 	};
@@ -330,17 +331,10 @@ export function displayCourse(
 	course: Course,
 	progress: CourseProgress,
 	contentViewer: HTMLElement,
+	styleContainer: HTMLStyleElement,
 ) {
 	contentViewer.innerHTML = "";
 	contentViewer.appendChild(buildCourseInfo(course, progress));
+
+	styleContainer.innerHTML = "#course-" + course.uuid + " {font-weight: bold}";
 }
-
-// TODO
-/*export function highlightCourse(course: string) {
-
-}*/
-
-// TODO:
-// Highlight course when:
-// - Course is displayed
-// - A Course within a Course Map is hovered over
