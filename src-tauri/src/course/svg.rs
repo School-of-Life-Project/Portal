@@ -38,18 +38,26 @@ impl CourseMap {
 
         let mut colors = HashMap::with_capacity(self.courses.len());
 
-        #[allow(clippy::cast_sign_loss)]
-        #[allow(clippy::cast_possible_truncation)]
-        let style = StyleAttr {
-            line_color: Color::from_name("black").unwrap(),
+        let relation_style = StyleAttr {
+            line_color: Color::new(0x00_00_00_ff),
             line_width: LINE_WIDTH,
             fill_color: None,
-            rounded: SIZE as usize / 16,
+            rounded: 0,
+            font_size: 8,
+        };
+
+        #[allow(clippy::cast_sign_loss)]
+        #[allow(clippy::cast_possible_truncation)]
+        let node_style = StyleAttr {
+            line_color: Color::new(0x00_00_00_ff),
+            line_width: LINE_WIDTH,
+            fill_color: Some(Color::new(0xff_ff_ff_ff)),
+            rounded: (SIZE / 16.) as usize,
             font_size: 8,
         };
 
         for course in &self.courses {
-            let mut style = style.clone();
+            let mut style = node_style.clone();
 
             if let Some(colorstring) = &course.color {
                 if let Some(color) = Color::from_name(&colorstring.to_ascii_lowercase()) {
@@ -78,7 +86,7 @@ impl CourseMap {
             if let Some(dest) = nodes.get(&course.uuid) {
                 for relation in &course.relations {
                     if let Some(source) = nodes.get(&relation.uuid) {
-                        let mut style = style.clone();
+                        let mut style = relation_style.clone();
 
                         if let Some(color) = colors.get(&relation.uuid) {
                             style.line_color = *color;
