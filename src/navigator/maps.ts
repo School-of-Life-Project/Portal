@@ -1,5 +1,5 @@
-import { Course, CourseMap, CourseProgress } from "../bindings";
-import { sortCourseMaps } from "../util";
+import { Course, CourseMap, CourseProgress, displayError } from "../bindings";
+import { isCompletable, isComplete, isStarted, sortCourseMaps } from "../util";
 
 export function buildCourseMapListing(
 	courseMapping: Map<string, [Course, CourseProgress]>,
@@ -74,7 +74,7 @@ export function buildCourseMapListing(
 function buildCourseMapInfo(
 	courseMap: CourseMap,
 	svg: string,
-	_courseMapping: Map<string, [Course, CourseProgress]>,
+	courseMapping: Map<string, [Course, CourseProgress]>,
 ) {
 	const root = document.createDocumentFragment();
 
@@ -93,7 +93,59 @@ function buildCourseMapInfo(
 
 	const svgElement = image.getElementsByTagName("svg")[0];
 
-	console.log(svgElement);
+	svgElement.getElementsByTagName("style")[0].innerHTML +=
+		" .course-map-item {cursor: pointer} .course-map-item:focus {background-color: var(--primary-border-color)}";
+
+	for (const element of svgElement.getElementsByTagName("foreignObject")) {
+		if (element.childNodes.length == 1) {
+			const item = element.childNodes[0] as HTMLElement;
+
+			if (item.classList.contains("course-map-item")) {
+				item.setAttribute("role", "button");
+				item.setAttribute("tabindex", "0");
+
+				const identifier = item.classList.item(1)?.substring(16);
+
+				if (identifier) {
+					const course = courseMapping.get(identifier);
+
+					if (course) {
+						if (isCompletable(course[0])) {
+							const paragraph = item.childNodes[0] as HTMLParagraphElement;
+
+							if (isComplete(course[1])) {
+								paragraph.innerText += " 🏆";
+							} else if (isStarted(course[1])) {
+								paragraph.innerText += " ✏️";
+							}
+						}
+					} else {
+						displayError({
+							message: "Unable to find Course " + identifier,
+							cause: "Error occured while parsing CourseMap " + courseMap.uuid,
+						});
+					}
+				}
+			}
+		}
+	}
+
+	svgElement.addEventListener("click", (event) => {
+		const target = event.target as Element;
+
+		if (target.tagName == "DIV" || target.tagName == "P") {
+			console.log(target);
+		}
+	});
+	svgElement.addEventListener("keydown", (event) => {
+		if (event.code == "Enter") {
+			const target = event.target as Element;
+
+			if (target.tagName == "DIV" || target.tagName == "P") {
+				console.log(target);
+			}
+		}
+	});
 
 	root.appendChild(image);
 
@@ -101,5 +153,4 @@ function buildCourseMapInfo(
 }
 
 // Next plans:
-// - Display if a ✔️ next to completed Courses within a Map
 // - Allow clicking on a Course to view it's details
