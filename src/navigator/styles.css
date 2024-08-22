@@ -59,7 +59,7 @@ section table {
 #contentViewer .image {
 	display: block;
 	overflow: auto;
-	height: calc(100% - (1.5em + 1.5lh));
+	height: calc(100% - 2.5lh);
 }
 
 #contentViewer > :first-child {

@@ -20,6 +20,10 @@ pub(super) const RATIO: f64 = 1.2;
 pub(super) const PADDING: f64 = 14.0;
 pub(super) const LINE_WIDTH: usize = 2;
 
+#[allow(clippy::cast_possible_truncation)]
+#[allow(clippy::cast_sign_loss)]
+const RADIUS: usize = (SIZE / 16.) as usize;
+
 impl CourseMap {
     /// Creates a visual representation of a ``CourseMap`` as an SVG.
     pub fn generate_svg(&self) -> String {
@@ -46,13 +50,11 @@ impl CourseMap {
             font_size: 8,
         };
 
-        #[allow(clippy::cast_sign_loss)]
-        #[allow(clippy::cast_possible_truncation)]
         let node_style = StyleAttr {
             line_color: Color::new(0x00_00_00_ff),
             line_width: LINE_WIDTH,
             fill_color: Some(Color::new(0xff_ff_ff_ff)),
-            rounded: (SIZE / 16.) as usize,
+            rounded: RADIUS,
             font_size: 8,
         };
 
@@ -200,8 +202,8 @@ impl SVGWriter {
 
         let svg_line = format!(
             "<svg width=\"{}\" height=\"{}\" viewBox=\"0 0 {} {}\
-            \" xmlns=\"http://www.w3.org/2000/svg\">\n",
-            self.view_size.x, self.view_size.y, self.view_size.x, self.view_size.y
+            \" xmlns=\"http://www.w3.org/2000/svg\">\n<style>p {{padding: 1em}} div.course-map-item {{width: 100%; height: 100%; background-color: var(--mini-card-color); border-radius: {}px}}</style>\n",
+            self.view_size.x, self.view_size.y, self.view_size.x, self.view_size.y, RADIUS,
         );
         result.push_str(&svg_line);
         result.push_str(SVG_DEFS);
@@ -264,17 +266,14 @@ impl RenderBackend for SVGWriter {
             let width = SIZE * RATIO;
             let height = SIZE / RATIO;
 
-            #[allow(clippy::cast_possible_truncation)]
-            #[allow(clippy::cast_sign_loss)]
             #[allow(clippy::cast_precision_loss)]
             self.content.push_str(&format!(
-                "<foreignObject x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\"><div class=\"course-map-item course-map-item-{}\" style=\"border-radius: {}px\"><p>{}</p></div></foreignObject>\n",
+                "<foreignObject x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\"><div class=\"course-map-item course-map-item-{}\"><p>📚 {}</p></div></foreignObject>\n",
                 xy.x - (width / 2.) + (LINE_WIDTH as f64 / 2.),
                 xy.y - (height / 2.) + (LINE_WIDTH as f64 / 2.),
                 width - LINE_WIDTH as f64,
                 height - LINE_WIDTH as f64,
 				course.uuid,
-                SIZE as usize / 16,
                 course.label,
             ));
 

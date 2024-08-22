@@ -139,8 +139,7 @@ export function buildCourseListing(
 			const course = courseMap.get(identifier);
 
 			if (course) {
-				contentViewer.innerHTML = "";
-				contentViewer.appendChild(buildCourseInfo(course[0], course[1]));
+				displayCourse(course[0], course[1], contentViewer);
 			}
 		}
 	};
@@ -326,3 +325,22 @@ function updateCourseCompletion(course: Course, completed: boolean) {
 
 	location.reload();
 }
+
+export function displayCourse(
+	course: Course,
+	progress: CourseProgress,
+	contentViewer: HTMLElement,
+) {
+	contentViewer.innerHTML = "";
+	contentViewer.appendChild(buildCourseInfo(course, progress));
+}
+
+// TODO
+/*export function highlightCourse(course: string) {
+
+}*/
+
+// TODO:
+// Highlight course when:
+// - Course is displayed
+// - A Course within a Course Map is hovered over
