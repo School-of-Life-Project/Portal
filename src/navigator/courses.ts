@@ -338,3 +338,5 @@ export function displayCourse(
 
 	styleContainer.innerHTML = "#course-" + course.uuid + " {font-weight: bold}";
 }
+
+// TODO: Open <details> elements if necessary and scroll to the relevant <a> element when calling displayCourse()
