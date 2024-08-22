@@ -14,7 +14,7 @@ export function buildCourseListing(
 	active: Set<string>,
 	contentViewer: HTMLElement,
 	styleContainer: HTMLStyleElement,
-): DocumentFragment {
+): [DocumentFragment, Map<string, [Course, CourseProgress]>] {
 	const fragment = document.createDocumentFragment();
 
 	if (courses.length == 0) {
@@ -29,7 +29,7 @@ export function buildCourseListing(
 
 		fragment.appendChild(message);
 
-		return fragment;
+		return [fragment, new Map()];
 	}
 
 	sortCourses(courses, active);
@@ -154,7 +154,7 @@ export function buildCourseListing(
 
 	fragment.appendChild(list);
 
-	return fragment;
+	return [fragment, courseMap];
 }
 
 function buildCourseCategory(

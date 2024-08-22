@@ -51,36 +51,36 @@ if (refreshButton) {
 }
 
 if (contentListing && contentViewer) {
-	listingPromise.then(async (listing) => {
-		if (!listing) {
-			return;
-		}
+	Promise.all([listingPromise, activePromise]).then(
+		async ([listing, activeCourses]) => {
+			if (!listing || !activeCourses) {
+				return;
+			}
 
-		const fragment = document.createDocumentFragment();
-
-		if (listing.course_maps.length > 0 && listing.courses.length > 0) {
-			fragment.appendChild(
-				buildCourseMapListing(
-					listing.course_maps,
-					contentViewer,
-					styleContainer,
-				),
+			const [courseListing, courseMapping] = buildCourseListing(
+				listing.courses,
+				new Set(activeCourses),
+				contentViewer,
+				styleContainer,
 			);
-		}
 
-		const activeCourses = await activePromise;
-		if (activeCourses) {
-			fragment.appendChild(
-				buildCourseListing(
-					listing.courses,
-					new Set(activeCourses),
-					contentViewer,
-					styleContainer,
-				),
-			);
-		}
+			const fragment = document.createDocumentFragment();
 
-		contentListing.innerHTML = "";
-		contentListing.appendChild(fragment);
-	});
+			if (listing.course_maps.length > 0 && listing.courses.length > 0) {
+				fragment.appendChild(
+					buildCourseMapListing(
+						courseMapping,
+						listing.course_maps,
+						contentViewer,
+						styleContainer,
+					),
+				);
+			}
+
+			fragment.appendChild(courseListing);
+
+			contentListing.innerHTML = "";
+			contentListing.appendChild(fragment);
+		},
+	);
 }

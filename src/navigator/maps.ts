@@ -1,7 +1,8 @@
-import { CourseMap } from "../bindings";
+import { Course, CourseMap, CourseProgress } from "../bindings";
 import { sortCourseMaps } from "../util";
 
 export function buildCourseMapListing(
+	courseMapping: Map<string, [Course, CourseProgress]>,
 	courseMaps: [CourseMap, string][],
 	contentViewer: HTMLElement,
 	styleContainer: HTMLStyleElement,
@@ -45,7 +46,7 @@ export function buildCourseMapListing(
 			if (courseMap) {
 				contentViewer.innerHTML = "";
 				contentViewer.appendChild(
-					buildCourseMapInfo(courseMap[0], courseMap[1]),
+					buildCourseMapInfo(courseMap[0], courseMap[1], courseMapping),
 				);
 
 				styleContainer.innerHTML =
@@ -70,7 +71,11 @@ export function buildCourseMapListing(
 	return fragment;
 }
 
-function buildCourseMapInfo(courseMap: CourseMap, svg: string) {
+function buildCourseMapInfo(
+	courseMap: CourseMap,
+	svg: string,
+	_courseMapping: Map<string, [Course, CourseProgress]>,
+) {
 	const root = document.createDocumentFragment();
 
 	const title = document.createElement("h2");
@@ -89,25 +94,16 @@ function buildCourseMapInfo(courseMap: CourseMap, svg: string) {
 
 	const svgElement = image.getElementsByTagName("svg")[0];
 
-	stylizeCourseMapSvg(svgElement);
+	console.log(svgElement);
+
+	//modifyCourseMapSvg(svgElement);
 
 	root.appendChild(image);
 
 	return root;
 }
 
-function stylizeCourseMapSvg(root: SVGSVGElement) {
-	/*const style = document.createElementNS("http://www.w3.org/2000/svg", "style");
-	style.innerHTML =
-		"p {padding: 1em} div.course-map-item {width: 100%; height: 100%; background-color: var(--mini-card-color)}";
-
-	root.appendChild(style);*/
-
-	console.log(root);
-}
-
 // Next plans:
-// - Create global Course Mapping
 // - Display if a ✔️ next to completed Courses within a Map
 // - Allow clicking on a Course to view it's details
 // - Better handle CourseMap descriptions
