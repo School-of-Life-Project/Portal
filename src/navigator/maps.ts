@@ -103,7 +103,7 @@ function buildCourseMapInfo(
 	const svgElement = image.getElementsByTagName("svg")[0];
 
 	svgElement.getElementsByTagName("style")[0].innerHTML +=
-		" .course-map-item {cursor: pointer; outline-offset: -0.5em}";
+		" .course-map-item {cursor: pointer; outline-offset: -0.5lh}";
 
 	for (const element of svgElement.getElementsByTagName("foreignObject")) {
 		if (element.childNodes.length == 1) {
