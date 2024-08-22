@@ -48,7 +48,6 @@ subject to change
 ### Course Maps
 - prevent invalid states from being representable
 	- empty course maps
-- how should Course Maps be best displayed?
 
 ### Course Map Building
 

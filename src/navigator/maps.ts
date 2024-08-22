@@ -1,5 +1,6 @@
 import { Course, CourseMap, CourseProgress, displayError } from "../bindings";
 import { isCompletable, isComplete, isStarted, sortCourseMaps } from "../util";
+import { displayCourse } from "./courses";
 
 export function buildCourseMapListing(
 	courseMapping: Map<string, [Course, CourseProgress]>,
@@ -46,7 +47,13 @@ export function buildCourseMapListing(
 			if (courseMap) {
 				contentViewer.innerHTML = "";
 				contentViewer.appendChild(
-					buildCourseMapInfo(courseMap[0], courseMap[1], courseMapping),
+					buildCourseMapInfo(
+						courseMap[0],
+						courseMap[1],
+						courseMapping,
+						contentViewer,
+						styleContainer,
+					),
 				);
 
 				styleContainer.innerHTML =
@@ -75,6 +82,8 @@ function buildCourseMapInfo(
 	courseMap: CourseMap,
 	svg: string,
 	courseMapping: Map<string, [Course, CourseProgress]>,
+	contentViewer: HTMLElement,
+	styleContainer: HTMLStyleElement,
 ) {
 	const root = document.createDocumentFragment();
 
@@ -130,19 +139,54 @@ function buildCourseMapInfo(
 		}
 	}
 
-	svgElement.addEventListener("click", (event) => {
-		const target = event.target as Element;
+	const handleCourseDisplay = (identifier: string) => {
+		const course = courseMapping.get(identifier);
 
-		if (target.tagName == "DIV" || target.tagName == "P") {
-			console.log(target);
+		if (course) {
+			displayCourse(course[0], course[1], contentViewer, styleContainer);
+		} else {
+			displayError({
+				message: "Unable to find Course " + identifier,
+				cause: "Error occured within displayCourseInfo",
+			});
+		}
+	};
+
+	svgElement.addEventListener("click", (event) => {
+		let target = event.target as Element;
+
+		if (target.tagName == "P") {
+			target = target.parentElement as Element;
+		}
+
+		if (
+			target.tagName == "DIV" &&
+			target.classList.contains("course-map-item")
+		) {
+			const identifier = target.classList.item(1)?.substring(16);
+
+			if (identifier) {
+				handleCourseDisplay(identifier);
+			}
 		}
 	});
 	svgElement.addEventListener("keydown", (event) => {
 		if (event.code == "Enter") {
-			const target = event.target as Element;
+			let target = event.target as Element;
 
-			if (target.tagName == "DIV" || target.tagName == "P") {
-				console.log(target);
+			if (target.tagName == "P") {
+				target = target.parentElement as Element;
+			}
+
+			if (
+				target.tagName == "DIV" &&
+				target.classList.contains("course-map-item")
+			) {
+				const identifier = target.classList.item(1)?.substring(16);
+
+				if (identifier) {
+					handleCourseDisplay(identifier);
+				}
 			}
 		}
 	});
@@ -151,6 +195,3 @@ function buildCourseMapInfo(
 
 	return root;
 }
-
-// Next plans:
-// - Allow clicking on a Course to view it's details

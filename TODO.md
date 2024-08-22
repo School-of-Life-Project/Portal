@@ -3,7 +3,7 @@
 ## front-end TODOs
 
 - [ ] Get code from [frontend-test](https://github.com/transkatgirl/frontend-test) working as frontend
-	- [ ] Finish implementing Course Maps
+	- [X] Finish implementing Course Maps
 	- [ ] Implement Settings
 - [ ] Improve UI clarity
 	- [ ] Better distingush interactable elements
