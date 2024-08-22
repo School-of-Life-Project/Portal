@@ -43,12 +43,13 @@ export function buildCourseMapListing(
 			const courseMap = courseMapMap.get(identifier);
 
 			if (courseMap) {
-				displayCourseMap(
-					courseMap[0],
-					courseMap[1],
-					contentViewer,
-					styleContainer,
+				contentViewer.innerHTML = "";
+				contentViewer.appendChild(
+					buildCourseMapInfo(courseMap[0], courseMap[1]),
 				);
+
+				styleContainer.innerHTML =
+					"#map-" + courseMap[0].uuid + " {font-weight: bold}";
 			}
 		}
 	};
@@ -105,14 +106,7 @@ function stylizeCourseMapSvg(root: SVGSVGElement) {
 	console.log(root);
 }
 
-export function displayCourseMap(
-	courseMap: CourseMap,
-	svg: string,
-	contentViewer: HTMLElement,
-	styleContainer: HTMLStyleElement,
-) {
-	contentViewer.innerHTML = "";
-	contentViewer.appendChild(buildCourseMapInfo(courseMap, svg));
-
-	styleContainer.innerHTML = "#map-" + courseMap.uuid + " {font-weight: bold}";
-}
+// Next plans:
+// - Create global Course Mapping
+// - Display if a ✔️ next to completed Courses within a Map
+// - Allow clicking on a Course to view it's details
