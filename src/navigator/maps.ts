@@ -89,14 +89,11 @@ function buildCourseMapInfo(
 	}
 
 	const image = document.createElement("div");
-	image.classList.add("image");
 	image.innerHTML = svg;
 
 	const svgElement = image.getElementsByTagName("svg")[0];
 
 	console.log(svgElement);
-
-	//modifyCourseMapSvg(svgElement);
 
 	root.appendChild(image);
 
@@ -106,4 +103,3 @@ function buildCourseMapInfo(
 // Next plans:
 // - Display if a ✔️ next to completed Courses within a Map
 // - Allow clicking on a Course to view it's details
-// - Better handle CourseMap descriptions

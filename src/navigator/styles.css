@@ -56,12 +56,6 @@ section table {
 	min-width: 100% !important;
 }
 
-#contentViewer .image {
-	display: block;
-	overflow: auto;
-	height: calc(100% - 2.5lh);
-}
-
 #contentViewer > :first-child {
 	margin-top: 0;
 }
