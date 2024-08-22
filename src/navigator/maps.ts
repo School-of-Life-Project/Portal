@@ -110,3 +110,4 @@ function stylizeCourseMapSvg(root: SVGSVGElement) {
 // - Create global Course Mapping
 // - Display if a ✔️ next to completed Courses within a Map
 // - Allow clicking on a Course to view it's details
+// - Better handle CourseMap descriptions
