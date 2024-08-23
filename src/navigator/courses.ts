@@ -9,6 +9,8 @@ import {
 import { BookChapterGraph } from "../graphing/main.ts";
 import { isCompletable, isComplete, isStarted, sortCourses } from "../util.ts";
 
+const listingElements: Map<string, HTMLAnchorElement> = new Map();
+
 export function buildCourseListing(
 	courses: [Course, CourseProgress][],
 	active: Set<string>,
@@ -193,6 +195,8 @@ function buildCourseSubListing(courses: Course[], active: Set<string>) {
 		label.setAttribute("role", "button");
 		label.innerText = course.title;
 
+		listingElements.set(course.uuid, label);
+
 		element.appendChild(label);
 
 		const checkbox = document.createElement("input");
@@ -337,6 +341,14 @@ export function displayCourse(
 	contentViewer.appendChild(buildCourseInfo(course, progress));
 
 	styleContainer.innerHTML = "#course-" + course.uuid + " {font-weight: bold}";
-}
 
-// TODO: Open <details> elements if necessary and scroll to the relevant <a> element when calling displayCourse()
+	const element = listingElements.get(course.uuid);
+
+	if (element) {
+		const details = element?.parentElement?.parentElement?.parentElement;
+
+		if (details && details.tagName == "DETAILS") {
+			(details as HTMLDetailsElement).open = true;
+		}
+	}
+}
