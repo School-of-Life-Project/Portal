@@ -119,14 +119,16 @@ function buildCourseMapInfo(
 					const course = courseMapping.get(identifier);
 
 					if (course) {
-						if (isCompletable(course[0])) {
-							const paragraph = item.childNodes[0] as HTMLParagraphElement;
+						const paragraph = item.childNodes[0] as HTMLParagraphElement;
 
+						if (isCompletable(course[0])) {
 							if (isComplete(course[1])) {
 								paragraph.innerText += " 🏆";
 							} else if (isStarted(course[1])) {
 								paragraph.innerText += " ✏️";
 							}
+						} else {
+							paragraph.innerText += " 📒";
 						}
 					} else {
 						displayError({
