@@ -25,6 +25,10 @@
 	padding: 1lh;
 }
 
+#contentViewer > p {
+	padding: unset;
+}
+
 button[type="button"] {
 	background-color: var(--button-color);
 	border: var(--secondary-border);
