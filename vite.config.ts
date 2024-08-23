@@ -47,6 +47,7 @@ export default defineConfig({
 			input: {
 				main: resolve(__dirname, "index.html"),
 				viewer: resolve(__dirname, "viewer.html"),
+				subviewer: resolve(__dirname, "subviewer.html"),
 				error: resolve(__dirname, "error.html"),
 				navigator: resolve(__dirname, "navigator.html"),
 				settings: resolve(__dirname, "settings.html"),

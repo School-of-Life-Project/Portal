@@ -239,7 +239,7 @@ function buildCourseInfo(course: Course, progress: CourseProgress) {
 		const section = document.createElement("section");
 
 		const wrapper = document.createElement("a");
-		wrapper.href = "/viewer.html?" + params.toString();
+		wrapper.href = "/subviewer.html?" + params.toString();
 
 		const chapterGraph = new BookChapterGraph(book.chapters.length, book.label);
 		chapterGraph.update(progress.completion[i].chapter_completion);
