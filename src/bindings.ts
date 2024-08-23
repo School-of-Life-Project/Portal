@@ -1,4 +1,4 @@
-import { invoke, convertFileSrc } from "@tauri-apps/api/tauri";
+import { invoke, convertFileSrc } from "@tauri-apps/api/core";
 
 // Based on /src-tauri/src/course/mod.rs
 

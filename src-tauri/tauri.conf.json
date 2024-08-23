@@ -2,16 +2,34 @@
 	"build": {
 		"beforeBuildCommand": "npm run build",
 		"beforeDevCommand": "npm run dev",
-		"devPath": "http://localhost:5173",
-		"distDir": "../dist"
+		"frontendDist": "../dist",
+		"devUrl": "http://localhost:5173"
 	},
-	"package": {
-		"productName": "school-of-life-portal"
+	"bundle": {
+		"active": true,
+		"targets": "all",
+		"icon": [
+			"icons/32x32.png",
+			"icons/128x128.png",
+			"icons/128x128@2x.png",
+			"icons/icon.icns",
+			"icons/icon.ico"
+		],
+		"publisher": "School of Life Project",
+		"copyright": "Licensed under BSL-1.0",
+		"category": "Education",
+		"shortDescription": "A textbook-based eLearning application.",
+		"longDescription": "Portal is an eLearning application built for independent learners, designed to allow the use of existing learning materials such as textbooks."
 	},
-	"tauri": {
-		"allowlist": {
-			"protocol": {
-				"asset": true
+	"productName": "school-of-life-portal",
+	"identifier": "com.schoolOfLifeProject.Portal",
+	"plugins": {},
+	"app": {
+		"security": {
+			"csp": null,
+			"assetProtocol": {
+				"enable": true,
+				"scope": ["$APPDATA/User Resources/*/**"]
 			}
 		},
 		"windows": [
@@ -19,29 +37,8 @@
 				"title": "Portal",
 				"minWidth": 600,
 				"minHeight": 400,
-				"fileDropEnabled": false,
 				"fullscreen": true
 			}
-		],
-		"security": {
-			"csp": null
-		},
-		"bundle": {
-			"active": true,
-			"targets": "all",
-			"identifier": "com.schoolOfLifeProject.Portal",
-			"publisher": "School of Life Project",
-			"copyright": "Licensed under BSL-1.0",
-			"category": "Education",
-			"shortDescription": "A textbook-based eLearning application.",
-			"longDescription": "Portal is an eLearning application built for independent learners, designed to allow the use of existing learning materials such as textbooks.",
-			"icon": [
-				"icons/32x32.png",
-				"icons/128x128.png",
-				"icons/128x128@2x.png",
-				"icons/icon.icns",
-				"icons/icon.ico"
-			]
-		}
+		]
 	}
 }

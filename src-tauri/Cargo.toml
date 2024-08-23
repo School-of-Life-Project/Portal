@@ -8,12 +8,11 @@ authors = [
 edition = "2021"
 
 [build-dependencies]
-tauri-build = { version = "1", features = [
+tauri-build = { version = "2.0.0-rc", features = [
 ] }
 
 [dependencies]
-tauri = { version = "1", features = [
-	"protocol-asset",
+tauri = { version = "2.0.0-rc", features = [ "protocol-asset",
 	"devtools",
 ] }
 serde = { version = "1", features = [
@@ -23,21 +22,21 @@ uuid = { version = "1.10.0", features = [
 	"v4",
 	"serde",
 ] }
-toml = "0.8.14"
-tokio = { version = "1.38.0", features = [
+toml = "0.8.19"
+tokio = { version = "1.39.3", features = [
 	"fs",
 	"macros",
 ] }
 open = "5.3.0"
 anyhow = "1.0.86"
-thiserror = "1.0.62"
+thiserror = "1.0.63"
 futures-util = "0.3.30"
 chrono = { version = "0.4.38", default-features = false, features = [
 	"std",
 	"clock",
 	"serde",
 ] }
-zip = { version = "2.1.3", default-features = false, features = [
+zip = { version = "2.2.0", default-features = false, features = [
 	"bzip2",
 	"deflate",
 	"deflate64",

@@ -1,8 +1,8 @@
 #![allow(clippy::used_underscore_binding)]
 
-use anyhow::anyhow;
+use std::path::PathBuf;
+
 use serde::Serialize;
-use tauri::{AppHandle, Manager};
 use tokio::try_join;
 use uuid::Uuid;
 
@@ -16,23 +16,20 @@ use super::{
 };
 
 pub struct State {
+    root: PathBuf,
     database: Database,
     datastore: DataStore,
 }
 
 impl State {
-    pub fn new(handle: &AppHandle) -> Result<Self, anyhow::Error> {
-        let root = handle
-            .path_resolver()
-            .app_data_dir()
-            .ok_or_else(|| anyhow!("Unable to find data_dir"))?;
-
+    pub fn new(root: PathBuf) -> Result<Self, anyhow::Error> {
         let database_path = root.join("Internal Database");
         let datastore_path = root.join("User Resources");
 
         std::fs::create_dir_all(&datastore_path)?;
 
         Ok(Self {
+            root,
             database: Database::new(&database_path)?,
             datastore: DataStore {
                 root: datastore_path,
@@ -56,12 +53,13 @@ pub fn open_data_dir(state: tauri::State<'_, State>) -> Result<(), ErrorWrapper>
 
 #[tauri::command]
 #[allow(clippy::needless_pass_by_value)]
-pub fn open_internal_data_dir(handle: AppHandle) -> Result<(), ErrorWrapper> {
-    if let Some(path) = handle.path_resolver().app_data_dir() {
-        open::that_detached(&path).map_err(|e| {
-            ErrorWrapper::new(format!("Unable to launch OS opener for {:?}", &path), &e)
-        })?;
-    }
+pub fn open_internal_data_dir(state: tauri::State<'_, State>) -> Result<(), ErrorWrapper> {
+    open::that_detached(&state.root).map_err(|e| {
+        ErrorWrapper::new(
+            format!("Unable to launch OS opener for {:?}", &state.root),
+            &e,
+        )
+    })?;
 
     Ok(())
 }
@@ -96,22 +94,10 @@ pub fn open_project_repo() -> Result<(), ErrorWrapper> {
 
 #[tauri::command]
 pub async fn get_course(
-    app_handle: AppHandle,
     state: tauri::State<'_, State>,
     uuid: Uuid,
 ) -> Result<(Course, CourseCompletion), ErrorWrapper> {
     let (course, completion, _) = util::get_course(&state, uuid).await?;
-
-    let scope = app_handle.asset_protocol_scope();
-
-    for book in &course.books {
-        scope.allow_directory(&book.file, true).map_err(|e| {
-            ErrorWrapper::new(
-                format!("Unable to update permissions for path {:?}", book.file),
-                &e,
-            )
-        })?;
-    }
 
     Ok((course, completion))
 }

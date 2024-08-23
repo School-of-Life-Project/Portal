@@ -17,11 +17,11 @@ if (!existsSync("node_modules/jszip/dist/jszip.js")) {
 
 // Tauri uses Edge on Windows and WebKit on macOS and Linux
 const targets =
-	process.env.TAURI_PLATFORM == "windows" ? "edge>=89" : "safari>=12";
+	process.env.TAURI_ENV_PLATFORM == "windows" ? "edge>=89" : "safari>=13";
 
 // Consider browser versions released since 2023 as modern
 const modernTargets =
-	process.env.TAURI_PLATFORM == "windows" ? "edge>=109" : "safari>=16.3";
+	process.env.TAURI_ENV_PLATFORM == "windows" ? "edge>=109" : "safari>=16.3";
 
 export default defineConfig({
 	// prevent vite from obscuring rust errors
@@ -33,12 +33,12 @@ export default defineConfig({
 	// to access the Tauri environment variables set by the CLI with information about the current target
 	envPrefix: [
 		"VITE_",
-		"TAURI_PLATFORM",
-		"TAURI_ARCH",
-		"TAURI_FAMILY",
-		"TAURI_PLATFORM_VERSION",
-		"TAURI_PLATFORM_TYPE",
-		"TAURI_DEBUG",
+		"TAURI_ENV_PLATFORM",
+		"TAURI_ENV_ARCH",
+		"TAURI_ENV_FAMILY",
+		"TAURI_ENV_PLATFORM_VERSION",
+		"TAURI_ENV_PLATFORM_TYPE",
+		"TAURI_ENV_DEBUG",
 	],
 	build: {
 		minify: "terser",
