@@ -256,7 +256,7 @@ export async function getSettings(): Promise<Settings> {
 	}
 }
 
-export async function setSettings(settings: Settings): Promise<null> {
+export async function setSettings(settings?: Settings): Promise<null> {
 	try {
 		return await invoke("set_settings", {
 			settings,
