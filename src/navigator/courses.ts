@@ -142,7 +142,11 @@ export function buildCourseListing(
 			const course = courseMap.get(identifier);
 
 			if (course) {
-				displayCourse(course[0], course[1], contentViewer, styleContainer);
+				contentViewer.innerHTML = "";
+				contentViewer.appendChild(buildCourseInfo(course[0], course[1]));
+
+				styleContainer.innerHTML =
+					"#course-" + course[0].uuid + " {font-weight: bold}";
 			}
 		}
 	};
