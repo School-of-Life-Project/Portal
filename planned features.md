@@ -8,7 +8,6 @@ subject to change
 - add support for README.md files
 - add authors field to courses
 - add language field to courses
-- implement optional textbooks
 - prevent invalid states from being representable
 	- empty courses
 	- uncompletable chapters
@@ -41,9 +40,7 @@ subject to change
 
 ## Course Management
 
-- viewing additional course metadata (author, year created, title & description, etc...)
 - create a centralized hub to find and download courses?
-
 
 ### Course Maps
 - prevent invalid states from being representable
