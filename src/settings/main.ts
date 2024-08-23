@@ -109,7 +109,7 @@ function buildSettingsForm(settings: Settings) {
 
 			const clockLabel = document.createElement("label");
 			clockLabel.setAttribute("for", "show_course_clock");
-			clockLabel.innerText = "Show stopwatch";
+			clockLabel.innerText = "Show stopwatch in textbook viewer";
 
 			fieldset1.appendChild(clockCheckbox);
 			fieldset1.appendChild(clockLabel);
@@ -126,7 +126,7 @@ function buildSettingsForm(settings: Settings) {
 
 			const courseTimeLabel = document.createElement("label");
 			courseTimeLabel.setAttribute("for", "maximum_course_time");
-			courseTimeLabel.innerText = "Maximum time (in minutes): ";
+			courseTimeLabel.innerText = "Maximum displayed time (in minutes): ";
 
 			fieldset1.appendChild(courseTimeLabel);
 			fieldset1.appendChild(courseTimeInput);
@@ -168,7 +168,7 @@ function buildSettingsForm(settings: Settings) {
 
 			const maxTotalTimeLabel = document.createElement("label");
 			maxTotalTimeLabel.setAttribute("for", "maximum_daily_time");
-			maxTotalTimeLabel.innerText = "Maximum total daily time (in minutes): ";
+			maxTotalTimeLabel.innerText = "Maximum displayed time (in minutes): ";
 
 			fieldset2.appendChild(maxTotalTimeLabel);
 			fieldset2.appendChild(maxTotalTimeInput);
@@ -185,7 +185,7 @@ function buildSettingsForm(settings: Settings) {
 
 			const maxTotalChapterLabel = document.createElement("label");
 			maxTotalChapterLabel.setAttribute("for", "maximum_daily_chapters");
-			maxTotalChapterLabel.innerText = "Maximum total daily chapters: ";
+			maxTotalChapterLabel.innerText = "Maximum displayed chapters: ";
 
 			fieldset2.appendChild(maxTotalChapterLabel);
 			fieldset2.appendChild(maxTotalChapterInput);
