@@ -116,7 +116,7 @@ export class ePubViewer implements DocumentViewer {
 						width: "100%",
 						height: "100%",
 						spread: "none",
-						allowScriptedContent: false,
+						allowScriptedContent: true,
 					});
 
 					const renderPromise = new Promise(
