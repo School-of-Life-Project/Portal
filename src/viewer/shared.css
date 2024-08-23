@@ -54,6 +54,10 @@ header,
 	overflow: auto;
 }
 
+#contentListing input[type="checkbox"] {
+	margin: 0.2em 0.2em 0.2em 0.4em;
+}
+
 header {
 	z-index: 3;
 	top: 0;

@@ -16,10 +16,6 @@
 	bottom: 0;
 }
 
-#contentListing input[type="checkbox"] {
-	margin: 0.2em 0.2em 0.2em 0.4em;
-}
-
 #contentViewer {
 	padding: 1lh;
 }
