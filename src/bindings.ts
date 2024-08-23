@@ -167,6 +167,30 @@ export async function openDataDir(): Promise<null> {
 	}
 }
 
+export async function openInternalDataDir(): Promise<null> {
+	try {
+		return await invoke("open_internal_data_dir");
+	} catch (error) {
+		throw convertBackendAsyncError(error);
+	}
+}
+
+export async function openIssueTracker(newIssue: boolean): Promise<null> {
+	try {
+		return await invoke("open_project_issue_tracker", { data: newIssue });
+	} catch (error) {
+		throw convertBackendAsyncError(error);
+	}
+}
+
+export async function openRepo(): Promise<null> {
+	try {
+		return await invoke("open_project_repo");
+	} catch (error) {
+		throw convertBackendAsyncError(error);
+	}
+}
+
 export async function getCourse(
 	uuid: string,
 ): Promise<[Course, CourseCompletionData]> {

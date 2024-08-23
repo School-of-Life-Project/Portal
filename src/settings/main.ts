@@ -1,6 +1,8 @@
 import {
 	displayError,
 	getSettings,
+	openIssueTracker,
+	openRepo,
 	setActiveCourses,
 	setSettings,
 	Settings,
@@ -12,6 +14,8 @@ const settingsPromise = getSettings().catch((error) => {
 
 const resetCoursesButton = document.getElementById("resetCoursesButton");
 const resetSettingsButton = document.getElementById("resetSettingsButton");
+const appWebsiteButton = document.getElementById("appWebsiteButton");
+const appIssueButton = document.getElementById("appIssueButton");
 const settingsForm = document.getElementById("settingsRoot");
 
 function updateSettings(settings?: Settings) {
@@ -46,6 +50,28 @@ if (resetCoursesButton) {
 	resetCoursesButton.addEventListener("keydown", (event) => {
 		if (event.code == "Enter") {
 			resetCourses();
+		}
+	});
+}
+
+if (appWebsiteButton) {
+	appWebsiteButton.addEventListener("click", () => {
+		openRepo();
+	});
+	appWebsiteButton.addEventListener("keydown", (event) => {
+		if (event.code == "Enter") {
+			openRepo();
+		}
+	});
+}
+
+if (appIssueButton) {
+	appIssueButton.addEventListener("click", () => {
+		openIssueTracker(false);
+	});
+	appIssueButton.addEventListener("keydown", (event) => {
+		if (event.code == "Enter") {
+			openIssueTracker(false);
 		}
 	});
 }
