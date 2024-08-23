@@ -4,9 +4,7 @@ Portal is an eLearning application built for independent learners, designed to a
 
 ## Notice
 
-Portal is currently a work in progress, and is not yet ready for use by end users.
-
-We welcome contributions from any developers interested in this project.
+Portal is currently a work in progress, and is not yet ready for use by end users. We welcome contributions from any developers interested in this project.
 
 At the moment, the application is functional enough to be evaluated by end-users, but it lacks documentation and has undergone very minimal testing. The application's Course and Course Map formats are unlikely to undergo any significant breaking changes.
 
