@@ -12,9 +12,8 @@
 }
 
 #contentListing footer {
-	position: absolute;
+	position: sticky;
 	bottom: 0;
-	margin: 0 0.8lh 0.8lh 0;
 }
 
 #contentListing input[type="checkbox"] {
@@ -62,4 +61,8 @@ section table {
 
 #contentViewer > :first-child {
 	margin-top: 0;
+}
+
+#listingInner {
+	min-height: 100%;
 }
