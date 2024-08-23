@@ -1,1 +1,48 @@
 @import "../shared.css";
+
+body {
+	margin: 1lh;
+	background-color: var(--background-color);
+}
+
+a {
+	color: unset;
+	text-decoration: unset;
+	cursor: pointer;
+}
+
+nav.related {
+	float: right;
+}
+
+nav.related a {
+	background-color: var(--button-color);
+	border: var(--primary-border);
+	border-radius: var(--button-border-radius);
+	padding: var(--button-padding);
+	margin-left: 0.5lh;
+	white-space: nowrap;
+	display: block;
+}
+
+fieldset {
+	width: fit-content;
+	border: var(--secondary-border);
+	border-radius: var(--card-border-radius);
+	background-color: var(--form-card-color);
+	margin: 1lh 0;
+}
+
+fieldset legend {
+	background-color: var(--form-card-title-color);
+	padding: 0.15lh 0.3lh;
+}
+
+textarea {
+	width: 24em;
+	height: 12em;
+	border: var(--secondary-border);
+	border-radius: var(--card-border-radius);
+	font: 1em monospace;
+	box-sizing: border-box;
+}
