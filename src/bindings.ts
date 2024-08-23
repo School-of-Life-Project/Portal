@@ -86,7 +86,7 @@ export function getCurrentBackendDate(): BackendDate {
 	const date = new Date();
 
 	const year = String(date.getFullYear());
-	let month = String(date.getMonth());
+	let month = String(date.getMonth() + 1);
 	let day = String(date.getDate());
 
 	if (month.length == 1) {
