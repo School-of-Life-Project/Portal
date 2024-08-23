@@ -8,7 +8,7 @@ Portal is currently a work in progress, and is not yet ready for use by end user
 
 We welcome contributions from any developers interested in this project.
 
-At the moment, the application is functional enough to be evaluated by end-users, but currently lacks documentation and has undergone very minimal testing. The application's Course and Course Map formats are unlikely to undergo any significant breaking changes.
+At the moment, the application is functional enough to be evaluated by end-users, but it lacks documentation and has undergone very minimal testing. The application's Course and Course Map formats are unlikely to undergo any significant breaking changes.
 
 ### For Developers
 
