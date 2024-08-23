@@ -5,6 +5,7 @@ subject to change
 - allow panel resizing
 
 ## Courses
+- add support for external links within ePub files
 - add support for README.md files
 - add authors field to courses
 - add language field to courses
