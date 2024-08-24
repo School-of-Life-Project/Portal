@@ -58,7 +58,6 @@ section,
 
 nav.related {
 	float: right;
-	margin-top: 0.5lh;
 }
 
 nav.related a {
@@ -68,5 +67,5 @@ nav.related a {
 	padding: var(--button-padding);
 	margin-left: 0.5lh;
 	white-space: nowrap;
-	display: block;
+	display: inline-block;
 }

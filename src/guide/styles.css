@@ -1,0 +1,26 @@
+@import "../shared.css";
+
+body {
+	margin: 1lh;
+	background-color: var(--background-color);
+}
+
+a {
+	color: unset;
+	text-decoration: unset;
+	cursor: pointer;
+}
+
+nav.related {
+	float: right;
+}
+
+nav.related a {
+	background-color: var(--button-color);
+	border: var(--primary-border);
+	border-radius: var(--button-border-radius);
+	padding: var(--button-padding);
+	margin-left: 0.5lh;
+	white-space: nowrap;
+	display: block;
+}
