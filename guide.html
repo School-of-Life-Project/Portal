@@ -142,6 +142,31 @@
 					of the relevant schema files.
 				</p>
 				<h3>📚 Courses</h3>
+				<p>
+					Courses are folders containing a TOML file named
+					<code>course.toml</code> at their root. This file, adhering to the
+					<code>$APPDATA/Resource Schema/Course.json</code> schema, contains a
+					set of one or more textbooks.
+				</p>
+				<p>
+					All files or folders referenced by the <code>course.toml</code> must
+					be contained within the Course folder. Files or folders within the
+					Course folders which are not referenced by the index are ignored.
+				</p>
+				<p>
+					Courses are loaded from the path <code>$APPDATA/{UUID}/</code>. On the
+					🏫&nbsp;Home page, only active courses are loaded. In the
+					📖&nbsp;Viewer, only the Course being viewed is loaded. In the
+					&nbsp;Course&nbsp;Navigator, all Courses are loaded, regardless of
+					their active status.
+				</p>
+				<p>
+					Outside of the 📖&nbsp;Viewer, only the <code>course.toml</code> file
+					is loaded, not any of the filepaths it references. The 📖&nbsp;Viewer
+					only loads the active textbook, and does not attempt to load other
+					textbooks.
+				</p>
+				<h4>📕 Textbooks</h4>
 				<h3>🗺️ Course Maps</h3>
 				<p>
 					Course Maps are TOML files, adhering to the
