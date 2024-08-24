@@ -24,3 +24,18 @@ nav.related a {
 	white-space: nowrap;
 	display: block;
 }
+
+code {
+	font-size: 90%;
+	padding: 0.1em;
+}
+
+code,
+pre {
+	background-color: var(--form-card-title-color);
+}
+
+pre {
+	display: inline-block;
+	margin: 0;
+}

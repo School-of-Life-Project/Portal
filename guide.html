@@ -20,122 +20,189 @@
 				This document assumes that the reader is capable of understanding
 				English language text and has basic computer literacy.
 			</p>
+			<p>🚧 This guide is a work-in-progress. Some sections are incomplete.</p>
 		</header>
 		<main>
-			<h2 id="adding-resources">📥 Adding Resources</h2>
-			<p>
-				In order to use the Portal app, you will need content to view within it.
-				Inside the app, content is referred to as resources.
-			</p>
-			<p>
-				The app can display two different types of resources: 📚&nbsp;Courses
-				and 🗺️&nbsp;Course&nbsp;Maps.
-			</p>
-			<p>
-				📚&nbsp;Courses are a collection of textbooks. Textbooks can be
-				📕&nbsp;completable, where you can track your progress, or they can be
-				📒&nbsp;non-completable. Non-completable textbooks are typically
-				included as reference materials or supplemental reading.
-			</p>
-			<p>
-				🗺️&nbsp;Course&nbsp;Maps are an interactive tree of 📚&nbsp;Courses.
-				These help you plan your learning journey by providing an intended order
-				to complete courses in.
-			</p>
-			<h3>🌐 Finding Resources</h3>
-			<h3>📂 Importing Resources</h3>
-			<h2 id="creating-resources">🎨 Creating Resources</h2>
-			<p>
-				 Unlike importing existing resources, creating resources for Portal is
-				a more involved progress. A degree of specialized technical knowledge
-				will be required.
-			</p>
-			<p>You will need a basic understanding of the following concepts:</p>
-			<ul>
-				<li>Tom's Obvious Minimal Language (TOML)</li>
-				<li>Universally Unique Identifier (UUID)</li>
-				<li>JSON Schema</li>
-				<li>
-					EPUB e-Book format
-					<ul>
-						<li>EPUB v3.2 specification</li>
-						<li>
-							Open Publication Structure v2 specification (only used by EPUB v2
-							documents)
-						</li>
-						<li>Extensible Markup Language (XML)</li>
-						<li>Hypertext Markup Language (HTML)</li>
-						<li>OCF abstract container (EPUB-specific file hierarchy)</li>
-						<li>EPUB navigation document</li>
-						<li>Navigation Center eXtended (only used by EPUB v2 documents)</li>
-					</ul>
-				</li>
-				<li>
-					ZIP archive format
-					<ul>
-						<li>DEFLATE compression algorithm</li>
-						<li>LZMA compression algorithm</li>
-					</ul>
-				</li>
-			</ul>
-			<p>You will need the following digital tools:</p>
-			<ul>
-				<li>A file archiver, such as PeaZip</li>
-				<li>
-					A code editor, such as Visual Studio Code
-					<ul>
-						<li>
-							A plugin to validate TOML files against a JSON schema
-							(recommended)
-						</li>
-					</ul>
-				</li>
-				<li>A specialized ePub editor, such as Sigil (recommended)</li>
-			</ul>
-			<p>
-				Throughout the rest of this section, Portal's user data folder will be
-				referred to as <code>$APPDATA</code>.
-			</p>
-			<h3> Portal Schema</h3>
-			<p>
-				Portal preserves backwards-compatibility whenever possible. Updating
-				Portal should not break existing resources — if this happens, it's a
-				bug.
-			</p>
-			<p>
-				However, Portal makes no guarantees regarding forwards-compatibility for
-				resources. Resources designed for newer versions may fail to load on
-				older versions.
-			</p>
-			<p>
-				As a result, it may be preferable to use specific versions of Portal for
-				building resources. Portal automatically generates a folder containing
-				JSON schema upon startup, located at
-				<code>$APPDATA/Resource Schema/</code>. This schema documents the
-				structure and functionality of resource TOML files.
-			</p>
-			<p>
-				This manual aims to maintain a degree of both backwards and forwards
-				compatibility, and will not repeat information that is within the scope
-				of the relevant schema files.
-			</p>
-			<h3>📚 Creating Courses</h3>
-			<h3>🗺️ Creating Course Maps</h3>
-			<h3> Packaging and Sharing Resources</h3>
-			<p>
-				⚠ If you plan on publically distributing a Course, a basic
-				understanding of copyright law is required.
-			</p>
+			<section>
+				<h2 id="adding-resources">📥 Adding Resources</h2>
+				<p>
+					In order to use the Portal app, you will need content to view within
+					it. Inside the app, content is referred to as resources.
+				</p>
+				<p>
+					The app can display two different types of resources: 📚&nbsp;Courses
+					and 🗺️&nbsp;Course&nbsp;Maps.
+				</p>
+				<p>
+					📚&nbsp;Courses are a collection of textbooks. Textbooks can be
+					📕&nbsp;completable, where you can track your progress, or they can be
+					📒&nbsp;non-completable. Non-completable textbooks are typically
+					included as reference materials or supplemental reading.
+				</p>
+				<p>
+					🗺️&nbsp;Course&nbsp;Maps are an interactive tree of 📚&nbsp;Courses.
+					These help you plan your learning journey by providing an intended
+					order to complete courses in.
+				</p>
+				<h3>🌐 Finding Resources</h3>
+				<h3>📂 Importing Resources</h3>
+			</section>
 			<hr />
-			<h2 id="taking-courses">📚 Taking Courses</h2>
-			<h3> Planning Your Journey</h3>
-			<h3>📖 Studying</h3>
-			<h3>🗓 Staying Consistent</h3>
+			<section>
+				<h2 id="taking-courses">📚 Taking Courses</h2>
+				<h3> Planning Your Journey</h3>
+				<h3>📖 Studying</h3>
+				<h3>🗓 Staying Consistent</h3>
+			</section>
 			<hr />
-			<h2 id="troubleshooting">🧰 Troubleshooting</h2>
-			<h3>🛑 Understanding Errors</h3>
-			<h3>🛠️ Fixing Common Issues</h3>
-			<h3>🐞 Reporting Bugs</h3>
+			<section>
+				<h2 id="troubleshooting">🧰 Troubleshooting</h2>
+				<h3>🛑 Understanding Errors</h3>
+				<h3>🛠️ Fixing Common Issues</h3>
+				<h3>🐞 Reporting Bugs</h3>
+			</section>
+			<hr />
+			<section>
+				<h2 id="creating-resources"> Creating Resources</h2>
+				<p>
+					⚠ It is highly recommended that you read all preceding sections of
+					the manual before attempting to create a resource.
+				</p>
+				<p>
+					Unlike importing existing resources, creating resources for Portal is
+					a more involved progress. A degree of specialized technical knowledge
+					will be required.
+				</p>
+				<p>You will need a basic understanding of the following concepts:</p>
+				<ul>
+					<li>Tom's Obvious Minimal Language (TOML)</li>
+					<li>Universally Unique Identifier (UUID)</li>
+					<li>JSON Schema</li>
+					<li>
+						EPUB e-Book format
+						<ul>
+							<li>EPUB v3.2 specification</li>
+							<li>
+								Open Publication Structure v2 specification (only used by EPUB
+								v2 documents)
+							</li>
+							<li>Extensible Markup Language (XML)</li>
+							<li>Hypertext Markup Language (HTML)</li>
+							<li>OCF abstract container (EPUB-specific file hierarchy)</li>
+							<li>EPUB navigation document</li>
+							<li>
+								Navigation Center eXtended (only used by EPUB v2 documents)
+							</li>
+						</ul>
+					</li>
+					<li>ZIP archive format</li>
+				</ul>
+				<p>You will need the following digital tools:</p>
+				<ul>
+					<li>A file archiver, such as PeaZip</li>
+					<li>
+						A code editor, such as Visual Studio Code
+						<ul>
+							<li>
+								A plugin to validate TOML files against a JSON schema
+								(recommended)
+							</li>
+						</ul>
+					</li>
+					<li>A specialized ePub editor, such as Sigil (recommended)</li>
+				</ul>
+
+				<p>
+					Throughout the rest of this section, Portal's user data folder will be
+					referred to as <code>$APPDATA</code>.
+				</p>
+				<p>
+					ℹ When using UUIDs in filesystem paths, the UUID must be represented
+					in lowercase hexadecimal form, without separators (example:
+					<code>79a55c4e046343039424684764eccd8a</code>). When referring to
+					representations of UUIDs in filesystem paths, the syntax
+					<code>{UUID}</code> will be used.
+				</p>
+				<h3> Portal Schema</h3>
+
+				<p>
+					Portal preserves backwards-compatibility whenever possible. Updating
+					Portal should not break existing resources — if this happens, it's a
+					bug.
+				</p>
+				<p>
+					However, Portal makes no guarantees regarding forwards-compatibility
+					for resources. Resources designed for newer versions may fail to load
+					on older versions.
+				</p>
+				<p>
+					As a result, it may be preferable to use specific versions of Portal
+					for building resources. Portal automatically generates a folder
+					containing JSON schema upon startup, located at
+					<code>$APPDATA/Resource Schema/</code>. This schema documents the
+					structure and functionality of resource TOML files.
+				</p>
+				<p>
+					This manual aims to maintain a degree of both backwards and forwards
+					compatibility, and will not repeat information that is within the
+					scope of the relevant schema files.
+				</p>
+				<h3>📚 Courses</h3>
+				<h3>🗺️ Course Maps</h3>
+				<p>
+					Course Maps are TOML files, adhering to the
+					<code>$APPDATA/Resource Schema/Course Map.json</code> schema, which
+					contain a user-facing dependency tree of Courses (referenced by UUID).
+				</p>
+				<p>
+					Course Maps are loaded from the path
+					<code>$APPDATA/User Resources/{UUID}.toml</code> when using the
+					&nbsp;Course&nbsp;Navigator. An invalid Course Map will result in an
+					immediate error. However, a Course Map which references a non-existent
+					Course will only produce an error once the user attempts to load the
+					Course Map.
+				</p>
+				<h3> Packaging and Sharing Resources</h3>
+				<p>
+					⚠ You should
+					<strong
+						>always test all aspects of your resources in the Portal app</strong
+					>
+					before packaging and sharing them. Validating your resource against
+					the relevant schema will not catch all possible mistakes.
+				</p>
+				<p>
+					⚠ If you plan on publically distributing a Course, a basic
+					understanding of copyright law is required. Legal guidance is out of
+					scope for this document.
+				</p>
+				<p>
+					Resources are packaged as unencrypted ZIP archives, which are loaded
+					from the path
+					<code>$APPDATA/User Resources/{FILENAME}.zip</code>. The Portal app
+					then automatically extracts all detected ZIP archives in the resource
+					folder into <code>$APPDATA/User Resources/</code>, overwriting any
+					files which already exist. Decompression will not be performed
+					recursively, so putting ZIP archives within other ZIP archives will
+					lead to inconsistent behavior. Once the decompression process is
+					successfully completed, the ZIP archive will be deleted from the
+					folder.
+				</p>
+				<p>
+					ZIP archives can be uncompressed, or they can be compressed with one
+					of the decompression algorithms supported by the app: DEFLATE,
+					DEFLATE64, BZIP2, ZStandard, LZMA, and XZ.
+				</p>
+				<p>
+					This form of packaging allows for a substantial degree of flexibility.
+					Courses could be packaged as individual files, or multiple Courses
+					could be packaged together into the same archive. Course Maps could be
+					shared directly as TOML files, or they could be packaged together with
+					the Courses they reference. However, it is important to keep in mind
+					the needs and expectations of non-technical users when determining how
+					to package your resources.
+				</p>
+			</section>
 		</main>
 	</body>
 </html>
