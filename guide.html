@@ -42,7 +42,7 @@
 				<p>
 					🗺️&nbsp;Course&nbsp;Maps are an interactive tree of 📚&nbsp;Courses.
 					These help you plan your learning journey by providing an intended
-					order to complete courses in.
+					order for completing courses.
 				</p>
 				<h3>🌐 Finding Resources</h3>
 				<h3>📂 Importing Resources</h3>
@@ -63,15 +63,15 @@
 			</section>
 			<hr />
 			<section>
-				<h2 id="creating-resources"> Creating Resources</h2>
+				<h2 id="creating-resources"> Creator's Guide</h2>
 				<p>
 					⚠ It is highly recommended that you read all preceding sections of
-					the manual before attempting to create a resource.
+					the manual before reading this section.
 				</p>
 				<p>
-					Unlike importing existing resources, creating resources for Portal is
-					a more involved progress. A degree of specialized technical knowledge
-					will be required.
+					This guide is intended for those who wish to create resources for
+					Portal. This is a somewhat involved process, and a degree of
+					specialized technical knowledge will be required.
 				</p>
 				<p>You will need a basic understanding of the following concepts:</p>
 				<ul>
@@ -111,7 +111,6 @@
 					</li>
 					<li>A specialized ePub editor, such as Sigil (recommended)</li>
 				</ul>
-
 				<p>
 					Throughout the rest of this section, Portal's user data folder will be
 					referred to as <code>$APPDATA</code>.
@@ -123,29 +122,24 @@
 					representations of UUIDs in filesystem paths, the syntax
 					<code>{UUID}</code> will be used.
 				</p>
-				<h3> Portal Schema</h3>
-
+				<h3> Resource Schema</h3>
 				<p>
-					Portal preserves backwards-compatibility whenever possible. Updating
-					Portal should not break existing resources — if this happens, it's a
-					bug.
+					Portal preserves backwards-compatibility for documented behavior.
+					Updating Portal should not break existing resources — if this happens,
+					it's usually a bug. However, resources designed for newer versions of
+					Portal may fail to load on older versions.
 				</p>
 				<p>
-					However, Portal makes no guarantees regarding forwards-compatibility
-					for resources. Resources designed for newer versions may fail to load
-					on older versions.
-				</p>
-				<p>
-					As a result, it may be preferable to use specific versions of Portal
+					In some cases, it may be preferable to use specific versions of Portal
 					for building resources. Portal automatically generates a folder
 					containing JSON schema upon startup, located at
 					<code>$APPDATA/Resource Schema/</code>. This schema documents the
 					structure and functionality of resource TOML files.
 				</p>
 				<p>
-					This manual aims to maintain a degree of both backwards and forwards
-					compatibility, and will not repeat information that is within the
-					scope of the relevant schema files.
+					This manual's text aims to avoid being tightly coupled to a specific
+					app version, and will not repeat information that is within the scope
+					of the relevant schema files.
 				</p>
 				<h3>📚 Courses</h3>
 				<h3>🗺️ Course Maps</h3>
