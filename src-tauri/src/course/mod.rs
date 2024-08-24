@@ -55,8 +55,9 @@ pub struct CourseMapCourse {
     pub uuid: Uuid,
     /// A short title for the Course
     pub label: String,
-    /// The accent color of the Course, either specified in RGB hexadecimal format or as a CSS color keyword. Defaults to black if not specified.
-    /// This can be useful to visually differentiate courses by subject.
+    /// The accent color of the Course, either specified in RGB hexadecimal format or as a CSS color keyword. Defaults to black if not specified
+    ///
+    /// This can be useful to visually differentiate courses by subject
     pub color: Option<String>,
     /// A list of unidirectional dependency relations for this course
     #[serde(default)]
@@ -89,15 +90,17 @@ pub enum CourseMapRelationType {
 }
 
 /// A Course bundle index
+///
+/// Courses are distributed as a folder containing a course.toml index file, along with all resource files specified in the index file
 #[derive(Serialize, Deserialize, JsonSchema, Debug)]
 pub struct Course {
     #[schemars(skip_deserializing)]
     pub uuid: Option<Uuid>,
-    /// Title for the course
+    /// Title for the Course
     pub title: String,
-    /// Optional description for the course
+    /// Optional description for the Course
     pub description: Option<String>,
-    /// The textbooks which are a part of this course
+    /// The textbooks which are a part of this Course
     pub books: Vec<Textbook>,
 }
 
@@ -109,43 +112,42 @@ impl Course {
     }
 }
 
-/// A Textbook within a ``Course``
+/// A textbook within a Course
 #[derive(Serialize, Deserialize, JsonSchema, Debug)]
 pub struct Textbook {
-    /// Label for the textbook when displayed as part of a larger course.
-    /// This generally shouldn't be set to the full textbook title.
+    /// A short title for the textbook
     pub label: String,
-    /// The path of the textbook's corresponding ePub file, relative to the course's root directory.
+    /// The path of the textbook's corresponding document file, relative to the Course index
+    ///
+    /// At the moment, only the ePub format (versions 2 through 3.2) is supported
     pub file: PathBuf,
-    /// A list of *completable* ``Chapter`` items within the textbook.
+    /// A list of user-completable chapters within the textbook
     #[serde(default)]
     pub chapters: Vec<Chapter>,
 }
 
-/// A completable Chapter within a ``Textbook``
-///
-/// ``Chapter`` elements should only be included when a chapter's completion is meaningful to progress within the overall course.
+/// A user-completable chapter within a textbook
 #[derive(Serialize, Deserialize, JsonSchema, Debug)]
 pub struct Chapter {
-    /// The section-id (ePub href) corresponding to the chapter's root.
-    ///
-    /// If this is ommitted, the completion status of the entire chapter will not be displayed within the book reader.
+    /// The section-id (in ePub documents, section IDs are TOC hrefs) corresponding to the chapter's root
     pub root: Option<String>,
 
-    /// A group of completable ``Section`` items within the chapter.
+    /// A list of section groups within the chapter
     #[serde(default)]
     pub groups: Vec<SectionGroup>,
 }
 
-/// A group of completable ``Section`` elements within a Chapter.
+/// A group of user-completable sections within a textbook chapter, used to calculate chapter progress
 ///
-/// Grouping sections allows the weight of their completion to be intentionally weighted unevenly throughout the chapter.
+/// Chapter progress is calculated as:
+/// sum(sectionGroup[i].completion * sectionGroup[i].weight) / sum(sectionGroup[i].weight)
+///
+/// Section group completion is calculated as:
+/// sectionGroup.completedSections.length / sectionGroup.sections.length
 #[derive(Serialize, Deserialize, JsonSchema, Debug)]
 pub struct SectionGroup {
-    /// The relative weight multiplier of the ``SectionGroup``, defaults to 1.0.
+    /// The relative weight of SectionGroup's completion. Defaults to 1.0
     pub weight: Option<f32>,
-    /// The ``Section``s included in the section group, each corresponding to a section-id (ePub href).
-    ///
-    /// Sections should only be included when a section's completion is meaningful to progress within the overall course.
+    /// The user-completable sections included in the section group. Each item must be a valid section-id (in ePub documents, section IDs are TOC hrefs)
     pub sections: Vec<String>,
 }
