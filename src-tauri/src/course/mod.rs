@@ -117,9 +117,12 @@ impl Course {
 pub struct Textbook {
     /// A short title for the textbook
     pub label: String,
-    /// The path of the textbook's corresponding document file, relative to the Course index
+    /// The path of the textbook's corresponding document file, relative to the Course index. Must correspond to a file or folder contained within the Course's folder
     ///
-    /// At the moment, only the ePub format (versions 2 through 3.2) is supported
+    /// Supported formats:
+    /// - ePub (versions 2 - 3.2)
+    ///     - Must be unpacked (the ePub container must be a folder, not a file)
+    ///     - Section IDs = `href`s specified within the ePub's Table of Contents
     pub file: PathBuf,
     /// A list of user-completable chapters within the textbook
     #[serde(default)]
@@ -129,7 +132,7 @@ pub struct Textbook {
 /// A user-completable chapter within a textbook
 #[derive(Serialize, Deserialize, JsonSchema, Debug)]
 pub struct Chapter {
-    /// The section-id (in ePub documents, section IDs are TOC hrefs) corresponding to the chapter's root
+    /// The Section ID corresponding to the chapter's root
     pub root: Option<String>,
 
     /// A list of section groups within the chapter
@@ -146,8 +149,8 @@ pub struct Chapter {
 /// sectionGroup.completedSections.length / sectionGroup.sections.length
 #[derive(Serialize, Deserialize, JsonSchema, Debug)]
 pub struct SectionGroup {
-    /// The relative weight of SectionGroup's completion. Defaults to 1.0
+    /// The relative weight of the group's completion. Defaults to 1.0
     pub weight: Option<f32>,
-    /// The user-completable sections included in the section group. Each item must be a valid section-id (in ePub documents, section IDs are TOC hrefs)
+    /// The user-completable sections included in the section group. Each item must be a valid Section ID
     pub sections: Vec<String>,
 }
