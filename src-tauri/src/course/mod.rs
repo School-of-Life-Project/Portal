@@ -122,9 +122,9 @@ pub struct Textbook {
     /// The path of the textbook's corresponding document file, relative to the Course index. Must correspond to a file or folder contained within the Course's folder
     ///
     /// Supported formats:
-    /// - ePub (versions 2 - 3.2)
-    ///     - Must be unpacked (the ePub container must be a folder, not a file)
-    ///     - Section IDs = `href`s specified within the ePub's Table of Contents
+    /// - EPUB (versions 2 - 3.2)
+    ///     - Must be unpacked (the EPUB container must be a folder, not a file)
+    ///     - Section IDs = `href`s specified within the EPUB's Table of Contents
     pub file: PathBuf,
     /// A list of user-completable chapters within the textbook
     #[serde(default)]
