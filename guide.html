@@ -113,7 +113,8 @@
 				</ul>
 				<p>
 					Throughout the rest of this section, Portal's user data folder will be
-					referred to as <code>$APPDATA</code>.
+					referred to as <code>$APPDATA</code>. Paths are case-sensitive
+					(assuming the underlying filesystem is) unless otherwise specified.
 				</p>
 				<p>
 					ℹ When using UUIDs in filesystem paths, the UUID must be represented
@@ -231,14 +232,14 @@
 				<p>
 					Resources are packaged as unencrypted ZIP archives, which are loaded
 					from the path
-					<code>$APPDATA/User Resources/{FILENAME}.zip</code>. The Portal app
-					then automatically extracts all detected ZIP archives in the resource
-					folder into <code>$APPDATA/User Resources/</code>, overwriting any
-					files which already exist. Decompression will not be performed
-					recursively, so putting ZIP archives within other ZIP archives will
-					lead to inconsistent behavior. Once the decompression process is
-					successfully completed, the ZIP archive will be deleted from the
-					folder.
+					<code>$APPDATA/User Resources/*.zip</code> (extension is not case
+					sensitive). The Portal app then automatically extracts all detected
+					ZIP archives in the resource folder into
+					<code>$APPDATA/User Resources/</code>, overwriting any files which
+					already exist. Decompression will not be performed recursively, so
+					putting ZIP archives within other ZIP archives will lead to
+					inconsistent behavior. Once the decompression process is successfully
+					completed, the ZIP archive will be deleted from the folder.
 				</p>
 				<p>
 					ZIP archives can be uncompressed, or they can be compressed with one
