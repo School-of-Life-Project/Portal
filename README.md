@@ -4,6 +4,8 @@ Portal is an app built for independent learners.
 
 Unlike most eLearning applications, Portal is focused on making use of existing learning materials. Any textbook or set of textbooks can be converted into a Portal-compatible course, as long as it is available in the ePub format.
 
+In addition, Portal is designed to function well on a wide variety of hardware configurations and does not require an internet connection to use. Courses and app updates can be distributed via a [sneakernet](https://en.wikipedia.org/wiki/Sneakernet) if necessary.
+
 ## Notice
 
 Portal is currently a work in progress, and is not yet ready for use by end users. We welcome contributions from any developers interested in this project.

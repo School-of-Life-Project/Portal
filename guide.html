@@ -46,9 +46,9 @@
 			<h3>📂 Importing Resources</h3>
 			<h2 id="creating-resources">🎨 Creating Resources</h2>
 			<p>
-				 Unlke importing existing resources, creating resources for Portal is a
-				more involved progress. A degree of specialized technical knowledge will
-				be required.
+				 Unlike importing existing resources, creating resources for Portal is
+				a more involved progress. A degree of specialized technical knowledge
+				will be required.
 			</p>
 			<p>You will need a basic understanding of the following concepts:</p>
 			<ul>
@@ -93,11 +93,39 @@
 				<li>A specialized ePub editor, such as Sigil (recommended)</li>
 			</ul>
 			<p>
-				⚠ If you plan on publically distributing a Course, a basic
-				understanding of copyright law is required.
+				Throughout the rest of this section, Portal's user data folder will be
+				referred to as <code>$APPDATA</code>.
+			</p>
+			<h3> Portal Schema</h3>
+			<p>
+				Portal preserves backwards-compatibility whenever possible. Updating
+				Portal should not break existing resources — if this happens, it's a
+				bug.
+			</p>
+			<p>
+				However, Portal makes no guarantees regarding forwards-compatibility for
+				resources. Resources designed for newer versions may fail to load on
+				older versions.
+			</p>
+			<p>
+				As a result, it may be preferable to use specific versions of Portal for
+				building resources. Portal automatically generates a folder containing
+				JSON schema upon startup, located at
+				<code>$APPDATA/Resource Schema/</code>. This schema documents the
+				structure and functionality of resource TOML files.
+			</p>
+			<p>
+				This manual aims to maintain a degree of both backwards and forwards
+				compatibility, and will not repeat information that is within the scope
+				of the relevant schema files.
 			</p>
 			<h3>📚 Creating Courses</h3>
 			<h3>🗺️ Creating Course Maps</h3>
+			<h3> Packaging and Sharing Resources</h3>
+			<p>
+				⚠ If you plan on publically distributing a Course, a basic
+				understanding of copyright law is required.
+			</p>
 			<hr />
 			<h2 id="taking-courses">📚 Taking Courses</h2>
 			<h3> Planning Your Journey</h3>
