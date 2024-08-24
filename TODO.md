@@ -2,6 +2,8 @@
 subject to change
 
 ## pre-beta checklist
+Goal: First beta release before Dec 2024
+
 - [ ] Improve validation
 	- [ ] Course
 		- empty courses
@@ -30,15 +32,19 @@ subject to change
 - [ ] Fix ePub sandboxing
 
 ## pre-release checklist
+Goal: First release within 2025
+
 - [ ] Better enforce front-end/back-end separation
 	- [ ] Write comprehensive backend documentation
+	- [ ] Review application security
+- [ ] Add localization support
 - [ ] Write unit tests
 	- [ ] Front-end (vitest)
 	- [ ] Back-end
 - [ ] Subset embedded emoji font
 - [ ] Perform testing on legacy platforms
-- [ ] Review application security
 
 ## post-1.0 wishlist
-- [ ] theming
-- [ ] localization
+- [ ] Theming?
+- [ ] Description Markdown?
+- [ ] Author Metadata?
