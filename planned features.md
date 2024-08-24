@@ -1,19 +1,6 @@
 # Planned Features
 subject to change
 
-## Interface
-- allow panel resizing
-
-## Courses
-- add support for external links within ePub files
-- add support for README.md files
-- add authors field to courses
-- add language field to courses
-- prevent invalid states from being representable
-	- empty courses
-	- uncompletable chapters
-	- uncompletable section groups
-
 ## Course Building
 
 ### Short-term
@@ -43,10 +30,6 @@ subject to change
 
 - create a centralized hub to find and download courses?
 
-### Course Maps
-- prevent invalid states from being representable
-	- empty course maps
-
 ### Course Map Building
 
 #### Short term
@@ -58,20 +41,12 @@ write instructions on how to create course maps by hand
 
 ## App
 - should support a wide range of devices
-	- eventually add mobile support?
-	- support all widely used OSes: Windows, Mac, and Linux
 - should support a wide range of OS versions
 - should be very user-friendly and reliable
 - should be as performant as reasonably possible
 	- needs to run well on older devices
 - should include all tools a learner is likely to need
 	- excluding tools built into the base operating system, such as a calculator, note-taking app, and browser
-- ship a user guide as a built-in course
-
-### display settings
-- theming
-- allow enabling/disabling all non-core features
-- add localization support?
 
 ## Packaging
 - ship an example course map that contains a variety of courses, covering a variety of topics

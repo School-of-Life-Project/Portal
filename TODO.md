@@ -1,25 +1,44 @@
-# short-term project TODOs
+# short-term project roadmap
+subject to change
 
-## front-end TODOs
+## pre-beta checklist
+- [ ] Improve validation
+	- [ ] Course
+		- empty courses
+		- uncompletable chapters
+		- uncompletable section groups
+	- [ ] Course Map
+		- empty course maps
+		- invalid dependency trees
+- [ ] Implement JSON Schema generation
+- [ ] Add in-app documentation
+	- [ ] User documentation
+	- [ ] Creator documentation
+- [ ] Add mobile support
+	- [ ] Ensure usability on touchscreen devices
+- [ ] Write architecture.md
+- [ ] Build GH actions release pipeline
+- [ ] Perform cross-platform testing
 
-- [X] Get code from [frontend-test](https://github.com/transkatgirl/frontend-test) working as frontend
-	- [X] Finish implementing Course Maps
-	- [X] Implement Settings
-- [ ] Improve UI clarity
-	- [ ] Better distingush interactable elements
-	- [ ] Better distingush element actions
-- [X] Optimize ePub viewer loading
-- [X] Optimize shared viewer code
-- [ ] Write unit tests with vitest
-- [ ] Determine additional necessary polyfills
-- [ ] Ensure CSP blocks external origins
-- [ ] Subset embedded emoji font
-
-## backend TODOs
-
-- [ ] Write unit tests
-- [ ] Write documentation for internals via Rustdoc
-- [X] Prune dependencies
+### misc
 - [ ] Add additional Clippy lints
-- [X] Automatically decompress ePubs
-- [X] Implement concurrent decompression of Courses / Course Files
+- [ ] Prune dependencies
+
+### during-beta checklist
+- [ ] Add support for panel resizing
+- [ ] Fix ePub external links
+- [ ] Fix ePub sandboxing
+
+## pre-release checklist
+- [ ] Better enforce front-end/back-end separation
+	- [ ] Write comprehensive backend documentation
+- [ ] Write unit tests
+	- [ ] Front-end (vitest)
+	- [ ] Back-end
+- [ ] Subset embedded emoji font
+- [ ] Perform testing on legacy platforms
+- [ ] Review application security
+
+## post-1.0 wishlist
+- [ ] theming
+- [ ] localization
