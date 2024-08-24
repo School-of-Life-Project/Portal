@@ -1,6 +1,8 @@
 # Portal
 
-Portal is an eLearning application built for independent learners, designed to allow the use of existing learning materials such as textbooks.
+Portal is an app built for independent learners.
+
+Unlike most eLearning applications, Portal is focused on making use of existing learning materials. Any textbook or set of textbooks can be converted into a Portal-compatible course, as long as it is available in the ePub format.
 
 ## Notice
 

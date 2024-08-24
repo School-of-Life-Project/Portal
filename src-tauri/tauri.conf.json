@@ -18,8 +18,7 @@
 		"publisher": "School of Life Project",
 		"copyright": "Licensed under BSL-1.0",
 		"category": "Education",
-		"shortDescription": "A textbook-based eLearning application.",
-		"longDescription": "Portal is an eLearning application built for independent learners, designed to allow the use of existing learning materials such as textbooks."
+		"shortDescription": "An app built for independent learners."
 	},
 	"productName": "school-of-life-portal",
 	"identifier": "com.schoolOfLifeProject.Portal",
