@@ -35,7 +35,9 @@ fn into_relative_path(path: &Path) -> PathBuf {
     new
 }
 
-/// A dependency tree of Courses
+/// A dependency tree of Courses. Must be a valid TOML file
+///
+/// The Course Map's filename must be a UUID in lowercase hexadecimal form without separator characters, with the `.toml`` file extension.
 #[derive(Serialize, Deserialize, JsonSchema, Debug)]
 pub struct CourseMap {
     #[serde(skip_deserializing)]
@@ -89,9 +91,9 @@ pub enum CourseMapRelationType {
     Corequisite,
 }
 
-/// A Course bundle index
+/// A Course bundle index. Must be a valid TOML file
 ///
-/// Courses are distributed as a folder containing a course.toml index file, along with all resource files specified in the index file
+/// Courses are distributed as a folder containing a course.toml at the root. The Course folder's filename must be a UUID in lowercase hexadecimal form without separator characters.
 #[derive(Serialize, Deserialize, JsonSchema, Debug)]
 pub struct Course {
     #[schemars(skip_deserializing)]
