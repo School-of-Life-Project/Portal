@@ -22,10 +22,6 @@ Goal: First beta release before Dec 2024
 - [ ] Build GH actions release pipeline
 - [ ] Perform cross-platform testing
 
-### misc
-- [ ] Add additional Clippy lints
-- [ ] Prune dependencies
-
 ### during-beta checklist
 - [ ] Add support for panel resizing
 - [ ] Fix ePub external links
@@ -37,6 +33,8 @@ Goal: First release within 2025
 - [ ] Better enforce front-end/back-end separation
 	- [ ] Write comprehensive backend documentation
 	- [ ] Review application security
+	- [ ] Review code linting
+	- [ ] Review dependencies
 - [ ] Add localization support
 - [ ] Write unit tests
 	- [ ] Front-end (vitest)
