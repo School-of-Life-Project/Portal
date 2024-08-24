@@ -1,4 +1,5 @@
 #![allow(clippy::module_name_repetitions)]
+#![allow(clippy::doc_markdown)] // Documentation comments are primarily used for JsonSchema
 
 use std::path::{Component, Path, PathBuf};
 
@@ -34,75 +35,69 @@ fn into_relative_path(path: &Path) -> PathBuf {
     new
 }
 
-/// A dependency tree of courses
+/// A dependency tree of Courses
 #[derive(Serialize, Deserialize, JsonSchema, Debug)]
 pub struct CourseMap {
-    /// The unique ID of the course map.
     #[serde(skip_deserializing)]
     pub uuid: Uuid,
-    /// Title for the course map
+    /// Title for the Course Map
     pub title: String,
-    /// Optional description for the course map
+    /// Optional description for the Course Map
     pub description: Option<String>,
-    /// The courses which are a part of this course map.
+    /// The Courses which are a part of this Course Map
     pub courses: Vec<CourseMapCourse>,
 }
 
-/// A representation of a Course within a ``CourseMap``
+/// A representation of a Course within a Course Map
 #[derive(Serialize, Deserialize, JsonSchema, Debug)]
 pub struct CourseMapCourse {
-    /// The unique ID of the course, mapping to a ``Course`` object.
+    /// The unique identifier for the Course
     pub uuid: Uuid,
-    /// Label for the course when displayed as part of the course map.
-    /// This generally shouldn't be set to the full course title.
+    /// A short title for the Course
     pub label: String,
-    /// The accent color of the course, defaulting to black if not specified.
+    /// The accent color of the Course, either specified in RGB hexadecimal format or as a CSS color keyword. Defaults to black if not specified.
     /// This can be useful to visually differentiate courses by subject.
     pub color: Option<String>,
-
-    /// The courses which have a dependency relation to this course.
-    ///
-    /// Relations are always unidirectional, with the source being the ``CourseMapRelation`` and the destination being the ``CourseMapCourse``.
+    /// A list of unidirectional dependency relations for this course
     #[serde(default)]
     pub relations: Vec<CourseMapRelation>,
 }
 
-/// A representation of a Course's dependency relation.
+/// A representation of a Course's dependency relation
+///
+/// Relations are always unidirectional: CourseMapRelation (source) -> CourseMapCourse (destination)
 #[derive(Serialize, Deserialize, JsonSchema, Debug)]
 pub struct CourseMapRelation {
-    /// The unique ID of the course, mapping to a ``CourseMapCourse`` object.
+    /// The unique identifier of the (source) Course. Must correspond to an existing CourseMapCourse object
     pub uuid: Uuid,
 
-    /// The type of the relation.
-    /// Relations are always unidirectional, with the source being the ``CourseMapRelation`` and the destination being the ``CourseMapCourse``.
+    /// The type of the relation
     pub r#type: CourseMapRelationType,
 
-    /// Optional courses should be used to specify material which, while not necessary to complete the course itself, gives you a deeper understanding of the material than the required courses alone.
-    /// Do not use optional courses to list courses which are required to understand the material, or courses which would be better specified as required corequisites (such as courses which are necessary to understand future material).
+    /// Mark a relation as optional
     #[serde(default)]
     pub optional: bool,
 }
 
-/// The type of a ``CourseMapRelation``.
+/// Types of Course dependency relations
 #[derive(Serialize, Deserialize, JsonSchema, Debug)]
 pub enum CourseMapRelationType {
-    /// Prerequisites are courses which should be taken before the following course.
+    /// Prerequisites are Courses which should be taken before the following Course
     Prerequisite,
-    /// Corequisites are courses which should be taken either with a course or before it.
+    /// Corequisites are Courses which should be taken before *or* at the same time as the following Course
     Corequisite,
 }
 
 /// A Course bundle index
 #[derive(Serialize, Deserialize, JsonSchema, Debug)]
 pub struct Course {
-    /// The unique ID of the course.
     #[schemars(skip_deserializing)]
     pub uuid: Option<Uuid>,
     /// Title for the course
     pub title: String,
     /// Optional description for the course
     pub description: Option<String>,
-    /// The textbooks which are a part of this course.
+    /// The textbooks which are a part of this course
     pub books: Vec<Textbook>,
 }
 
