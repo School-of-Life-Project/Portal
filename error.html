@@ -20,12 +20,11 @@
 					>.
 				</p>
 				<ul>
-					<li><a href="/index.html">🚪 Return to homepage</a></li>
+					<li><a href="/">🏫 Go home</a></li>
 					<li>
-						<a href="javascript:history.back()"
-							>🔙 Return to previous page (not recommended)</a
-						>
+						<a href="javascript:history.back()">🔙 Return to previous page</a>
 					</li>
+					<li><a href="/guide.html">📜 View guide</a></li>
 					<li>
 						<a href="javascript:window.__TAURI_INVOKE__('open_data_dir')"
 							>📂 Open resource folder</a
@@ -34,18 +33,18 @@
 					<li>
 						<a
 							href="javascript:window.__TAURI_INVOKE__('open_internal_data_dir')"
-							>📂 Open app data folder</a
+							>📂 Open data folder</a
 						>
 					</li>
 					<li>
 						<a href="javascript:window.__TAURI_INVOKE__('open_project_repo')"
-							>🔗 View the app's source code</a
+							>🔗 App website & source code</a
 						>
 					</li>
 					<li>
 						<a
 							href="javascript:window.__TAURI_INVOKE__('open_project_issue_tracker', {data: false})"
-							>🔗 View the app's issue tracker</a
+							>🔗 App issue tracker</a
 						>
 					</li>
 				</ul>
@@ -57,31 +56,24 @@
 					</p>
 					<ul>
 						<li>
-							<a
-								href="javascript:window.__TAURI_INVOKE__('set_active_courses', {courses: []})"
-								>📚 Reset active course list</a
-							>
-						</li>
-						<li>
 							<a href="javascript:window.__TAURI_INVOKE__('set_settings')"
 								>⚙️ Reset settings to defaults</a
 							>
 						</li>
+						<li>
+							<a
+								href="javascript:window.__TAURI_INVOKE__('set_active_courses', {courses: []})"
+								>📚 Reset active courses</a
+							>
+						</li>
 					</ul>
 					<p>
-						If you believe the app's database is corrupted (and the above
-						actions have not corrected the issue), open the
+						🗃 The app's database is stored in the
 						<a
 							href="javascript:window.__TAURI_INVOKE__('open_internal_data_dir')"
 							>app's data folder</a
-						>
-						and delete the "Internal Database" folder,
-						<em>then restart the app</em>. This will
-						<strong>wipe all progress data and user settings</strong>.
-					</p>
-					<p>
-						<strong>Application database corruptions are rare</strong>. Most
-						common errors are caused by a malformed course or course map.
+						>, inside the "Internal Database" folder. This database stores all
+						user data (progress, settings, etc).
 					</p>
 				</details>
 			</footer>
