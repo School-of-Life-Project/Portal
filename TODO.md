@@ -25,9 +25,9 @@ Goal: First beta release before Dec 2024
 ### during-beta checklist
 During the Beta period, the focus will shift towards developing tooling and content for the app, rather than developing the app itself.
 
-- [ ] Add support for panel resizing
 - [ ] Fix ePub external links
 - [ ] Fix ePub sandboxing
+- [ ] Add support for panel resizing
 
 ## pre-release checklist
 - [ ] Better enforce front-end/back-end separation
