@@ -1,6 +1,8 @@
 import {
 	displayError,
 	getSettings,
+	openDataDir,
+	openInternalDataDir,
 	openIssueTracker,
 	openRepo,
 	setActiveCourses,
@@ -16,6 +18,8 @@ const resetCoursesButton = document.getElementById("resetCoursesButton");
 const resetSettingsButton = document.getElementById("resetSettingsButton");
 const appWebsiteButton = document.getElementById("appWebsiteButton");
 const appIssueButton = document.getElementById("appIssueButton");
+const resourceButton = document.getElementById("resourceButton");
+const internalFolderButton = document.getElementById("internalFolderButton");
 const settingsForm = document.getElementById("settingsRoot");
 
 function updateSettings(settings?: Settings) {
@@ -56,22 +60,60 @@ if (resetCoursesButton) {
 
 if (appWebsiteButton) {
 	appWebsiteButton.addEventListener("click", () => {
-		openRepo();
+		openRepo().catch((error) => {
+			displayError(error);
+		});
 	});
 	appWebsiteButton.addEventListener("keydown", (event) => {
 		if (event.code == "Enter") {
-			openRepo();
+			openRepo().catch((error) => {
+				displayError(error);
+			});
 		}
 	});
 }
 
 if (appIssueButton) {
 	appIssueButton.addEventListener("click", () => {
-		openIssueTracker(false);
+		openIssueTracker(false).catch((error) => {
+			displayError(error);
+		});
 	});
 	appIssueButton.addEventListener("keydown", (event) => {
 		if (event.code == "Enter") {
-			openIssueTracker(false);
+			openIssueTracker(false).catch((error) => {
+				displayError(error);
+			});
+		}
+	});
+}
+
+if (resourceButton) {
+	resourceButton.addEventListener("click", () => {
+		openDataDir().catch((error) => {
+			displayError(error);
+		});
+	});
+	resourceButton.addEventListener("keydown", (event) => {
+		if (event.code == "Enter") {
+			openDataDir().catch((error) => {
+				displayError(error);
+			});
+		}
+	});
+}
+
+if (internalFolderButton) {
+	internalFolderButton.addEventListener("click", () => {
+		openInternalDataDir().catch((error) => {
+			displayError(error);
+		});
+	});
+	internalFolderButton.addEventListener("keydown", (event) => {
+		if (event.code == "Enter") {
+			openInternalDataDir().catch((error) => {
+				displayError(error);
+			});
 		}
 	});
 }
