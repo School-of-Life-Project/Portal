@@ -2,6 +2,7 @@
 
 use std::path::PathBuf;
 
+use schemars::schema_for;
 use serde::Serialize;
 use tokio::try_join;
 use uuid::Uuid;
@@ -26,7 +27,26 @@ impl State {
         let database_path = root.join("Internal Database");
         let datastore_path = root.join("User Resources");
 
+        let course_schema = schema_for!(Course);
+        let course_map_schema = schema_for!(CourseMap);
+
         std::fs::create_dir_all(&datastore_path)?;
+
+        let schema_path = root.join("Resource Schema");
+
+        std::fs::create_dir_all(&schema_path)?;
+
+        let course_schema_path = schema_path.join("Course.json");
+        let course_map_schema_path = schema_path.join("CourseMap.json");
+
+        std::fs::write(
+            course_schema_path,
+            serde_json::to_string_pretty(&course_schema)?,
+        )?;
+        std::fs::write(
+            course_map_schema_path,
+            serde_json::to_string_pretty(&course_map_schema)?,
+        )?;
 
         Ok(Self {
             root,

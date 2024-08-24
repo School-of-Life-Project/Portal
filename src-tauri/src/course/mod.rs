@@ -2,6 +2,7 @@
 
 use std::path::{Component, Path, PathBuf};
 
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -34,7 +35,7 @@ fn into_relative_path(path: &Path) -> PathBuf {
 }
 
 /// A dependency tree of courses
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, JsonSchema, Debug)]
 pub struct CourseMap {
     /// The unique ID of the course map.
     #[serde(skip_deserializing)]
@@ -48,7 +49,7 @@ pub struct CourseMap {
 }
 
 /// A representation of a Course within a ``CourseMap``
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, JsonSchema, Debug)]
 pub struct CourseMapCourse {
     /// The unique ID of the course, mapping to a ``Course`` object.
     pub uuid: Uuid,
@@ -67,7 +68,7 @@ pub struct CourseMapCourse {
 }
 
 /// A representation of a Course's dependency relation.
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, JsonSchema, Debug)]
 pub struct CourseMapRelation {
     /// The unique ID of the course, mapping to a ``CourseMapCourse`` object.
     pub uuid: Uuid,
@@ -83,7 +84,7 @@ pub struct CourseMapRelation {
 }
 
 /// The type of a ``CourseMapRelation``.
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, JsonSchema, Debug)]
 pub enum CourseMapRelationType {
     /// Prerequisites are courses which should be taken before the following course.
     Prerequisite,
@@ -92,9 +93,10 @@ pub enum CourseMapRelationType {
 }
 
 /// A Course bundle index
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, JsonSchema, Debug)]
 pub struct Course {
     /// The unique ID of the course.
+    #[schemars(skip_deserializing)]
     pub uuid: Option<Uuid>,
     /// Title for the course
     pub title: String,
@@ -113,7 +115,7 @@ impl Course {
 }
 
 /// A Textbook within a ``Course``
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, JsonSchema, Debug)]
 pub struct Textbook {
     /// Label for the textbook when displayed as part of a larger course.
     /// This generally shouldn't be set to the full textbook title.
@@ -128,7 +130,7 @@ pub struct Textbook {
 /// A completable Chapter within a ``Textbook``
 ///
 /// ``Chapter`` elements should only be included when a chapter's completion is meaningful to progress within the overall course.
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, JsonSchema, Debug)]
 pub struct Chapter {
     /// The section-id (ePub href) corresponding to the chapter's root.
     ///
@@ -143,7 +145,7 @@ pub struct Chapter {
 /// A group of completable ``Section`` elements within a Chapter.
 ///
 /// Grouping sections allows the weight of their completion to be intentionally weighted unevenly throughout the chapter.
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, JsonSchema, Debug)]
 pub struct SectionGroup {
     /// The relative weight multiplier of the ``SectionGroup``, defaults to 1.0.
     pub weight: Option<f32>,

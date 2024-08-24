@@ -2784,6 +2784,7 @@ dependencies = [
  "serde",
  "serde_json",
  "url",
+ "uuid",
 ]
 
 [[package]]
@@ -2808,6 +2809,7 @@ dependencies = [
  "futures-util",
  "layout-rs",
  "open",
+ "schemars",
  "serde",
  "serde_json",
  "sled",

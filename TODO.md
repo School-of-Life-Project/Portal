@@ -12,7 +12,7 @@ Goal: First beta release before Dec 2024
 	- [ ] Course Map
 		- empty course maps
 		- invalid dependency trees
-- [ ] Implement JSON Schema generation
+- [X] Implement JSON Schema generation
 - [ ] Add in-app documentation
 	- [ ] User documentation
 	- [ ] Creator documentation
