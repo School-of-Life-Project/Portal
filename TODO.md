@@ -22,7 +22,7 @@ Goal: First beta release before Dec 2024
 - [ ] Build GH actions release pipeline
 - [ ] Perform cross-platform testing
 
-### during-beta checklist
+## during-beta checklist
 During the Beta period, the focus will shift towards developing tooling and content for the app, rather than developing the app itself.
 
 - [ ] Fix ePub external links
