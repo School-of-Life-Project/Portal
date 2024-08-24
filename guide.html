@@ -160,13 +160,45 @@
 					&nbsp;Course&nbsp;Navigator, all Courses are loaded, regardless of
 					their active status.
 				</p>
-				<h4>📕 Textbooks</h4>
-				<p>Portal is built around using the EPUB format for textbooks.</p>
+				<h4>📕 Textbook EPUBs</h4>
+				<p>
+					ℹ This section assumes that you have an existing textbook, in EPUB
+					format, that you would like to include in a Course. Converting
+					textbooks into the EPUB format, or creating EPUB documents from
+					scratch, is out of scope for this document.
+				</p>
+				<p>
+					All textbooks referenced by the <code>course.toml</code> must be
+					unpacked EPUB files (the EPUB container must be a folder, not a file).
+					Existing EPUBs can be unpacked by changing their extension to
+					<code>.zip</code> and then extracting the archive. Review the Course
+					schema for a list of supported EPUB versions.
+				</p>
+				<p>
+					In order for a textbook to be completable, a list of user-completable
+					chapters must be included in the <code>course.toml</code> section for
+					that textbook. Each referenced section in the chapter must match a a
+					valid <code>href</code> from the EPUB's Table of Contents.
+				</p>
+				<p>
+					ℹ Only make chapters or sections completable when their completion is
+					<em>meaningful</em>. Sections included for reference or as
+					supplementary material should not be marked as completable.
+				</p>
+				<p>
+					⚠ In order to ensure each textbook within your course is completable,
+					you must test them within the Portal app.
+					<em>Referencing invalid sections will not result in an error.</em>
+				</p>
 				<p>
 					The 📖&nbsp;Viewer is the only part of the application which loads
-					Course textbooks (all other areas of the app only load the
+					Course textbooks (all other areas of the app will only load the
 					<code>course.toml</code>). It will only load the textbook being
 					actively viewed.
+				</p>
+				<p>
+					The 🏫&nbsp;Home page and &nbsp;Course&nbsp;Navigator are useful
+					areas to check the completion of a Course.
 				</p>
 				<h3>🗺️ Course Maps</h3>
 				<p>
