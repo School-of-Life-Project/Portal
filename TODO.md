@@ -15,7 +15,7 @@ Goal: First beta release before Dec 2024
 - [X] Implement JSON Schema generation
 - [ ] Add in-app documentation
 	- [ ] User documentation
-	- [ ] Creator documentation
+	- [X] Creator documentation
 - [ ] Add mobile support
 	- [ ] Ensure usability on touchscreen devices
 - [ ] Write architecture.md
