@@ -35,7 +35,6 @@ During the Beta period, the focus will shift towards developing tooling and cont
 	- [ ] Review application security
 	- [ ] Review code linting
 	- [ ] Review dependencies
-- [ ] Add localization support
 - [ ] Write unit tests
 	- [ ] Front-end (vitest)
 	- [ ] Back-end
@@ -44,5 +43,6 @@ During the Beta period, the focus will shift towards developing tooling and cont
 
 ## post-1.0 wishlist
 - [ ] Theming?
+- [ ] Localization?
 - [ ] Description Markdown?
 - [ ] Author Metadata?

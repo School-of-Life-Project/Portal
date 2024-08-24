@@ -26,10 +26,6 @@ button[type="button"] {
 	margin: var(--button-padding) var(--button-padding) 0 0;
 }
 
-input[type="checkbox"] {
-	margin-right: 0.4em;
-}
-
 nav.related {
 	float: right;
 }

@@ -151,10 +151,10 @@ function buildSettingsForm(settings: Settings) {
 
 			const clockLabel = document.createElement("label");
 			clockLabel.setAttribute("for", "show_course_clock");
-			clockLabel.innerText = "Show stopwatch in textbook viewer";
+			clockLabel.innerText = "📖 Show viewer stopwatch: ";
 
-			fieldset1.appendChild(clockCheckbox);
 			fieldset1.appendChild(clockLabel);
+			fieldset1.appendChild(clockCheckbox);
 			fieldset1.appendChild(document.createElement("br"));
 			clockCheckbox.addEventListener("change", handleInputUpdate);
 
@@ -168,7 +168,7 @@ function buildSettingsForm(settings: Settings) {
 
 			const courseTimeLabel = document.createElement("label");
 			courseTimeLabel.setAttribute("for", "maximum_course_time");
-			courseTimeLabel.innerText = "Maximum displayed time (in minutes): ";
+			courseTimeLabel.innerText = "⌛️ Maximum time (in minutes): ";
 
 			fieldset1.appendChild(courseTimeLabel);
 			fieldset1.appendChild(courseTimeInput);
@@ -193,7 +193,7 @@ function buildSettingsForm(settings: Settings) {
 
 			const weekLabel = document.createElement("label");
 			weekLabel.setAttribute("for", "weeks_displayed");
-			weekLabel.innerText = "Weeks displayed: ";
+			weekLabel.innerText = "📅 Displayed weeks: ";
 
 			fieldset2.appendChild(weekLabel);
 			fieldset2.appendChild(weekInput);
@@ -210,7 +210,7 @@ function buildSettingsForm(settings: Settings) {
 
 			const maxTotalTimeLabel = document.createElement("label");
 			maxTotalTimeLabel.setAttribute("for", "maximum_daily_time");
-			maxTotalTimeLabel.innerText = "Maximum displayed time (in minutes): ";
+			maxTotalTimeLabel.innerText = "⌛️ Maximum time (in minutes): ";
 
 			fieldset2.appendChild(maxTotalTimeLabel);
 			fieldset2.appendChild(maxTotalTimeInput);
@@ -227,7 +227,7 @@ function buildSettingsForm(settings: Settings) {
 
 			const maxTotalChapterLabel = document.createElement("label");
 			maxTotalChapterLabel.setAttribute("for", "maximum_daily_chapters");
-			maxTotalChapterLabel.innerText = "Maximum displayed chapters: ";
+			maxTotalChapterLabel.innerText = "📑 Maximum chapters: ";
 
 			fieldset2.appendChild(maxTotalChapterLabel);
 			fieldset2.appendChild(maxTotalChapterInput);
