@@ -18,7 +18,7 @@ Goal: First beta release before Dec 2024
 - [ ] Add mobile support
 	- [ ] Ensure usability on touchscreen devices
 - [ ] Write architecture.md
-- [ ] Build GH actions release pipeline
+- [X] Build GH actions release pipeline
 - [ ] Perform cross-platform testing
 
 ## during-beta checklist
