@@ -27,6 +27,7 @@ During the Beta period, the focus will shift towards developing tooling and cont
 - [ ] Fix ePub sandboxing
 - [ ] Add support for panel resizing
 - [ ] Add mobile support
+- [ ] Add builds for ARM Linux (see https://v2.tauri.app/distribute/pipelines/github/#arm-runner-compilation)
 
 ## pre-release checklist
 - [ ] Better enforce front-end/back-end separation
@@ -45,4 +46,4 @@ During the Beta period, the focus will shift towards developing tooling and cont
 - [ ] Localization?
 - [ ] Description Markdown?
 - [ ] Author Metadata?
-- [ ] ARM Linux and Windows builds in CI?
+- [ ] ARM Windows builds in CI?
