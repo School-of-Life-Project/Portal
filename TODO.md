@@ -4,14 +4,13 @@ subject to change
 ## pre-beta checklist
 Goal: First beta release before Dec 2024
 
-- [ ] Improve validation
-	- [ ] Course
-		- empty courses
+- [X] Improve internal handling of malformed resources
+	- [X] Course
 		- uncompletable chapters
 		- uncompletable section groups
-	- [ ] Course Map
-		- empty course maps
+	- [X] Course Map
 		- invalid dependency trees
+- [ ] Fail on missing Course sections
 - [X] Implement JSON Schema generation
 - [ ] Add in-app documentation
 	- [ ] User documentation
