@@ -129,8 +129,8 @@ pub async fn set_course_completion(
     completion: CourseCompletion,
 ) -> Result<(), ErrorWrapper> {
     let uuid = course.uuid.ok_or(ErrorWrapper {
-        message: "Unable to parse Course!".to_string(),
-        cause: "Missing field uuid".to_string(),
+        message: "An internal error occured".to_string(),
+        cause: "Course is missing field uuid".to_string(),
     })?;
 
     state
@@ -159,10 +159,9 @@ pub async fn set_active_courses(
 
 #[tauri::command]
 pub async fn get_all(state: tauri::State<'_, State>) -> Result<ListingResult, ErrorWrapper> {
-    let scan =
-        state.datastore.scan().await.map_err(|e| {
-            ErrorWrapper::new("Unable to get Course/CourseMap list".to_string(), &e)
-        })?;
+    let scan = state.datastore.scan().await.map_err(|e| {
+        ErrorWrapper::new("Unable to get Course and CourseMap list".to_string(), &e)
+    })?;
 
     let (courses, course_maps) = try_join!(
         util::get_courses(&state, &scan.courses),

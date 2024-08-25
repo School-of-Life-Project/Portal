@@ -181,8 +181,8 @@ export class ViewManager {
 					chapters.set(chapter.root, chapter);
 				} else {
 					displayError({
-						message: "Unable to find chapter root " + chapter.root,
-						cause: "Occured while loading Course " + course.course.uuid,
+						message: "Unable to display Course " + course.course.uuid,
+						cause: "Unable to find chapter root " + chapter.root,
 					});
 				}
 			}
@@ -201,8 +201,8 @@ export class ViewManager {
 						chapters.set(section, chapter);
 					} else {
 						displayError({
-							message: "Unable to find section " + section,
-							cause: "Occured while loading Course " + course.course.uuid,
+							message: "Unable to display Course " + course.course.uuid,
+							cause: "Unable to find section " + section,
 						});
 					}
 				}

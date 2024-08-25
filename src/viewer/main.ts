@@ -32,13 +32,13 @@ if (identifier) {
 		});
 	} else {
 		displayError({
-			message: "Unable to initalize document viewer",
+			message: "An internal error occured",
 			cause: "Could not parse document_index",
 		});
 	}
 } else {
 	displayError({
-		message: "Unable to initalize document viewer",
+		message: "An internal error occured",
 		cause: "Course UUID was not specified",
 	});
 }
@@ -80,7 +80,7 @@ if (
 				return await viewer.render(viewManager, result[1]);
 			} catch (error) {
 				displayError({
-					message: "Unable to display document",
+					message: "Unable to display Course " + result[0].uuid,
 					cause: String(error),
 				});
 			}
@@ -88,9 +88,4 @@ if (
 		.catch((error: Error) => {
 			displayError(error);
 		});
-} else if (settings && coursePromise) {
-	displayError({
-		message: "Unable to initalize document viewer",
-		cause: "Could not find HTMLElement",
-	});
 }

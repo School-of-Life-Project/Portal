@@ -132,8 +132,8 @@ function buildCourseMapInfo(
 						}
 					} else {
 						displayError({
-							message: "Unable to find Course " + identifier,
-							cause: "Error occured while parsing CourseMap " + courseMap.uuid,
+							message: "Unable to display Course Map " + courseMap.uuid,
+							cause: "Course " + identifier + " does not exist",
 						});
 					}
 				}
@@ -146,11 +146,6 @@ function buildCourseMapInfo(
 
 		if (course) {
 			displayCourse(course[0], course[1], contentViewer, styleContainer);
-		} else {
-			displayError({
-				message: "Unable to find Course " + identifier,
-				cause: "Error occured within displayCourseInfo",
-			});
 		}
 	};
 
