@@ -50,7 +50,13 @@ dpkg -i school-of-life-portal_*.deb
 
 #### RPM-based distros
 
-**TODO**
+Download the `.rpm` with the appropriate CPU architecture for your device.
+
+Then, run the following command as root:
+
+```bash
+dnf install school-of-life-portal_*.rpm
+```
 
 ## Building
 
