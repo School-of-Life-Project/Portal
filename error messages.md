@@ -1,25 +1,45 @@
-# error messages
+# Possible UI Error Messages
 
-## backend
+## Other
+
+If the application fails to start, it is either a Filesystem Error, a Database Error, or an OS Error.
+
+## Backend
 
 - An internal error occured
-- Unable to get Course {id}
-- Unable to get progress for Course {id}
-- Unable to get list of active Courses
-- Unable to check if Course exists
-- Unable to get Course Map {uuid}
+
+### OS Errors
+
 - Unable to launch OS opener for {path}
+
+### Malformed Resources
+
+- Unable to get Course {id}
+- Unable to get Course Map {uuid}
+
+### Filesystem Errors
+
+- Unable to check if Course exists
+- Unable to get Course and CourseMap list
+
+### Database Errors
+
+- Unable to get list of active Courses
+- Unable to get progress for Course {id}
 - Unable to update progress for Course {uuid}
 - Unable to update list of active Courses
-- Unable to get Course and CourseMap list
 - Unable to get overall progress
 - Unable to get Settings
 - Unable to update Settings
 
-## frontend
+## Frontend
 
 - An internal error occured
+
+### Malformed Resources
+
 - Unable to display Course {id}
-	- Cause: Unable to find [section / chapter root] {id}
+	- Cause: Unable to find section {id}
+	- Cause: Unable to find chapter root {id}
 - Unable to display Course Map {id}
 	- Cause: Course {id} does not exist
