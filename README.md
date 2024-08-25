@@ -83,3 +83,5 @@ Then, you can:
 Portal is built using [Tauri](https://tauri.app) and [Vite](https://vitejs.dev).
 
 The Rust-based backend of the application is used to load resources from disk and manage the state of the [embedded database](https://github.com/spacejam/sled). The TypeScript-based frontend of the application is used to render UI elements and display textbooks using [epub.js](https://github.com/futurepress/epub.js/).
+
+Portal is a work in progress. See the [development roadmap](TODO.md) for more information.
