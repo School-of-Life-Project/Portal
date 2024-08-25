@@ -121,7 +121,7 @@ pub struct Textbook {
     pub label: String,
     /// The path of the textbook's corresponding document, relative to the Course index
     ///
-    /// Must resolve to an unpacked EPUB (the EPUB container must be a folder, not a file). EPUB versions 2 - 3.2 are supported
+    /// Must resolve to an unpacked EPUB (the EPUB container must be a folder, not a file). EPUB versions 2 - 3.2 are supported. EPUBs containing JavaScript are not supported
     pub file: PathBuf,
     /// A list of user-completable chapters within the textbook
     #[serde(default)]
