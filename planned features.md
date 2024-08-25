@@ -39,14 +39,5 @@ write instructions on how to create course maps by hand
 - add a course map building interface
 	- make a separate app / script / plugin for building course maps?
 
-## App
-- should support a wide range of devices
-- should support a wide range of OS versions
-- should be very user-friendly and reliable
-- should be as performant as reasonably possible
-	- needs to run well on older devices
-- should include all tools a learner is likely to need
-	- excluding tools built into the base operating system, such as a calculator, note-taking app, and browser
-
 ## Packaging
 - ship an example course map that contains a variety of courses, covering a variety of topics
