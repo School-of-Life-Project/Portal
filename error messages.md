@@ -28,9 +28,9 @@ If the application fails to start, it is either a Filesystem Error, a Database E
 ### Database Errors
 
 - Unable to get list of active Courses
+- Unable to update list of active Courses
 - Unable to get progress for Course {id}
 - Unable to update progress for Course {uuid}
-- Unable to update list of active Courses
 - Unable to get overall progress
 - Unable to get Settings
 - Unable to update Settings
