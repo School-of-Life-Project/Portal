@@ -6,7 +6,7 @@ Unlike most eLearning applications, Portal is focused on making use of existing 
 
 In addition, Portal is designed to function well on a wide variety of hardware configurations and does not require an internet connection to use.
 
-## For Users
+## Installing
 
 > [!WARNING]
 > Portal is currently a work in progress, and is not yet ready for use by end users.
