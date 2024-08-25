@@ -4,17 +4,38 @@ Portal is an app built for independent learners.
 
 Unlike most eLearning applications, Portal is focused on making use of existing learning materials. Any textbook or set of textbooks can be converted into a Portal-compatible course, as long as it is available in the ePub format.
 
-In addition, Portal is designed to function well on a wide variety of hardware configurations and does not require an internet connection to use. However, an internet connection may be required during installation on Windows 7, 8, and 8.1 devices in order to install WebView2.
+In addition, Portal is designed to function well on a wide variety of hardware configurations and does not require an internet connection to use.
 
-## Notice
+## For Users
 
-Portal is currently a work in progress, and is not yet ready for use by end users. We welcome contributions from any developers interested in this project.
+> [!WARNING]
+> Portal is currently a work in progress, and is not yet ready for use by end users.
 
-At the moment, the application is functional enough to be evaluated by end-users, but it lacks documentation and has undergone very minimal testing. The application's Course and Course Map formats are unlikely to undergo any significant breaking changes.
+App releases can be found on the [releases page](https://github.com/School-of-Life-Project/Portal-App/releases/). Platform-specific installation instructions are provided below.
 
-[Development Roadmap](TODO.md)
+### Windows
 
-### For Developers
+Download and run the `.msi` file from the release you wish to install. Follow the prompts provided to install the application.
+
+> [!NOTE]
+> If the device you wish to install the application on does not have an internet connection, you will need to install the [WebView2 Runtime](https://developer.microsoft.com/en-us/microsoft-edge/webview2/#download) before running the installer.
+
+### MacOS
+
+Download and mount the `.dmg` file from the release you wish to install. Drag the application into the Applications folder, and then unmount the disk image.
+
+> [!TIP]
+> If the application fails to start after installation, open Terminal and run the following command:
+>
+> ```bash
+> xattr -d com.apple.quarantine /Applications/school-of-life-portal.app
+> ```
+
+### Linux
+
+**TODO**
+
+## Building
 
 You will need Cargo (Rust's Package Manager) and NPM (Node.js' package manager) to build this application.
 
