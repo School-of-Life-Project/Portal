@@ -6,6 +6,8 @@ If the application fails to start, it is either a Filesystem Error, a Database E
 
 ## Backend
 
+### Application Bug
+
 - An internal error occured
 
 ### OS Errors
@@ -33,6 +35,8 @@ If the application fails to start, it is either a Filesystem Error, a Database E
 - Unable to update Settings
 
 ## Frontend
+
+### Application Bug
 
 - An internal error occured
 
