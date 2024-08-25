@@ -2,8 +2,6 @@
 subject to change
 
 ## pre-beta checklist
-Goal: First beta release before Dec 2024
-
 - [X] Improve internal handling of malformed resources
 	- [X] Course
 		- missing sections
