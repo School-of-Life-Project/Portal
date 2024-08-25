@@ -4,7 +4,7 @@ Portal is an app built for independent learners.
 
 Unlike most eLearning applications, Portal is focused on making use of existing learning materials. Any textbook or set of textbooks can be converted into a Portal-compatible course, as long as it is available in the ePub format.
 
-In addition, Portal is designed to function well on a wide variety of hardware configurations and does not require an internet connection to use. Courses and app updates can be distributed via a [sneakernet](https://en.wikipedia.org/wiki/Sneakernet) if necessary.
+In addition, Portal is designed to function well on a wide variety of hardware configurations and does not require an internet connection to use. However, an internet connection may be required during installation on Windows 7, 8, and 8.1 devices in order to install WebView2.
 
 ## Notice
 

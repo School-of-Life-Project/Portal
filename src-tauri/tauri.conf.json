@@ -17,17 +17,11 @@
 		],
 		"windows": {
 			"webviewInstallMode": {
-				"silent": true,
 				"type": "embedBootstrapper"
 			}
 		},
 		"macOS": {
 			"minimumSystemVersion": "10.13"
-		},
-		"linux": {
-			"appimage": {
-				"bundleMediaFramework": true
-			}
 		},
 		"publisher": "School of Life Project",
 		"copyright": "Licensed under BSL-1.0",
