@@ -12,7 +12,8 @@ If the application fails to start, it is either a Filesystem Error, a Database E
 
 ### OS Errors
 
-- Unable to launch OS opener for {path}
+- Unable to open handler for path {path}
+- Unable to open URL {path}
 
 ### Malformed Resources
 

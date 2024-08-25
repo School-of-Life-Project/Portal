@@ -63,7 +63,10 @@ impl State {
 pub fn open_data_dir(state: tauri::State<'_, State>) -> Result<(), ErrorWrapper> {
     open::that_detached(&state.datastore.root).map_err(|e| {
         ErrorWrapper::new(
-            format!("Unable to launch OS opener for {:?}", &state.datastore.root),
+            format!(
+                "Unable to open handler for path {:?}",
+                &state.datastore.root
+            ),
             &e,
         )
     })?;
@@ -76,7 +79,7 @@ pub fn open_data_dir(state: tauri::State<'_, State>) -> Result<(), ErrorWrapper>
 pub fn open_internal_data_dir(state: tauri::State<'_, State>) -> Result<(), ErrorWrapper> {
     open::that_detached(&state.root).map_err(|e| {
         ErrorWrapper::new(
-            format!("Unable to launch OS opener for {:?}", &state.root),
+            format!("Unable to open handler for path {:?}", &state.root),
             &e,
         )
     })?;
@@ -92,7 +95,7 @@ pub fn open_project_issue_tracker(data: bool) -> Result<(), ErrorWrapper> {
         false => crate::PROJECT_ISSUE_TRACKER,
     };
     open::that_detached(url)
-        .map_err(|e| ErrorWrapper::new(format!("Unable to launch OS opener for {:?}", &url), &e))?;
+        .map_err(|e| ErrorWrapper::new(format!("Unable to open URL  {:?}", &url), &e))?;
 
     Ok(())
 }
@@ -101,10 +104,7 @@ pub fn open_project_issue_tracker(data: bool) -> Result<(), ErrorWrapper> {
 pub fn open_project_repo() -> Result<(), ErrorWrapper> {
     open::that_detached(crate::PROJECT_SOURCE_REPO).map_err(|e| {
         ErrorWrapper::new(
-            format!(
-                "Unable to launch OS opener for {:?}",
-                &crate::PROJECT_SOURCE_REPO
-            ),
+            format!("Unable to open URL {:?}", &crate::PROJECT_SOURCE_REPO),
             &e,
         )
     })?;
