@@ -179,6 +179,11 @@ export class ViewManager {
 					label.parentElement?.appendChild(checkbox);
 
 					chapters.set(chapter.root, chapter);
+				} else {
+					displayError({
+						message: "Unable to find chapter root " + chapter.root,
+						cause: "Occured while loading Course " + course.course.uuid,
+					});
 				}
 			}
 			for (const group of chapter.groups) {
@@ -194,6 +199,11 @@ export class ViewManager {
 						label.parentElement?.appendChild(checkbox);
 
 						chapters.set(section, chapter);
+					} else {
+						displayError({
+							message: "Unable to find section " + section,
+							cause: "Occured while loading Course " + course.course.uuid,
+						});
 					}
 				}
 			}
