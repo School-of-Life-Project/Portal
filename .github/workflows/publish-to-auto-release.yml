@@ -52,9 +52,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
+          projectPath: "src-tauri"
           tagName: v__VERSION__ # the action automatically replaces \_\_VERSION\_\_ with the app version.
           releaseName: "Portal v__VERSION__"
-          releaseBody: "Replace this placeholder text with information about the release."
           releaseDraft: true
           prerelease: false
           args: ${{ matrix.args }}
