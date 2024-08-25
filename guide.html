@@ -331,8 +331,8 @@
 					<strong
 						>always test all aspects of your resources in the Portal app</strong
 					>
-					before packaging and sharing them. Validating your resource against
-					the relevant schema will not catch all possible mistakes.
+					before sharing them. Validating your resource against the relevant
+					schema will not catch all possible mistakes.
 				</p>
 				<p>
 					⚠ If you plan on publically distributing a Course, a basic
@@ -343,13 +343,12 @@
 					Resources are packaged as unencrypted ZIP archives, which are loaded
 					from the path
 					<code>$APPDATA/User Resources/*.zip</code> (extension is not case
-					sensitive). The Portal app then automatically extracts all detected
-					ZIP archives in the resource folder into
-					<code>$APPDATA/User Resources/</code>, overwriting any files which
-					already exist. Decompression will not be performed recursively, so
-					putting ZIP archives within other ZIP archives will lead to
-					inconsistent behavior. Once the decompression process is successfully
-					completed, the ZIP archive will be deleted from the folder.
+					sensitive). The Portal app automatically extracts the contents of all
+					detected archives into <code>$APPDATA/User Resources/</code>,
+					overwriting any files which already exist. Decompression will not be
+					performed recursively, so archives should not be put inside other
+					archives. Once the decompression process is successfully completed,
+					the archive will be deleted from the folder.
 				</p>
 				<p>
 					ℹ Unlike Courses or Course Maps, archive filenames do not convey
@@ -362,24 +361,13 @@
 					ZStandard, LZMA, and XZ.
 				</p>
 				<p>
-					This form of packaging allows for a substantial degree of flexibility.
-					Courses could be packaged as individual files, or multiple Courses
-					could be packaged together into the same archive. Course Maps could be
-					shared directly as TOML files, or they could be packaged together with
-					the Courses they reference. However, it is important to keep in mind
-					the needs and expectations of non-technical users when determining how
-					to package your resources.
-				</p>
-				<p>
-					ℹ Sets of Courses which are intended to be completed together should
-					be packaged together as one archive. If this is not feasible, use
+					Sets of Courses which are intended to be completed together should be
+					packaged together into one archive. If this is not feasible, use
 					multiple archives with filenames indicating their relation (example:
-					<code>My Course Collection (Part 1 of 3).zip</code>).
-				</p>
-				<p>
-					ℹ Courses and Course Maps should be distributed together, as one
-					archive containing all relevant resources. Avoid distributing Course
-					Maps separately from Courses.
+					<code>My Course Collection (Part 1 of 3).zip</code>). Courses and
+					Course Maps should be distributed together, as one archive containing
+					all relevant resources. Do not distribute Course Maps separately from
+					Courses.
 				</p>
 			</section>
 		</main>
