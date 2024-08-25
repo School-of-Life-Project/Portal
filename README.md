@@ -60,7 +60,7 @@ dnf install school-of-life-portal_*.rpm
 
 ## Building
 
-You will need Cargo (Rust's Package Manager) and NPM (Node.js' package manager) to build this application.
+You will need [Rust](https://www.rust-lang.org/tools/install) and [Node.js](https://nodejs.org/en/download) to build this application.
 
 First, install the app's dependencies.
 
