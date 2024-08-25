@@ -21,10 +21,9 @@ You will need Cargo (Rust's Package Manager) and NPM (Node.js' package manager) 
 First, install the app's dependencies.
 
 ```bash
-cargo install tauri-cli
 npm install
 ```
 
 Then, you can:
-- run the app in development mode with `cargo tauri dev`
-- build an optimized binary with `cargo tauri build`
+- run the app in development mode with `npx tauri dev`
+- build an optimized binary with `npx tauri build`
