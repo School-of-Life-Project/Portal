@@ -7,7 +7,6 @@ body {
 
 a {
 	color: unset;
-	text-decoration: unset;
 	cursor: pointer;
 }
 
@@ -23,6 +22,7 @@ nav.related a {
 	margin-left: 0.5lh;
 	white-space: nowrap;
 	display: block;
+	text-decoration: unset;
 }
 
 code {

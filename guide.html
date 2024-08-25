@@ -58,6 +58,23 @@
 					drop-down.
 				</p>
 				<h3>📂 Importing Resources</h3>
+				<p>
+					Resources are distributed as <code>.zip</code> files. These files
+					contain one or more 📚&nbsp;Courses and may contain
+					🗺️&nbsp;Course&nbsp;Maps.
+				</p>
+				<p>
+					In order to import a resource, open the &nbsp;Course&nbsp;Navigator,
+					and click the 📂&nbsp;Open&nbsp;Resource&nbsp;Folder button. Then,
+					drag the <code>.zip</code> files into the resource folder. Once you
+					have added your files into the folder, click the
+					🔄&nbsp;Refresh&nbsp;Navigator button to update the list of resources.
+				</p>
+				<p>
+					🛑 Encountered an error? See the
+					<a href="#troubleshooting">🧰&nbsp;Troubleshooting</a> section for
+					help.
+				</p>
 			</section>
 			<hr />
 			<section>
@@ -254,6 +271,11 @@
 					completed, the ZIP archive will be deleted from the folder.
 				</p>
 				<p>
+					ℹ Unlike Courses or Course Maps, archive filenames do not have any
+					special meaning to the app. You should use these filenames to inform
+					the user of the archive's contents.
+				</p>
+				<p>
 					ZIP archives can be uncompressed, or they can be compressed with one
 					of the decompression algorithms supported by the app: DEFLATE,
 					DEFLATE64, BZIP2, ZStandard, LZMA, and XZ.
@@ -266,6 +288,19 @@
 					the Courses they reference. However, it is important to keep in mind
 					the needs and expectations of non-technical users when determining how
 					to package your resources.
+				</p>
+				<p>
+					ℹ If you make individual Courses, it makes sense to distribute them
+					as individual archives. However, if you make sets of Courses which are
+					intended to be completed together, you should package these together
+					as one archive. If this is not feasible, use multiple archives with
+					filenames that suggest that they are related (example:
+					<code>My Course Collection (Part 1 of 3).zip</code>).
+				</p>
+				<p>
+					ℹ It's recommended that you distribute Courses and Course Maps
+					together, as one ZIP archive containing all relevant resources. Avoid
+					distributing Course Maps separately from Courses.
 				</p>
 			</section>
 		</main>
