@@ -33,6 +33,23 @@ Download and mount the `.dmg` file from the release you wish to install. Drag th
 
 ### Linux
 
+On Linux, installation instructions are distribution-specific.
+
+Alterntively, you can download the `.AppImage` with the appropriate CPU architecture for your device. [AppImage](https://appimage.org) files are portable binaries which can be run on any distribution.
+
+#### DPKG-based distros
+
+Download the `.deb` with the appropriate CPU architecture for your device.
+
+Then, run the following commands as root:
+
+```bash
+apt install libwebkit2gtk-4.1-0 libgtk-3-0
+dpkg -i school-of-life-portal_*.deb
+```
+
+#### RPM-based distros
+
 **TODO**
 
 ## Building
