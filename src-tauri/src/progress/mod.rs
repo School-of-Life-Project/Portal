@@ -91,6 +91,10 @@ impl CourseProgress {
 
                             let mut group_progress: usize = 0;
 
+                            if group.sections.is_empty() {
+                                continue;
+                            }
+
                             for section in &group.sections {
                                 if book_completion.completed_sections.contains(section) {
                                     group_progress += 1;
@@ -109,7 +113,7 @@ impl CourseProgress {
 
                         if progress > 0.0 {
                             chapter_progress.push(progress / total);
-                        } else {
+                        } else if total > 0.0 {
                             chapter_progress.push(0.0);
                         }
                     }
