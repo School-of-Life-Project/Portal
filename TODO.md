@@ -6,11 +6,11 @@ Goal: First beta release before Dec 2024
 
 - [X] Improve internal handling of malformed resources
 	- [X] Course
+		- missing sections
 		- uncompletable chapters
 		- uncompletable section groups
 	- [X] Course Map
 		- invalid dependency trees
-- [ ] Fail on missing Course sections
 - [X] Implement JSON Schema generation
 - [ ] Add in-app documentation
 	- [ ] User documentation
