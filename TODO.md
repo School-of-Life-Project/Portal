@@ -13,7 +13,6 @@ subject to change
 - [ ] Add in-app documentation
 	- [ ] User documentation
 	- [X] Creator documentation
-- [ ] Ensure usability on touchscreen devices
 - [X] Add additional sections to README
 	- [X] Installation Instructions
 	- [X] Application architecture
