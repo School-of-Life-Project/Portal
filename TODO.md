@@ -46,4 +46,3 @@ During the Beta period, the focus will shift towards developing tooling and cont
 - [ ] Localization?
 - [ ] Description Markdown?
 - [ ] Author Metadata?
-- [ ] ARM Windows builds in CI?
