@@ -37,6 +37,9 @@ On Linux, installation instructions are distribution-specific.
 
 Alterntively, you can download the `.AppImage` with the appropriate CPU architecture for your device. [AppImage](https://appimage.org) files are portable binaries which can be run on any distribution.
 
+> [!NOTE]
+> If you are using a lesser-used CPU architecture, you will need to [build the application from source code](#building).
+
 #### DPKG-based distros
 
 Download the `.deb` with the appropriate CPU architecture for your device.
@@ -62,12 +65,12 @@ dnf install school-of-life-portal_*.rpm
 
 You will need [Rust](https://www.rust-lang.org/tools/install) and [Node.js](https://nodejs.org/en/download) to build this application.
 
-First, install the app's dependencies.
+First, install the applications's dependencies.
 
 ```bash
 npm install
 ```
 
 Then, you can:
-- run the app in development mode with `npx tauri dev`
+- run the application in development mode with `npx tauri dev`
 - build an optimized binary with `npx tauri build`
