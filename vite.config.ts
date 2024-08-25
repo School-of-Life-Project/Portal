@@ -17,7 +17,7 @@ if (!existsSync("node_modules/jszip/dist/jszip.js")) {
 
 // Tauri uses Edge on Windows and WebKit on macOS and Linux
 const targets =
-	process.env.TAURI_ENV_PLATFORM == "windows" ? "edge>=89" : "safari>=13";
+	process.env.TAURI_ENV_PLATFORM == "windows" ? "edge>=89" : "safari>=11";
 
 // Consider browser versions released since 2023 as modern
 const modernTargets =
