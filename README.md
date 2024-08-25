@@ -9,7 +9,7 @@ In addition, Portal is designed to perform well on low-end hardware and does not
 ## Installing
 
 > [!WARNING]
-> Portal is currently a work in progress, and is not yet ready for use by end users.
+> Portal is a work in progress. Please report any issues you find.
 
 App releases can be found on the [releases page](https://github.com/School-of-Life-Project/Portal-App/releases/). Platform-specific installation instructions are provided below.
 
@@ -74,3 +74,9 @@ npm install
 Then, you can:
 - run the application in development mode with `npx tauri dev`
 - build an optimized binary with `npx tauri build`
+
+## Architecture
+
+Portal is built using [Tauri](https://tauri.app) and [Vite](https://vitejs.dev).
+
+The Rust-based backend of the application is used to load resources from disk and manage the state of the [embedded database](https://github.com/spacejam/sled). The TypeScript-based frontend of the application is used to render UI elements and display textbooks using [epub.js](https://github.com/futurepress/epub.js/).

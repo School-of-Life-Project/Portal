@@ -14,7 +14,9 @@ subject to change
 	- [ ] User documentation
 	- [X] Creator documentation
 - [ ] Ensure usability on touchscreen devices
-- [ ] Write architecture.md
+- [X] Add additional sections to README
+	- [X] Installation Instructions
+	- [X] Application architecture
 - [X] Build GH actions release pipeline
 
 ## during-beta checklist
