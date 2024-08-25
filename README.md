@@ -4,12 +4,7 @@ Portal is an app built for independent learners.
 
 Unlike most eLearning applications, Portal is focused on making use of existing learning materials. Any textbook or set of textbooks can be converted into a Portal-compatible course, as long as it is available in the ePub format.
 
-Portal is designed to perform well on low-end hardware and does not require an internet connection to use.
-
-The following operating systems are supported:
-- Windows 7 or newer
-- MacOS 10.15 or newer
-- Linux
+Portal is designed to perform well on low-end hardware and does not require an internet connection to use. Portal can be run on Windows >= 7, macOS >= 10.15, and a wide variety of Linux distributions.
 
 ## Installing
 
