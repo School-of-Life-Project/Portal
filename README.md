@@ -18,7 +18,7 @@ App releases can be found on the [releases page](https://github.com/School-of-Li
 Download and run the `.msi` file from the release you wish to install. Follow the prompts provided to install the application.
 
 > [!NOTE]
-> If the device you are installing the application on does not have an internet connection, you will need to install the [WebView2 Runtime](https://developer.microsoft.com/en-us/microsoft-edge/webview2/#download) before running the installer. This step can be skipped on Windows 10 and 11.
+> If the device you are installing the application on does not have an internet connection, you will need to install the [WebView2 Runtime](https://developer.microsoft.com/en-us/microsoft-edge/webview2/#download) before running the installer. Windows 10 and 11 come with WebView2 preinstalled.
 
 ### MacOS
 
