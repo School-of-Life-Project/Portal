@@ -13,6 +13,8 @@ Portal is designed to perform well on low-end hardware and does not require an i
 
 App releases can be found on the [releases page](https://github.com/School-of-Life-Project/Portal-App/releases/). Platform-specific installation instructions are provided below.
 
+After installation, you will need resources to import into the app. Major online [communities built around portal](community.md) can provide a useful place to find resources.
+
 ### Windows
 
 Download and run the `.msi` file from the release you wish to install. Follow the prompts provided to install the application.
