@@ -15,8 +15,7 @@ Goal: First beta release before Dec 2024
 - [ ] Add in-app documentation
 	- [ ] User documentation
 	- [X] Creator documentation
-- [ ] Add mobile support
-	- [ ] Ensure usability on touchscreen devices
+- [ ] Ensure usability on touchscreen devices
 - [ ] Write architecture.md
 - [X] Build GH actions release pipeline
 - [ ] Perform cross-platform testing
@@ -27,6 +26,11 @@ During the Beta period, the focus will shift towards developing tooling and cont
 - [ ] Fix ePub external links
 - [ ] Fix ePub sandboxing
 - [ ] Add support for panel resizing
+- [ ] Improve release packaging
+	- [ ] Distribute portable binaries instead of installers
+	- [ ] Build for linux aarch64
+	- [ ] Build for windows aarch64
+- [ ] Add mobile support
 
 ## pre-release checklist
 - [ ] Better enforce front-end/back-end separation
