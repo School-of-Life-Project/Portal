@@ -2,7 +2,7 @@
 
 Portal is an app built for independent learners.
 
-Unlike most eLearning applications, Portal is focused on making use of existing learning materials. Any textbook or set of textbooks can be converted into a Portal-compatible course, as long as it is available in the ePub format.
+Unlike most eLearning applications, Portal is focused on making use of existing learning materials. Any textbook or set of textbooks can be converted into a Portal-compatible course, as long as it is available in the ePub format. [Online communities built around portal](community.md) provide repositories of content for app users.
 
 Portal is designed to perform well on low-end hardware and does not require an internet connection to use. It can run on Windows >= 7, macOS >= 10.15, and most Linux distributions.
 
@@ -12,8 +12,6 @@ Portal is designed to perform well on low-end hardware and does not require an i
 > Portal is a work in progress. Please report any issues you find.
 
 App releases can be found on the [releases page](https://github.com/School-of-Life-Project/Portal-App/releases/). Platform-specific installation instructions are provided below.
-
-After installation, you will need resources to import into the app. Major online [communities built around portal](community.md) can provide a useful place to find resources.
 
 ### Windows
 
