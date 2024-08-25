@@ -18,16 +18,16 @@ Goal: First beta release before Dec 2024
 - [ ] Ensure usability on touchscreen devices
 - [ ] Write architecture.md
 - [X] Build GH actions release pipeline
-- [ ] Perform cross-platform testing
 
 ## during-beta checklist
 During the Beta period, the focus will shift towards developing tooling and content for the app, rather than developing the app itself.
 
+- [ ] Add builds for ARM Linux (see https://v2.tauri.app/distribute/pipelines/github/#arm-runner-compilation)
 - [ ] Fix ePub external links
 - [ ] Fix ePub sandboxing
 - [ ] Add support for panel resizing
 - [ ] Add mobile support
-- [ ] Add builds for ARM Linux (see https://v2.tauri.app/distribute/pipelines/github/#arm-runner-compilation)
+- [ ] Perform cross-platform testing
 
 ## pre-release checklist
 - [ ] Better enforce front-end/back-end separation
