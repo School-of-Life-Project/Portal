@@ -10,8 +10,8 @@ subject to change
 	- [X] Course Map
 		- invalid dependency trees
 - [X] Implement JSON Schema generation
-- [ ] Add in-app documentation
-	- [ ] User documentation
+- [X] Add in-app documentation
+	- [X] User documentation
 	- [X] Creator documentation
 - [X] Prevent database & filesystem errors from causing app startup to fail
 - [X] Add additional sections to README
