@@ -13,6 +13,7 @@ subject to change
 - [ ] Add in-app documentation
 	- [ ] User documentation
 	- [X] Creator documentation
+- [ ] Improve handling of database & filesystem errors on startup
 - [X] Add additional sections to README
 	- [X] Installation Instructions
 	- [X] Application architecture
