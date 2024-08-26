@@ -122,7 +122,8 @@ if (internalFolderButton) {
 
 if (appVersionLabel) {
 	getVersion().then((version) => {
-		appVersionLabel.innerText = "School of Life Portal v" + version;
+		appVersionLabel.innerText =
+			"Portal v" + version + " by School of Life Project";
 	});
 }
 

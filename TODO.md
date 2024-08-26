@@ -28,7 +28,6 @@ During the Beta period, the focus will shift towards developing tooling and cont
 - [ ] Add support for panel resizing
 - [ ] Add mobile support
 - [ ] Perform cross-platform testing
-- [ ] Add exit button
 
 ## pre-release checklist
 - [ ] Better enforce front-end/back-end separation
