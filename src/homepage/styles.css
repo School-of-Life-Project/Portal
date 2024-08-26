@@ -17,6 +17,7 @@ section {
 	padding: var(--large-card-padding);
 	display: inline-block;
 	margin: 0 1lh 1lh 0;
+	overflow: auto;
 }
 
 section h2,
