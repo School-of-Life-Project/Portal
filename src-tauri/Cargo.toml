@@ -20,7 +20,7 @@ tauri-build = { version = "2.0.0-rc", features = [
 ] }
 
 [dependencies]
-tauri = { version = "2.0.0-rc", features = [
+tauri = { version = "=2.0.0-rc.5", features = [ # temporary workaround for failing mobile builds. see https://github.com/tauri-apps/tauri/issues/10760
 	"protocol-asset",
 	"devtools",
 ] }
