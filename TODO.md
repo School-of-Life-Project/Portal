@@ -22,7 +22,7 @@ subject to change
 ## during-beta checklist
 During the Beta period, the focus will shift towards developing tooling and content for the app, rather than developing the app itself.
 
-- [ ] Add builds for ARM Linux (see https://v2.tauri.app/distribute/pipelines/github/#arm-runner-compilation)
+- [X] Add builds for ARM Linux
 - [ ] Fix ePub external links
 - [ ] Fix ePub sandboxing
 - [ ] Add support for panel resizing

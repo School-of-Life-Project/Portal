@@ -62,26 +62,26 @@ jobs:
             # Build the application
             npm run tauri build -- --verbose
 
-      - name: Get app version
-        run: echo "APP_VERSION=$(jq -r .version src-tauri/tauri.conf.json)" >> $GITHUB_ENV
-
       - name: Upload deb bundle
-        uses: JasonEtco/upload-to-release@master
-        with:
-          args: ${{ github.workspace }}/src-tauri/target/release/bundle/deb/Portal_${{ env.APP_VERSION }}_${{ matrix.deb }}.deb
+        uses: xresloader/upload-to-github-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          file: "${{ github.workspace }}/src-tauri/target/release/bundle/deb/Portal_*.deb"
+          release_id: ${{ github.event.release.id }}
 
       - name: Upload rpm bundle
-        uses: JasonEtco/upload-to-release@master
-        with:
-          args: ${{ github.workspace }}/src-tauri/target/release/bundle/rpm/Portal-${{ env.APP_VERSION }}-1.${{ matrix.rpm }}.rpm
+        uses: xresloader/upload-to-github-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          file: "${{ github.workspace }}/src-tauri/target/release/bundle/rpm/Portal-*.rpm"
+          release_id: ${{ github.event.release.id }}
 
       - name: Upload appimage bundle
-        uses: JasonEtco/upload-to-release@master
-        with:
-          args: ${{ github.workspace }}/src-tauri/target/release/bundle/appimage/Portal_${{ env.APP_VERSION }}_${{ matrix.appimage }}.AppImage
+        uses: xresloader/upload-to-github-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          file: "${{ github.workspace }}/src-tauri/target/release/bundle/appimage/Portal_*.AppImage"
+          release_id: ${{ github.event.release.id }}
