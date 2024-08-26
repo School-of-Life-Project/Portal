@@ -66,7 +66,7 @@ dnf install school-of-life-portal_*.rpm
 
 ## Building
 
-You will need [Rust](https://www.rust-lang.org/tools/install) and [Node.js](https://nodejs.org/en/download) to build this application.
+You will need [Rust](https://www.rust-lang.org/tools/install) and [Node.js](https://nodejs.org/en/download) to build this application. In addition, you will need to install the build dependencies for [Tauri](https://v2.tauri.app/start/prerequisites/).
 
 First, install the applications's dependencies.
 
