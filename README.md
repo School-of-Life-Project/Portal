@@ -38,7 +38,7 @@ Download and mount the `.dmg` file from the release you wish to install. Drag th
 
 On Linux, installation instructions are distribution-specific.
 
-Alterntively, you can download the `.AppImage` with the appropriate CPU architecture for your device. [AppImage](https://appimage.org) files are portable binaries which can be run on any distribution.
+Alternatively, you can download the `.AppImage` with the appropriate CPU architecture for your device. [AppImage](https://appimage.org) files are portable binaries which can be run on any distribution.
 
 > [!NOTE]
 > If you are using a lesser-used CPU architecture, you will need to [build the application from source code](#building).
