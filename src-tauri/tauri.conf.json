@@ -23,12 +23,17 @@
 		"macOS": {
 			"minimumSystemVersion": "10.13"
 		},
+		"linux": {
+			"appimage": {
+				"bundleMediaFramework": true
+			}
+		},
 		"publisher": "School of Life Project",
 		"copyright": "Licensed under BSL-1.0",
 		"category": "Education",
 		"shortDescription": "An app built for independent learners."
 	},
-	"productName": "school-of-life-portal",
+	"productName": "Portal",
 	"identifier": "com.schoolOfLifeProject.Portal",
 	"plugins": {
 		"shell": {
