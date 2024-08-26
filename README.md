@@ -31,7 +31,7 @@ Download and mount the `.dmg` file from the release you wish to install. Drag th
 > If the application fails to start after installation, open Terminal and run the following command:
 >
 > ```bash
-> xattr -d com.apple.quarantine /Applications/school-of-life-portal.app
+> xattr -d com.apple.quarantine /Applications/Portal.app
 > ```
 
 ### Linux
@@ -51,7 +51,7 @@ Then, run the following commands as root:
 
 ```bash
 apt install libwebkit2gtk-4.1-0 libgtk-3-0
-dpkg -i school-of-life-portal_*.deb
+dpkg -i Portal_*.deb
 ```
 
 #### RPM-based distros
@@ -61,7 +61,7 @@ Download the `.rpm` with the appropriate CPU architecture for your device.
 Then, run the following command as root:
 
 ```bash
-dnf install school-of-life-portal_*.rpm
+dnf install Portal-*.rpm
 ```
 
 ## Building
