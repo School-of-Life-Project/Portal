@@ -1,6 +1,5 @@
 #![warn(clippy::pedantic)]
 
-use anyhow::{Context, Result};
 use tauri::Manager;
 
 mod api;
@@ -14,12 +13,16 @@ const PROJECT_ISSUE_TRACKER_NEW: &str =
     "https://github.com/School-of-Life-Project/Portal-App/issues/new";
 const PROJECT_SOURCE_REPO: &str = "https://github.com/School-of-Life-Project/Portal-App";
 
-#[allow(clippy::missing_errors_doc)]
+#[allow(clippy::missing_panics_doc)]
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
-pub fn run() -> Result<()> {
+pub fn run() {
     tauri::Builder::default()
         .setup(|app| {
-            app.manage(api::State::new(app.path().app_data_dir()?));
+            app.manage(api::State::new(
+                app.path()
+                    .app_data_dir()
+                    .expect("Unable to find application data directory"),
+            ));
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
@@ -38,5 +41,5 @@ pub fn run() -> Result<()> {
             api::set_settings,
         ])
         .run(tauri::generate_context!())
-        .context("Failed to initalize application window")
+        .expect("Failed to initalize application window");
 }

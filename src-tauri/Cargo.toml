@@ -37,7 +37,6 @@ tokio = { version = "1.39.3", features = [
 	"macros",
 ] }
 open = "5.3.0"
-anyhow = "1.0.86"
 thiserror = "1.0.63"
 futures-util = "0.3.30"
 chrono = { version = "0.4.38", default-features = false, features = [
