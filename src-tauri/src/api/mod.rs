@@ -98,55 +98,14 @@ impl State {
 
 #[tauri::command]
 #[allow(clippy::needless_pass_by_value)]
-pub fn open_data_dir(state: tauri::State<'_, State>) -> Result<(), ErrorWrapper> {
-    let datastore_path = state.root.join("User Resources");
-
-    open::that_detached(&datastore_path).map_err(|e| {
-        ErrorWrapper::new(
-            format!("Unable to open handler for path {:?}", &datastore_path),
-            &e,
-        )
-    })?;
-
-    Ok(())
+pub fn get_data_dir(state: tauri::State<'_, State>) -> PathBuf {
+    state.root.join("User Resources")
 }
 
 #[tauri::command]
 #[allow(clippy::needless_pass_by_value)]
-pub fn open_internal_data_dir(state: tauri::State<'_, State>) -> Result<(), ErrorWrapper> {
-    open::that_detached(&state.root).map_err(|e| {
-        ErrorWrapper::new(
-            format!("Unable to open handler for path {:?}", &state.root),
-            &e,
-        )
-    })?;
-
-    Ok(())
-}
-
-#[tauri::command]
-pub fn open_project_issue_tracker(data: bool) -> Result<(), ErrorWrapper> {
-    #[allow(clippy::match_bool)]
-    let url = match data {
-        true => crate::PROJECT_ISSUE_TRACKER_NEW,
-        false => crate::PROJECT_ISSUE_TRACKER,
-    };
-    open::that_detached(url)
-        .map_err(|e| ErrorWrapper::new(format!("Unable to open URL  {:?}", &url), &e))?;
-
-    Ok(())
-}
-
-#[tauri::command]
-pub fn open_project_repo() -> Result<(), ErrorWrapper> {
-    open::that_detached(crate::PROJECT_SOURCE_REPO).map_err(|e| {
-        ErrorWrapper::new(
-            format!("Unable to open URL {:?}", &crate::PROJECT_SOURCE_REPO),
-            &e,
-        )
-    })?;
-
-    Ok(())
+pub fn get_internal_data_dir(state: tauri::State<'_, State>) -> PathBuf {
+    state.root.clone()
 }
 
 #[tauri::command]

@@ -1,4 +1,11 @@
 import { invoke, convertFileSrc } from "@tauri-apps/api/core";
+import { open } from "@tauri-apps/plugin-shell";
+
+const projectRepoURL = "https://github.com/School-of-Life-Project/Portal-App";
+const issueTrackerURL =
+	"https://github.com/School-of-Life-Project/Portal-App/issues";
+const newIssueURL =
+	"https://github.com/School-of-Life-Project/Portal-App/issues/new";
 
 // Based on /src-tauri/src/course/mod.rs
 
@@ -137,12 +144,12 @@ function convertBackendAsyncError(error: Error | string | unknown): Error {
 		return error;
 	} else if (typeof error === "string") {
 		return {
-			message: "Unable to perform internal API call",
+			message: "Unable to perform API call",
 			cause: error,
 		};
 	} else {
 		return {
-			message: "Unable to perform internal API call",
+			message: "Unable to perform API call",
 			cause: String(error),
 		};
 	}
@@ -159,33 +166,39 @@ export function displayError(error: Error) {
 
 // Based on /src-tauri/src/api/mod.rs
 
-export async function openDataDir(): Promise<null> {
+export async function openDataDir(): Promise<void> {
 	try {
-		return await invoke("open_data_dir");
+		const path: string = await invoke("get_data_dir");
+		return await open(path);
 	} catch (error) {
 		throw convertBackendAsyncError(error);
 	}
 }
 
-export async function openInternalDataDir(): Promise<null> {
+export async function openInternalDataDir(): Promise<void> {
 	try {
-		return await invoke("open_internal_data_dir");
+		const path: string = await invoke("get_internal_data_dir");
+		return await open(path);
 	} catch (error) {
 		throw convertBackendAsyncError(error);
 	}
 }
 
-export async function openIssueTracker(newIssue: boolean): Promise<null> {
+export async function openIssueTracker(newIssue: boolean): Promise<void> {
 	try {
-		return await invoke("open_project_issue_tracker", { data: newIssue });
+		if (newIssue) {
+			return await open(newIssueURL);
+		} else {
+			return await open(issueTrackerURL);
+		}
 	} catch (error) {
 		throw convertBackendAsyncError(error);
 	}
 }
 
-export async function openRepo(): Promise<null> {
+export async function openRepo(): Promise<void> {
 	try {
-		return await invoke("open_project_repo");
+		return await open(projectRepoURL);
 	} catch (error) {
 		throw convertBackendAsyncError(error);
 	}

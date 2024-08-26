@@ -30,7 +30,11 @@
 	},
 	"productName": "school-of-life-portal",
 	"identifier": "com.schoolOfLifeProject.Portal",
-	"plugins": {},
+	"plugins": {
+		"shell": {
+			"open": ".*"
+		}
+	},
 	"app": {
 		"security": {
 			"csp": null,

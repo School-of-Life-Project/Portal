@@ -27,6 +27,7 @@
 	},
 	"dependencies": {
 		"@tauri-apps/api": "^2.0.0-rc.3",
+		"@tauri-apps/plugin-shell": "^2.0.0-rc.0",
 		"epubjs": "0.3.93"
 	},
 	"overrides": {
