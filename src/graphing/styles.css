@@ -5,7 +5,7 @@
 
 table.progress-map {
 	table-layout: fixed;
-	min-width: max-content;
+	width: max-content;
 	contain: strict;
 }
 
