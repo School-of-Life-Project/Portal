@@ -42,13 +42,15 @@ pub(super) async fn get_course(
     id: Uuid,
 ) -> Result<(Course, CourseCompletion, CourseProgress), ErrorWrapper> {
     let course = state
-        .datastore
+        .get_datastore()
+        .await?
         .get_course(id)
         .await
         .map_err(|e| ErrorWrapper::new(format!("Unable to get Course {id}"), &e))?;
 
     state
-        .database
+        .get_database()
+        .await?
         .get_course_progress(course)
         .await
         .map_err(|e| ErrorWrapper::new(format!("Unable to get progress for Course {id}"), &e))
@@ -78,18 +80,22 @@ pub(super) async fn get_courses(
 }
 
 pub(super) async fn get_active_courses(state: &State) -> Result<Vec<Uuid>, ErrorWrapper> {
-    let active =
-        state.database.get_active_courses().await.map_err(|e| {
-            ErrorWrapper::new("Unable to get list of active Courses".to_string(), &e)
-        })?;
+    let active = state
+        .get_database()
+        .await?
+        .get_active_courses()
+        .await
+        .map_err(|e| ErrorWrapper::new("Unable to get list of active Courses".to_string(), &e))?;
 
     let mut ids = Vec::with_capacity(active.len());
+
+    let datastore = state.get_datastore().await?;
 
     for chunk in active.chunks(MAX_FS_CONCURRENCY) {
         let mut future_set = Vec::with_capacity(MAX_FS_CONCURRENCY);
 
         for uuid in chunk {
-            future_set.push(state.datastore.has_course(*uuid));
+            future_set.push(datastore.has_course(*uuid));
         }
 
         let results = try_join_all(future_set)
@@ -112,6 +118,8 @@ pub(super) async fn get_course_maps(
 ) -> Result<Vec<(CourseMap, String)>, ErrorWrapper> {
     let mut course_maps = Vec::with_capacity(ids.len());
 
+    let datastore = state.get_datastore().await?;
+
     for chunk in ids.chunks(MAX_FS_CONCURRENCY) {
         let mut future_set = Vec::with_capacity(MAX_FS_CONCURRENCY);
 
@@ -119,8 +127,7 @@ pub(super) async fn get_course_maps(
             future_set.push(async {
                 let uuid = *uuid;
 
-                state
-                    .datastore
+                datastore
                     .get_course_map(uuid)
                     .await
                     .map_err(|e| ErrorWrapper::new(format!("Unable to get Course Map {uuid}"), &e))

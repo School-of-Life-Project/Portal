@@ -4,7 +4,7 @@ use std::path::PathBuf;
 
 use schemars::schema_for;
 use serde::Serialize;
-use tokio::try_join;
+use tokio::{sync::OnceCell, task, try_join};
 use uuid::Uuid;
 
 mod util;
@@ -18,55 +18,92 @@ use super::{
 
 pub struct State {
     root: PathBuf,
-    database: Database,
-    datastore: DataStore,
+    database: OnceCell<Database>,
+    datastore: OnceCell<DataStore>,
 }
 
 impl State {
-    pub fn new(root: PathBuf) -> Result<Self, anyhow::Error> {
-        let database_path = root.join("Internal Database");
-        let datastore_path = root.join("User Resources");
-
-        let course_schema = schema_for!(Course);
-        let course_map_schema = schema_for!(CourseMap);
-
-        std::fs::create_dir_all(&datastore_path)?;
-
-        let schema_path = root.join("Resource Schema");
-
-        std::fs::create_dir_all(&schema_path)?;
-
-        let course_schema_path = schema_path.join("Course.json");
-        let course_map_schema_path = schema_path.join("CourseMap.json");
-
-        std::fs::write(
-            course_schema_path,
-            serde_json::to_string_pretty(&course_schema)?,
-        )?;
-        std::fs::write(
-            course_map_schema_path,
-            serde_json::to_string_pretty(&course_map_schema)?,
-        )?;
-
-        Ok(Self {
+    pub fn new(root: PathBuf) -> Self {
+        Self {
             root,
-            database: Database::new(&database_path)?,
-            datastore: DataStore {
-                root: datastore_path,
-            },
-        })
+            database: OnceCell::new(),
+            datastore: OnceCell::new(),
+        }
+    }
+
+    pub async fn get_datastore(&self) -> Result<&DataStore, ErrorWrapper> {
+        self.datastore
+            .get_or_try_init(|| async {
+                let datastore_path = self.root.join("User Resources");
+                let schema_path = self.root.join("Resource Schema");
+
+                task::spawn_blocking(move || {
+                    std::fs::create_dir_all(&datastore_path).map_err(|e| {
+                        ErrorWrapper::new("Unable to create resource folder".to_string(), &e)
+                    })?;
+
+                    let course_schema = schema_for!(Course);
+                    let course_map_schema = schema_for!(CourseMap);
+
+                    std::fs::create_dir_all(&schema_path).map_err(|e| {
+                        ErrorWrapper::new("Unable to write resource schema".to_string(), &e)
+                    })?;
+
+                    let course_schema_path = schema_path.join("Course.json");
+                    let course_map_schema_path = schema_path.join("CourseMap.json");
+
+                    std::fs::write(
+                        course_schema_path,
+                        serde_json::to_string_pretty(&course_schema).map_err(|e| {
+                            ErrorWrapper::new("Unable to write resource schema".to_string(), &e)
+                        })?,
+                    )
+                    .map_err(|e| {
+                        ErrorWrapper::new("Unable to write resource schema".to_string(), &e)
+                    })?;
+                    std::fs::write(
+                        course_map_schema_path,
+                        serde_json::to_string_pretty(&course_map_schema).map_err(|e| {
+                            ErrorWrapper::new("Unable to write resource schema".to_string(), &e)
+                        })?,
+                    )
+                    .map_err(|e| {
+                        ErrorWrapper::new("Unable to write resource schema".to_string(), &e)
+                    })?;
+
+                    Ok(DataStore {
+                        root: datastore_path,
+                    })
+                })
+                .await?
+            })
+            .await
+    }
+
+    pub async fn get_database(&self) -> Result<&Database, ErrorWrapper> {
+        self.database
+            .get_or_try_init(|| async {
+                let database_path = self.root.join("Internal Database");
+
+                task::spawn_blocking(move || {
+                    Database::new(&database_path).map_err(|e| {
+                        ErrorWrapper::new("Unable to load application database".to_string(), &e)
+                    })
+                })
+                .await?
+            })
+            .await
     }
 }
 
 #[tauri::command]
 #[allow(clippy::needless_pass_by_value)]
 pub fn open_data_dir(state: tauri::State<'_, State>) -> Result<(), ErrorWrapper> {
-    open::that_detached(&state.datastore.root).map_err(|e| {
+    let datastore_path = state.root.join("User Resources");
+
+    open::that_detached(&datastore_path).map_err(|e| {
         ErrorWrapper::new(
-            format!(
-                "Unable to open handler for path {:?}",
-                &state.datastore.root
-            ),
+            format!("Unable to open handler for path {:?}", &datastore_path),
             &e,
         )
     })?;
@@ -134,7 +171,8 @@ pub async fn set_course_completion(
     })?;
 
     state
-        .database
+        .get_database()
+        .await?
         .set_course_completion(course, completion)
         .await
         .map_err(|e| ErrorWrapper::new(format!("Unable to update progress for Course {uuid}"), &e))
@@ -151,7 +189,8 @@ pub async fn set_active_courses(
     courses: Vec<Uuid>,
 ) -> Result<(), ErrorWrapper> {
     state
-        .database
+        .get_database()
+        .await?
         .set_active_courses(courses)
         .await
         .map_err(|e| ErrorWrapper::new("Unable to update list of active Courses".to_string(), &e))
@@ -159,7 +198,7 @@ pub async fn set_active_courses(
 
 #[tauri::command]
 pub async fn get_all(state: tauri::State<'_, State>) -> Result<ListingResult, ErrorWrapper> {
-    let scan = state.datastore.scan().await.map_err(|e| {
+    let scan = state.get_datastore().await?.scan().await.map_err(|e| {
         ErrorWrapper::new("Unable to get Course and CourseMap list".to_string(), &e)
     })?;
 
@@ -193,7 +232,8 @@ pub async fn get_overall_progress(
     state: tauri::State<'_, State>,
 ) -> Result<OverallProgress, ErrorWrapper> {
     state
-        .database
+        .get_database()
+        .await?
         .get_overall_progress()
         .await
         .map_err(|e| ErrorWrapper::new("Unable to get overall progress".to_string(), &e))
@@ -202,7 +242,8 @@ pub async fn get_overall_progress(
 #[tauri::command]
 pub async fn get_settings(state: tauri::State<'_, State>) -> Result<Settings, ErrorWrapper> {
     state
-        .database
+        .get_database()
+        .await?
         .get_settings()
         .await
         .map_err(|e| ErrorWrapper::new("Unable to get Settings".to_string(), &e))
@@ -214,7 +255,8 @@ pub async fn set_settings(
     settings: Option<Settings>,
 ) -> Result<(), ErrorWrapper> {
     state
-        .database
+        .get_database()
+        .await?
         .set_settings(settings.unwrap_or_default())
         .await
         .map_err(|e| ErrorWrapper::new("Unable to update Settings".to_string(), &e))

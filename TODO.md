@@ -13,7 +13,7 @@ subject to change
 - [ ] Add in-app documentation
 	- [ ] User documentation
 	- [X] Creator documentation
-- [ ] Prevent database & filesystem errors from causing app startup to fail
+- [X] Prevent database & filesystem errors from causing app startup to fail
 - [X] Add additional sections to README
 	- [X] Installation Instructions
 	- [X] Application architecture

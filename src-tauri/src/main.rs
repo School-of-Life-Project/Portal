@@ -18,7 +18,7 @@ const PROJECT_SOURCE_REPO: &str = "https://github.com/School-of-Life-Project/Por
 fn main() -> Result<()> {
     tauri::Builder::default()
         .setup(|app| {
-            app.manage(api::State::new(app.path().app_data_dir()?)?);
+            app.manage(api::State::new(app.path().app_data_dir()?));
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![

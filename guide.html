@@ -155,8 +155,8 @@
 				<h3>🛑 Understanding Errors</h3>
 				<p>Errors can happen for a wide variety of reasons:</p>
 				<p>
-					🐞&nbsp;Application&nbsp;Issues are unintended behavior in the app.
-					These should always be reported.
+					🐞&nbsp;Application&nbsp;Errors are errors indicating unexpected
+					behavior in the app. These should always be reported.
 				</p>
 				<p>
 					🖥&nbsp;Interface&nbsp;Errors are issues with communication between
@@ -167,7 +167,7 @@
 					resources from being loaded.
 				</p>
 				<p>
-					💽&nbsp;Disk&nbsp;Errors are issues with reading app data from the
+					💽&nbsp;Disk&nbsp;Errors are issues with reading resources from the
 					computer's disk.
 				</p>
 				<p>
@@ -177,7 +177,7 @@
 				<p>All possible error messages are listed below:</p>
 				<ul>
 					<li>
-						🐞 Application Issues
+						🐞 Application Errors
 						<ul>
 							<li>"An internal error occured"</li>
 						</ul>
@@ -201,6 +201,8 @@
 					<li>
 						💽 Disk Errors
 						<ul>
+							<li>"Unable to create resource folder"</li>
+							<li>"Unable to write resource schema"</li>
 							<li>"Unable to check if Course exists"</li>
 							<li>"Unable to get Course and CourseMap list"</li>
 						</ul>
@@ -208,6 +210,7 @@
 					<li>
 						🗃 Database Errors
 						<ul>
+							<li>"Unable to load application database"</li>
 							<li>"Unable to get list of active Courses"</li>
 							<li>"Unable to update list of active Courses"</li>
 							<li>"Unable to get progress for Course"</li>
@@ -219,9 +222,8 @@
 					</li>
 				</ul>
 				<p>
-					ℹ If the application fails to start, this will always be either an
-					🖥&nbsp;Interface&nbsp;Error, a 💽&nbsp;Disk&nbsp;Error, or a
-					🗃&nbsp;Database&nbsp;Error.
+					ℹ If the application refuses to open, this will always be an
+					🖥&nbsp;Interface&nbsp;Error.
 				</p>
 				<h3>🛠️ Fixing Common Issues</h3>
 				<h3>🐞 Reporting Issues</h3>
