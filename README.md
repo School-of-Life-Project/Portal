@@ -9,7 +9,7 @@ Portal is designed to perform well on low-end hardware and does not require an i
 ## Installing
 
 > [!WARNING]
-> Portal is a work in progress. Please report any issues you find.
+> Portal is a work in progress. Please check for app updates frequently, and report any issues you find.
 
 App releases can be found on the [releases page](https://github.com/School-of-Life-Project/Portal-App/releases/). Platform-specific installation instructions are provided below.
 
