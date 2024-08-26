@@ -68,7 +68,7 @@ dnf install school-of-life-portal_*.rpm
 
 You will need [Rust](https://www.rust-lang.org/tools/install) and [Node.js](https://nodejs.org/en/download) to build this application. In addition, you will need to install the build dependencies for [Tauri](https://v2.tauri.app/start/prerequisites/).
 
-After installing the required dependencies, run the following commands in the repository folder:
+After installing the required dependencies, run the following command in the repository folder:
 
 ```bash
 npm install
@@ -76,7 +76,11 @@ npm install
 
 Then, you can:
 - run the application in development mode with `npx tauri dev`
-- build an optimized binary with `npx tauri build`
+<!--	- run the application in an ios emulator with `npx tauri ios dev`
+	- run the application in an android emulator with `npx tauri android dev` -->
+- build an optimized desktop binary with `npx tauri build`
+<!--	- build an ios app with `npx tauri ios build`
+	- build an android app with `npx tauri android build` -->
 
 ## Architecture
 
