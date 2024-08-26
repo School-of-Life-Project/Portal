@@ -157,16 +157,19 @@
 					them.
 				</p>
 				<p>
-					🖥&nbsp;Interface&nbsp;Errors are issues which prevent the app from
-					communicating with the computer's operating system.
+					🖥&nbsp;Interface&nbsp;Errors are issues which occur when the app is
+					communicating with the operating system. Please
+					<a href="#reporting-issues">report these errors</a> if you encounter
+					them.
+				</p>
+				<p>
+					💽&nbsp;Disk&nbsp;Errors are issues which prevent the app from reading
+					user data from the computer's disk. These are rare and have a wide
+					range of potential causes.
 				</p>
 				<p>
 					📄&nbsp;Resource&nbsp;Errors are non-database issues that prevent
 					resources from being loaded.
-				</p>
-				<p>
-					💽&nbsp;Disk&nbsp;Errors are issues with reading resources from the
-					computer's disk.
 				</p>
 				<p>
 					🗃&nbsp;Database&nbsp;Errors are issues with the app's internal
@@ -188,21 +191,21 @@
 						</ul>
 					</li>
 					<li>
-						📄 Resource Errors
-						<ul>
-							<li>"Unable to get Course"</li>
-							<li>"Unable to get Course Map"</li>
-							<li>"Unable to display Course"</li>
-							<li>"Unable to display Course Map"</li>
-						</ul>
-					</li>
-					<li>
 						💽 Disk Errors
 						<ul>
 							<li>"Unable to create resource folder"</li>
 							<li>"Unable to write resource schema"</li>
 							<li>"Unable to check if Course exists"</li>
 							<li>"Unable to get Course and CourseMap list"</li>
+						</ul>
+					</li>
+					<li>
+						📄 Resource Errors
+						<ul>
+							<li>"Unable to get Course"</li>
+							<li>"Unable to get Course Map"</li>
+							<li>"Unable to display Course"</li>
+							<li>"Unable to display Course Map"</li>
 						</ul>
 					</li>
 					<li>
@@ -221,11 +224,63 @@
 				</ul>
 				<p>ℹ Not all issues will cause an error message to be displayed.</p>
 				<p>
-					ℹ If the application refuses to open, this will always be an
+					ℹ If the application refuses to open, this is an
 					🖥&nbsp;Interface&nbsp;Error.
 				</p>
 				<h3>🛠️ Fixing Common Issues</h3>
-				<p>🚧 This section is a <strong>work-in-progress</strong>.</p>
+				<p>
+					In the absence of 💽&nbsp;Disk&nbsp;Errors,
+					📄&nbsp;Resource&nbsp;Errors are caused by resources which are
+					incompatible with the app. They can be fixed by removing the
+					problematic resource from the 📂&nbsp;Resource&nbsp;Folder.
+				</p>
+				<p>
+					Issues with 📚&nbsp;Courses are either a result of a course which is
+					corrupted, or a course which is not compatible with the active
+					application version. If updating Portal does not fix the issue,
+					contact the resource creator.
+				</p>
+				<p>
+					Issues with 🗺️&nbsp;Course&nbsp;Maps can result from a course map
+					which is corrupted, not compatible with the active application
+					version, or missing courses.
+				</p>
+				<p>
+					If the error message is "Unable to display Course Map", then the
+					course map is missing one or more of the courses it is designed to
+					accompany. Contact the resource creator for more information.
+				</p>
+				<p>
+					If the error message is "Unable to get Course Map", the course map is
+					either corrupted or not compatible with the active application
+					version. If updating Portal does not fix the issue, contact the
+					resource creator.
+				</p>
+				<p>
+					🗃&nbsp;Database&nbsp;Errors are rare. In the absence of
+					💽&nbsp;Disk&nbsp;Errors, these result from an issue with the app's
+					internal database, which keeps track of user settings, progress, and
+					active courses.
+				</p>
+				<p>
+					If the error message is "Unable to get Settings", try using the
+					⚙️&nbsp;Reset&nbsp;Settings&nbsp;to&nbsp;Defaults action under the
+					error page's 🛠️&nbsp;Database&nbsp;Actions drop-down.
+				</p>
+				<p>
+					If the error message is "Unable to get list of active Courses", try
+					using the 📚&nbsp;Reset&nbsp;Active&nbsp;Courses action under the
+					error page's 🛠️&nbsp;Database&nbsp;Actions drop-down.
+				</p>
+				<p>
+					As a last resort, the app's database can be entirely reset. However,
+					this will
+					<strong>permanently erase all user settings and progress data</strong
+					>. To reset the database, open the 📂&nbsp;Data&nbsp;Folder using the
+					action on the error page, and delete the folder with the name
+					"Internal Database". Once the folder has been deleted, close and
+					re-open the app.
+				</p>
 				<h3 id="reporting-issues">🐞 Reporting Issues</h3>
 				<p>
 					Once you have confirmed that an issue is caused by a mistake in the
