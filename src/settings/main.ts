@@ -1,3 +1,4 @@
+import { getVersion } from "@tauri-apps/api/app";
 import {
 	displayError,
 	getSettings,
@@ -21,6 +22,7 @@ const appIssueButton = document.getElementById("appIssueButton");
 const resourceButton = document.getElementById("resourceButton");
 const internalFolderButton = document.getElementById("internalFolderButton");
 const settingsForm = document.getElementById("settingsRoot");
+const appVersionLabel = document.getElementById("appVersionLabel");
 
 function updateSettings(settings?: Settings) {
 	setSettings(settings).catch((error) => {
@@ -115,6 +117,12 @@ if (internalFolderButton) {
 				displayError(error);
 			});
 		}
+	});
+}
+
+if (appVersionLabel) {
+	getVersion().then((version) => {
+		appVersionLabel.innerText = "School of Life Portal v" + version;
 	});
 }
 
