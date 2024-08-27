@@ -75,11 +75,3 @@ jobs:
         with:
           file: "${{ github.workspace }}/src-tauri/target/release/bundle/rpm/Portal-*.rpm"
           release_id: ${{ github.event.release.id }}
-
-      - name: Upload appimage bundle
-        uses: xresloader/upload-to-github-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          file: "${{ github.workspace }}/src-tauri/target/release/bundle/appimage/Portal_*.AppImage"
-          release_id: ${{ github.event.release.id }}
