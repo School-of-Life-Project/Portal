@@ -24,7 +24,6 @@ During the Beta period, the focus will shift towards developing tooling and cont
 
 - [X] Add builds for ARM Linux
 - [ ] Fix ePub external links
-- [ ] Fix ePub sandboxing
 - [ ] Add support for panel resizing
 - [ ] Add mobile support?
 	- Currently blocked by mobile-specific issues with open() and app_data_dir
