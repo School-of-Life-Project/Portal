@@ -23,7 +23,7 @@ subject to change
 During the Beta period, the focus will shift towards developing tooling and content for the app, rather than developing the app itself.
 
 - [X] Add builds for ARM Linux
-- [ ] Fix ePub external links
+- [ ] Fix external links in document viewer
 - [ ] Add support for panel resizing
 - [ ] Add mobile support?
 	- Currently blocked by mobile-specific issues with open() and app_data_dir
