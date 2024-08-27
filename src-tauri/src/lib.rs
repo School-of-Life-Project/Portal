@@ -23,6 +23,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             api::get_data_dir,
             api::get_internal_data_dir,
+            api::get_backend_date,
             api::get_course,
             api::set_course_completion,
             api::get_active_courses,

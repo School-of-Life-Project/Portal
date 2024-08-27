@@ -2,6 +2,7 @@
 
 use std::path::PathBuf;
 
+use chrono::{Local, NaiveDate};
 use schemars::schema_for;
 use serde::Serialize;
 use tokio::{sync::OnceCell, task, try_join};
@@ -106,6 +107,11 @@ pub fn get_data_dir(state: tauri::State<'_, State>) -> PathBuf {
 #[allow(clippy::needless_pass_by_value)]
 pub fn get_internal_data_dir(state: tauri::State<'_, State>) -> PathBuf {
     state.root.clone()
+}
+
+#[tauri::command]
+pub fn get_backend_date() -> NaiveDate {
+    Local::now().date_naive()
 }
 
 #[tauri::command]

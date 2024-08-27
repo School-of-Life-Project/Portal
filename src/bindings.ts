@@ -89,22 +89,12 @@ export interface Settings {
 	weeks_displayed: number;
 }
 
-export function getCurrentBackendDate(): BackendDate {
-	const date = new Date();
-
-	const year = String(date.getFullYear());
-	let month = String(date.getMonth() + 1);
-	let day = String(date.getDate());
-
-	if (month.length == 1) {
-		month = "0" + month;
+export async function getBackendDate(): Promise<BackendDate> {
+	try {
+		return await invoke("get_backend_date");
+	} catch (error) {
+		throw convertBackendAsyncError(error);
 	}
-
-	if (day.length == 1) {
-		day = "0" + day;
-	}
-
-	return year + "-" + month + "-" + day;
 }
 
 export function parseBackendDate(dateString: BackendDate) {

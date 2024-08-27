@@ -5,7 +5,7 @@ import {
 	displayError,
 	Error,
 	Settings,
-	getCurrentBackendDate,
+	getBackendDate,
 	Chapter,
 	Textbook,
 } from "../bindings.ts";
@@ -244,28 +244,38 @@ export class ViewManager {
 
 		let timeDisplay: TimeProgressMeter | undefined;
 		if (this.settings.show_course_clock) {
-			timeDisplay = new TimeProgressMeter(
-				0,
-				this.settings.maximum_course_time * 60,
-			);
-			timeDisplay.update(course.completion.time_spent[getCurrentBackendDate()]);
-			this.container.timer.appendChild(timeDisplay.element);
+			getBackendDate()
+				.then((backendDate) => {
+					timeDisplay = new TimeProgressMeter(
+						0,
+						this.settings.maximum_course_time * 60,
+					);
+					timeDisplay.update(course.completion.time_spent[backendDate]);
+					this.container.timer.appendChild(timeDisplay.element);
+				})
+				.catch((error: Error) => {
+					displayError(error);
+				});
 		}
 
 		window.setInterval(() => {
-			if (!document.hidden) {
-				if (course.completion.time_spent[getCurrentBackendDate()]) {
-					course.completion.time_spent[getCurrentBackendDate()] += 1;
-				} else {
-					course.completion.time_spent[getCurrentBackendDate()] = 1;
-				}
-			}
-			updateCompletion(course.course, course.completion);
-			if (timeDisplay) {
-				timeDisplay.update(
-					course.completion.time_spent[getCurrentBackendDate()],
-				);
-			}
+			getBackendDate()
+				.then((backendDate) => {
+					if (!document.hidden) {
+						if (course.completion.time_spent[backendDate]) {
+							course.completion.time_spent[backendDate] += 1;
+						} else {
+							course.completion.time_spent[backendDate] = 1;
+						}
+					}
+					updateCompletion(course.course, course.completion);
+					if (timeDisplay) {
+						timeDisplay.update(course.completion.time_spent[backendDate]);
+					}
+				})
+				.catch((error: Error) => {
+					displayError(error);
+				});
 		}, 1000);
 		window.addEventListener("visibilitychange", () => {
 			if (document.visibilityState == "hidden") {
