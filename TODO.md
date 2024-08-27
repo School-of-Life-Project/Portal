@@ -23,13 +23,10 @@ subject to change
 During the Beta period, the focus will shift towards developing tooling and content for the app, rather than developing the app itself.
 
 - [X] Add builds for ARM Linux
-- [ ] Fix external links in document viewer
-- [ ] Add support for panel resizing
-- [ ] Add mobile support?
-	- Currently blocked by mobile-specific issues with open() and app_data_dir
-- [ ] Perform cross-platform testing
+- [ ] Fix known issues
+	- [ ] Add mobile support
 
-## pre-release checklist
+## pre-v1.0 checklist
 - [ ] Better enforce front-end/back-end separation
 	- [ ] Write comprehensive backend documentation
 	- [ ] Review application security
@@ -41,7 +38,7 @@ During the Beta period, the focus will shift towards developing tooling and cont
 - [ ] Subset embedded emoji font
 - [ ] Perform testing on legacy platforms
 
-## post-1.0 wishlist
+## post-v1.0 wishlist
 - [ ] Theming?
 - [ ] Localization?
 - [ ] Description Markdown?
