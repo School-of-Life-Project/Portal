@@ -24,6 +24,7 @@ button[type="button"] {
 	cursor: pointer;
 	display: block;
 	margin: var(--button-padding) var(--button-padding) 0 0;
+	color: black;
 }
 
 nav.related {

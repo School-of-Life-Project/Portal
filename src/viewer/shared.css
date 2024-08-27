@@ -1,5 +1,11 @@
 @import "../shared.css";
 
+body {
+	background-color: var(--background-color);
+	margin: 0;
+	height: 100vh;
+}
+
 a {
 	color: unset;
 	text-decoration: unset;
@@ -22,20 +28,20 @@ details summary {
 header,
 #contentListing,
 #contentViewer {
-	position: absolute;
+	position: fixed;
 	box-sizing: border-box;
 	contain: strict;
 }
 
 #contentListing,
 #contentViewer {
-	height: calc(100vh - (2lh + 1lh));
+	height: calc(100dvh - (2lh + 1lh));
 }
 
 #contentViewer {
 	right: 0;
 	bottom: 0;
-	width: calc(100vw - (1.6lh + 30ch));
+	width: calc(100dvw - (1.6lh + 30ch));
 	color: black;
 	background-color: oklch(
 		from var(--background-color) calc(l * 3) calc(c / 3) h
@@ -62,7 +68,7 @@ header {
 	z-index: 3;
 	top: 0;
 	left: 0;
-	width: 100vw;
+	width: 100dvw;
 	height: calc(2lh + 1lh);
 	background-color: var(--top-navbar-color);
 	border-bottom: var(--secondary-border);
@@ -115,7 +121,7 @@ header nav a {
 
 @media (max-width: calc((1.6lh + 30ch) + 120ch)) {
 	#contentViewer {
-		width: calc(100vw - 1.6lh);
+		width: calc(100dvw - 1.6lh);
 	}
 
 	#contentListing:not(:hover) {
