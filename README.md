@@ -63,8 +63,6 @@ dnf install Portal-*.rpm
 ```
 
 ## Known Issues
-- A read-only null `uuid` field is present at the root of the `Course` and `CourseMap` schema. This is a bug and will be removed in the next release.
-- Textbooks with under 10 chapters have a distorted progress display. This is a bug and will be fixed in the next release.
 - External links are broken inside the textbook viewer. This is caused by [a bug in Tauri](https://github.com/tauri-apps/tauri/issues/9912).
 - When compiling Portal as a Linux AppImage, external links and folder buttons are broken. This is caused by [a bug in Tauri](https://github.com/tauri-apps/tauri/issues/6172).
 - When compiling Portal for mobile platforms, the "Open Resource Folder" and "Open Data Folder" buttons do not function correctly.
