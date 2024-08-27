@@ -63,6 +63,7 @@ dnf install Portal-*.rpm
 ```
 
 ## Known Issues
+- After exiting a textbook viewer opened from the Course Navigator, displayed progress may not update. This is a bug and will be fixed in the next release. As a workaround, you can refresh the navigator to update the displayed progress.
 - External links are broken inside the textbook viewer. This is caused by [a bug in Tauri](https://github.com/tauri-apps/tauri/issues/9912).
 - When compiling Portal as a Linux AppImage, external links and folder buttons are broken. This is caused by [a bug in Tauri](https://github.com/tauri-apps/tauri/issues/6172).
 - When compiling Portal for mobile platforms, the "Open Resource Folder" and "Open Data Folder" buttons do not function correctly.
