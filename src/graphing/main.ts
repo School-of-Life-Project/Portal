@@ -83,6 +83,11 @@ export class BookChapterGraph {
 				this.#dataElements.push(dataElement);
 				row.appendChild(dataElement);
 				if (this.#dataElements.length >= this.chapters) {
+					if (i != this.width - 1) {
+						const padElement = document.createElement("td");
+						padElement.classList.add("pad");
+						row.appendChild(padElement);
+					}
 					break;
 				}
 			}

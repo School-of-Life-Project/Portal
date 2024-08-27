@@ -31,6 +31,11 @@ table.progress-map tbody td {
 	border-radius: 15%;
 }
 
+table.progress-map tbody td.pad {
+	background-color: unset !important;
+	width: auto;
+}
+
 table.progress-map th {
 	font-weight: normal;
 	text-align: right;
