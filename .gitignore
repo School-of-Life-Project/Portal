@@ -15,6 +15,7 @@ dist-ssr
 # Rust / Tauri
 target
 /src-tauri/gen/schemas
+/src-tauri/.cargo
 
 # Editor directories and files
 .vscode/*

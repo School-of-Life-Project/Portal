@@ -76,11 +76,14 @@ npm install
 
 Then, you can:
 - run the application in development mode with `npx tauri dev`
-<!--	- run the application in an ios emulator with `npx tauri ios dev`
-	- run the application in an android emulator with `npx tauri android dev` -->
+	- run the application in an ios emulator with `npx tauri ios dev`
+	- run the application in an android emulator with `npx tauri android dev`
 - build an optimized desktop binary with `npx tauri build`
-<!--	- build an ios app with `npx tauri ios build`
-	- build an android app with `npx tauri android build` -->
+	- build an ios app with `npx tauri ios build`
+	- build an android app with `npx tauri android build`
+
+> [!WARNING]
+> Mobile support is an early work in progress and is not ready for use by end-users. Build instructions are provided to assist developers who wish to contribute to Portal.
 
 ## Architecture
 
