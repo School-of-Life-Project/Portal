@@ -41,6 +41,7 @@ fn into_relative_path(path: &Path) -> PathBuf {
 #[derive(Serialize, Deserialize, JsonSchema, Debug)]
 pub struct CourseMap {
     #[serde(skip_deserializing)]
+    #[schemars(skip)]
     pub uuid: Uuid,
     /// Title for the Course Map
     pub title: String,
@@ -96,7 +97,7 @@ pub enum CourseMapRelationType {
 /// Courses are distributed as a folder containing a course.toml at the root. The Course folder's filename must be a UUID in lowercase hexadecimal form without separator characters.
 #[derive(Serialize, Deserialize, JsonSchema, Debug)]
 pub struct Course {
-    #[schemars(skip_deserializing)]
+    #[schemars(skip)]
     pub uuid: Option<Uuid>,
     /// Title for the Course
     pub title: String,
