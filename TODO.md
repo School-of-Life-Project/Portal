@@ -26,7 +26,8 @@ During the Beta period, the focus will shift towards developing tooling and cont
 - [ ] Fix ePub external links
 - [ ] Fix ePub sandboxing
 - [ ] Add support for panel resizing
-- [ ] Add mobile support
+- [ ] Add mobile support?
+	- Currently blocked by mobile-specific issues with open() and app_data_dir
 - [ ] Perform cross-platform testing
 
 ## pre-release checklist
