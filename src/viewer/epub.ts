@@ -71,9 +71,15 @@ function convertNavItems(items: NavItem[]): ListingItem[] {
 			subitems = convertNavItems(item.subitems);
 		}
 
+		let identifier = item.href;
+
+		if (identifier.startsWith("./")) {
+			identifier = identifier.substring(2);
+		}
+
 		convertedItems.push({
 			label: item.label,
-			identifier: item.href,
+			identifier,
 			subitems,
 		});
 	}
