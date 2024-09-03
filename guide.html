@@ -348,7 +348,8 @@
 				<p>
 					Throughout the rest of this section, Portal's user data folder will be
 					referred to as <code>$APPDATA</code>. Paths are case-sensitive
-					(assuming the underlying filesystem is) unless otherwise specified.
+					(assuming the underlying filesystem is) unless otherwise specified,
+					and files may be loaded by the app in any order.
 				</p>
 				<p>
 					ℹ When using UUIDs in filesystem paths, the UUID must be represented
@@ -481,12 +482,17 @@
 				<p>
 					ZIP archives can be uncompressed, or they can be compressed with any
 					of the algorithms supported by the app: DEFLATE, DEFLATE64, BZIP2,
-					ZStandard, LZMA, and XZ.
+					ZStandard, LZMA, and XZ. ZStandard is generally the best option for
+					most use cases. Slower algorithms (BZIP2, LZMA, and XZ) should only be
+					used if archive size is more important than decompression speed.
+					Decompression of individual archives is single-threaded, but the app
+					will attempt to decompress multiple archives at a time.
 				</p>
 				<p>
 					Sets of Courses which are intended to be completed together should be
-					packaged together into one archive. If this is not feasible, use
-					multiple archives with filenames indicating their relation (example:
+					packaged together into one archive. If the collection is large (>2GB),
+					it should be split into multiple ~2GB archives with filenames
+					indicating their relation (example:
 					<code>My Course Collection (Part 1 of 3).zip</code>). Courses and
 					Course Maps should be distributed together, as one archive containing
 					all relevant resources. Do not distribute Course Maps separately from
