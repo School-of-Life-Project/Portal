@@ -72,9 +72,7 @@ impl State {
                         ErrorWrapper::new("Unable to write resource schema".to_string(), &e)
                     })?;
 
-                    Ok(DataStore {
-                        root: datastore_path,
-                    })
+                    Ok(DataStore::new(datastore_path))
                 })
                 .await?
             })

@@ -9,7 +9,10 @@ use std::{
 
 use serde::Deserialize;
 use thiserror::Error;
-use tokio::task::{self, JoinError, JoinSet};
+use tokio::{
+    sync::Mutex,
+    task::{self, JoinError, JoinSet},
+};
 use toml::Deserializer;
 use uuid::{fmt::Simple, Uuid};
 use zip::{result::ZipError, ZipArchive};
@@ -43,7 +46,9 @@ async fn get_dir_entries(path: PathBuf) -> Result<Vec<PathBuf>, Error> {
     .await?
 }
 
-async fn unpack_dir(root: PathBuf) -> Result<(), Error> {
+async fn unpack_dir(root: PathBuf, write_mutex: &Mutex<()>) -> Result<(), Error> {
+    let _lock = write_mutex.lock().await;
+
     let entries = get_dir_entries(root.clone()).await?;
 
     let root = Arc::new(root);
@@ -184,9 +189,16 @@ async fn scan_dir(root: PathBuf) -> Result<DirScanResults, Error> {
 
 pub struct DataStore {
     pub root: PathBuf,
+    write_mutex: Mutex<()>,
 }
 
 impl DataStore {
+    pub fn new(root: PathBuf) -> DataStore {
+        DataStore {
+            root,
+            write_mutex: Mutex::new(()),
+        }
+    }
     pub async fn get_course(&self, id: Uuid) -> Result<Course, Error> {
         let root = self
             .root
@@ -244,7 +256,7 @@ impl DataStore {
     }
 
     pub async fn scan(&self) -> Result<ScanResult, Error> {
-        unpack_dir(self.root.clone()).await?;
+        unpack_dir(self.root.clone(), &self.write_mutex).await?;
 
         let scan = scan_dir(self.root.clone()).await?;
 
