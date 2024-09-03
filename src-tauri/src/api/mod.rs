@@ -5,7 +5,7 @@ use std::path::PathBuf;
 use chrono::{Local, NaiveDate};
 use schemars::schema_for;
 use serde::Serialize;
-use tokio::{sync::OnceCell, task, try_join};
+use tokio::{runtime::Handle, sync::OnceCell, task, try_join};
 use uuid::Uuid;
 
 mod util;
@@ -21,6 +21,7 @@ pub struct State {
     root: PathBuf,
     database: OnceCell<Database>,
     datastore: OnceCell<DataStore>,
+    threads: OnceCell<usize>,
 }
 
 impl State {
@@ -29,7 +30,18 @@ impl State {
             root,
             database: OnceCell::new(),
             datastore: OnceCell::new(),
+            threads: OnceCell::new(),
         }
+    }
+
+    pub async fn get_threads(&self) -> usize {
+        *self
+            .threads
+            .get_or_init(|| async {
+                let metrics = Handle::current().metrics();
+                metrics.num_workers()
+            })
+            .await
     }
 
     pub async fn get_datastore(&self) -> Result<&DataStore, ErrorWrapper> {
@@ -161,13 +173,19 @@ pub async fn set_active_courses(
 
 #[tauri::command]
 pub async fn get_all(state: tauri::State<'_, State>) -> Result<ListingResult, ErrorWrapper> {
-    let scan = state.get_datastore().await?.scan().await.map_err(|e| {
-        ErrorWrapper::new("Unable to get Course and CourseMap list".to_string(), &e)
-    })?;
+    let threads = state.get_threads().await;
+    let scan = state
+        .get_datastore()
+        .await?
+        .scan(threads)
+        .await
+        .map_err(|e| {
+            ErrorWrapper::new("Unable to get Course and CourseMap list".to_string(), &e)
+        })?;
 
     let (courses, course_maps) = try_join!(
-        util::get_courses(&state, &scan.courses),
-        util::get_course_maps(&state, &scan.course_maps)
+        util::get_courses(&state, &scan.courses, threads),
+        util::get_course_maps(&state, &scan.course_maps, threads)
     )?;
 
     Ok(ListingResult {
@@ -187,7 +205,8 @@ pub async fn get_active(
     state: tauri::State<'_, State>,
 ) -> Result<Vec<(Course, CourseProgress)>, ErrorWrapper> {
     let scan = util::get_active_courses(&state).await?;
-    util::get_courses(&state, &scan).await
+    let threads = state.get_threads().await;
+    util::get_courses(&state, &scan, threads).await
 }
 
 #[tauri::command]

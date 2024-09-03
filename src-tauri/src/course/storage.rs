@@ -17,8 +17,6 @@ use toml::Deserializer;
 use uuid::{fmt::Simple, Uuid};
 use zip::{result::ZipError, ZipArchive};
 
-use crate::MAX_FS_CONCURRENCY;
-
 use super::{Course, CourseMap};
 
 #[derive(Error, Debug)]
@@ -46,14 +44,14 @@ async fn get_dir_entries(path: PathBuf) -> Result<Vec<PathBuf>, Error> {
     .await?
 }
 
-async fn unpack_dir(root: PathBuf, write_mutex: &Mutex<()>) -> Result<(), Error> {
+async fn unpack_dir(root: PathBuf, write_mutex: &Mutex<()>, threads: usize) -> Result<(), Error> {
     let _lock = write_mutex.lock().await;
 
     let entries = get_dir_entries(root.clone()).await?;
 
     let root = Arc::new(root);
 
-    for path_chunk in entries.chunks(MAX_FS_CONCURRENCY) {
+    for path_chunk in entries.chunks(threads) {
         let mut join_set = JoinSet::new();
 
         for path in path_chunk {
@@ -148,7 +146,7 @@ struct DirScanResults {
     folders: HashSet<Uuid>,
 }
 
-async fn scan_dir(root: PathBuf) -> Result<DirScanResults, Error> {
+async fn scan_dir(root: PathBuf, threads: usize) -> Result<DirScanResults, Error> {
     let entries = get_dir_entries(root).await?;
 
     let mut results = DirScanResults {
@@ -156,7 +154,7 @@ async fn scan_dir(root: PathBuf) -> Result<DirScanResults, Error> {
         folders: HashSet::new(),
     };
 
-    for path_chunk in entries.chunks(MAX_FS_CONCURRENCY) {
+    for path_chunk in entries.chunks(threads) {
         let mut join_set = JoinSet::new();
 
         for path in path_chunk {
@@ -255,10 +253,10 @@ impl DataStore {
         .await?
     }
 
-    pub async fn scan(&self) -> Result<ScanResult, Error> {
-        unpack_dir(self.root.clone(), &self.write_mutex).await?;
+    pub async fn scan(&self, threads: usize) -> Result<ScanResult, Error> {
+        unpack_dir(self.root.clone(), &self.write_mutex, threads).await?;
 
-        let scan = scan_dir(self.root.clone()).await?;
+        let scan = scan_dir(self.root.clone(), threads).await?;
 
         Ok(ScanResult {
             courses: scan.folders.into_iter().collect(),

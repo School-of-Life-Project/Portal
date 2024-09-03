@@ -6,8 +6,6 @@ mod api;
 mod course;
 mod progress;
 
-pub const MAX_FS_CONCURRENCY: usize = 8;
-
 #[allow(clippy::missing_panics_doc)]
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {

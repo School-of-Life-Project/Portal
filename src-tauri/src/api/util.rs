@@ -3,8 +3,6 @@ use serde::Serialize;
 use tokio::task::JoinError;
 use uuid::Uuid;
 
-use crate::MAX_FS_CONCURRENCY;
-
 use super::{
     super::{
         course::{Course, CourseMap},
@@ -59,11 +57,12 @@ pub(super) async fn get_course(
 pub(super) async fn get_courses(
     state: &State,
     ids: &[Uuid],
+    threads: usize,
 ) -> Result<Vec<(Course, CourseProgress)>, ErrorWrapper> {
     let mut hydrated_courses = Vec::with_capacity(ids.len());
 
-    for chunk in ids.chunks(MAX_FS_CONCURRENCY) {
-        let mut future_set = Vec::with_capacity(MAX_FS_CONCURRENCY);
+    for chunk in ids.chunks(threads) {
+        let mut future_set = Vec::with_capacity(threads);
 
         for uuid in chunk {
             future_set.push(get_course(state, *uuid));
@@ -86,13 +85,14 @@ pub(super) async fn get_active_courses(state: &State) -> Result<Vec<Uuid>, Error
         .get_active_courses()
         .await
         .map_err(|e| ErrorWrapper::new("Unable to get list of active Courses".to_string(), &e))?;
+    let threads = state.get_threads().await;
 
     let mut ids = Vec::with_capacity(active.len());
 
     let datastore = state.get_datastore().await?;
 
-    for chunk in active.chunks(MAX_FS_CONCURRENCY) {
-        let mut future_set = Vec::with_capacity(MAX_FS_CONCURRENCY);
+    for chunk in active.chunks(threads) {
+        let mut future_set = Vec::with_capacity(threads);
 
         for uuid in chunk {
             future_set.push(datastore.has_course(*uuid));
@@ -115,13 +115,14 @@ pub(super) async fn get_active_courses(state: &State) -> Result<Vec<Uuid>, Error
 pub(super) async fn get_course_maps(
     state: &State,
     ids: &[Uuid],
+    threads: usize,
 ) -> Result<Vec<(CourseMap, String)>, ErrorWrapper> {
     let mut course_maps = Vec::with_capacity(ids.len());
 
     let datastore = state.get_datastore().await?;
 
-    for chunk in ids.chunks(MAX_FS_CONCURRENCY) {
-        let mut future_set = Vec::with_capacity(MAX_FS_CONCURRENCY);
+    for chunk in ids.chunks(threads) {
+        let mut future_set = Vec::with_capacity(threads);
 
         for uuid in chunk {
             future_set.push(async {
