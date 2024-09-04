@@ -34,7 +34,7 @@ uuid = { version = "1.10.0", features = [
 	"serde",
 ] }
 toml = "0.8.19"
-tokio = { version = "1.39.3", features = [
+tokio = { version = "1.40.0", features = [
 	"fs",
 	"macros",
 ] }
