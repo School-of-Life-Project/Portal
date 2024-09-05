@@ -25,6 +25,7 @@ During the Beta period, the focus will shift towards developing tooling and cont
 - [X] Add builds for ARM Linux
 - [ ] Fix known issues
 - [ ] Add mobile support
+- [ ] Add parallel decompression of individual ZIP archives?
 
 ## pre-v1.0 checklist
 - [ ] Better enforce front-end/back-end separation
