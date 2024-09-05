@@ -20,6 +20,8 @@ pub(super) const RATIO: f64 = 1.2;
 pub(super) const PADDING: f64 = 14.0;
 pub(super) const LINE_WIDTH: usize = 2;
 
+const EMPTY_SVG: &str = "<svg width=\"1\" height=\"1\" viewBox=\"0 0 1 1\"></svg>";
+
 #[allow(clippy::cast_possible_truncation)]
 #[allow(clippy::cast_sign_loss)]
 const RADIUS: usize = (SIZE / 16.) as usize;
@@ -27,6 +29,10 @@ const RADIUS: usize = (SIZE / 16.) as usize;
 impl CourseMap {
     /// Creates a visual representation of a ``CourseMap`` as an SVG.
     pub fn generate_svg(&self) -> String {
+        if self.courses.is_empty() {
+            return EMPTY_SVG.to_string();
+        }
+
         let mut graph = self.generate_graph();
 
         let mut writer = SVGWriter::new();
