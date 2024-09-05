@@ -97,6 +97,10 @@ function buildCourseMapInfo(
 		root.appendChild(description);
 	}
 
+	if (svg.length == 0) {
+		return root;
+	}
+
 	const image = document.createElement("div");
 	image.innerHTML = svg;
 
