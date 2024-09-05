@@ -17,7 +17,6 @@ use super::{CourseMap, CourseMapCourse, CourseMapRelationType};
 
 pub(super) const SIZE: f64 = 128.0;
 pub(super) const RATIO: f64 = 1.2;
-pub(super) const PADDING: f64 = 14.0;
 pub(super) const LINE_WIDTH: usize = 2;
 
 #[allow(clippy::cast_possible_truncation)]
@@ -76,12 +75,12 @@ impl CourseMap {
             let node = Element {
                 shape: ShapeKind::Box(to_string(course).unwrap()),
                 look: style,
-                orientation: Orientation::TopToBottom,
+                orientation: Orientation::LeftToRight,
                 pos: Position::new(
                     Point::zero(),
                     Point::new(SIZE * RATIO, SIZE / RATIO),
                     Point::zero(),
-                    Point::splat(PADDING),
+                    Point::splat(SIZE * 0.75),
                 ),
             };
 
@@ -114,7 +113,7 @@ impl CourseMap {
                                 start: LineEndKind::None,
                                 end,
                                 line_style,
-                                text: " ".to_string(),
+                                text: String::new(),
                                 look: style,
                                 src_port: None,
                                 dst_port: None,

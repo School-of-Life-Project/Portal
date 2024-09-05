@@ -75,7 +75,7 @@ pub struct CourseMapCourse {
 ///
 /// Relations are always unidirectional: CourseMapRelation (source) -> CourseMapCourse (destination)
 ///
-/// Attempting to create bidirectional or circular dependency cycles will cause the graphing process to fail
+/// Attempting to create bidirectional relations will cause the graphing process to fail
 #[derive(Serialize, Deserialize, JsonSchema, Debug)]
 pub struct CourseMapRelation {
     /// The unique identifier of the (source) Course. Must correspond to an existing CourseMapCourse object
