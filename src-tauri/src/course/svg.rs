@@ -28,14 +28,14 @@ impl CourseMap {
     /// Creates a visual representation of a ``CourseMap`` as an SVG.
     pub fn generate_svg(&self) -> String {
         if self.courses.is_empty() {
-            return "".to_string();
+            return String::new();
         }
 
         let mut graph = self.generate_graph();
 
         let mut writer = SVGWriter::new();
 
-        graph.do_it(false, false, false, &mut writer);
+        graph.do_it(false, true, false, &mut writer);
 
         writer.finalize()
     }
