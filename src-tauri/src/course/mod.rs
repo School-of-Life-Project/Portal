@@ -52,6 +52,8 @@ pub struct CourseMap {
 }
 
 /// A representation of a Course within a Course Map
+///
+/// Courses will always be graphed in the order they are specified in
 #[derive(Serialize, Deserialize, JsonSchema, Debug)]
 pub struct CourseMapCourse {
     /// The unique identifier for the Course
@@ -63,6 +65,8 @@ pub struct CourseMapCourse {
     /// This can be useful to visually differentiate courses by subject
     pub color: Option<String>,
     /// A list of unidirectional dependency relations for this course
+    ///
+    /// Relations will be graphed in the order they are specified in
     #[serde(default)]
     pub relations: Vec<CourseMapRelation>,
 }
@@ -70,6 +74,8 @@ pub struct CourseMapCourse {
 /// A representation of a Course's dependency relation
 ///
 /// Relations are always unidirectional: CourseMapRelation (source) -> CourseMapCourse (destination)
+///
+/// Attempting to create bidirectional or circular dependency cycles will cause the graphing process to fail
 #[derive(Serialize, Deserialize, JsonSchema, Debug)]
 pub struct CourseMapRelation {
     /// The unique identifier of the (source) Course. Must correspond to an existing CourseMapCourse object
@@ -84,7 +90,7 @@ pub struct CourseMapRelation {
 }
 
 /// Types of Course dependency relations
-#[derive(Serialize, Deserialize, JsonSchema, Debug)]
+#[derive(Serialize, Deserialize, JsonSchema, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum CourseMapRelationType {
     /// Prerequisites are Courses which should be taken before the following Course
     Prerequisite,
