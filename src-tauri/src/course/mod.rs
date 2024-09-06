@@ -39,7 +39,7 @@ fn into_relative_path(path: &Path) -> PathBuf {
 ///
 /// The Course Map's filename must be a UUID in lowercase hexadecimal form without separator characters, with the `.toml`` file extension.
 ///
-/// Note: If the Course Map fails to render, it may crash the rendering task. If this happens, try disabling layout optimization and/or removing excessive relations.
+/// Note: If the Course Map fails to render, it may crash the rendering task. If this happens, try removing excessive relations or disabling layout optimization.
 #[derive(Serialize, Deserialize, JsonSchema, Debug)]
 pub struct CourseMap {
     #[serde(skip_deserializing)]
@@ -81,7 +81,7 @@ pub struct CourseMapCourse {
 ///
 /// Relations are always unidirectional: CourseMapRelation (source) -> CourseMapCourse (destination)
 ///
-/// Note: It takes some trial and error to get a Course Map to display relations cleanly. Try rearranging Courses and/or Course relations, enabling or disabling layout optimization, and using Layout relations as necessary.
+/// Note: It takes some trial and error to get a Course Map to display relations cleanly. Try rearranging Courses and/or Course relations, toggling layout optimization, and using Layout relations as necessary.
 #[derive(Serialize, Deserialize, JsonSchema, Debug)]
 pub struct CourseMapRelation {
     /// The unique identifier of the (source) Course. Must correspond to an existing CourseMapCourse object
