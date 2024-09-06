@@ -45,7 +45,7 @@ export class ViewManager {
 	rendered = false;
 	settings: Settings;
 	savePosition?: (position: string) => void;
-	#labels: Map<string, HTMLAnchorElement> = new Map();
+	#labels: Map<string, HTMLAnchorElement | HTMLSpanElement> = new Map();
 	constructor(container: ViewContainer, settings: Settings) {
 		this.container = container;
 		this.settings = settings;
@@ -91,6 +91,7 @@ export class ViewManager {
 	#buildListing(
 		items: ListingItem[],
 		callback?: ListingCallback,
+		state: { index: number } = { index: 0 },
 	): HTMLOListElement {
 		const root = document.createElement("ol");
 
@@ -126,6 +127,9 @@ export class ViewManager {
 				this.#labels.set(item.identifier, label);
 			} else {
 				label = document.createElement("span");
+				label.id = "label-span-" + state.index;
+
+				this.#labels.set("span-" + state.index, label);
 			}
 			label.innerText = item.label;
 
@@ -136,7 +140,9 @@ export class ViewManager {
 				subcontainer_title.appendChild(label);
 				subcontainer.appendChild(subcontainer_title);
 
-				subcontainer.appendChild(this.#buildListing(item.subitems));
+				subcontainer.appendChild(
+					this.#buildListing(item.subitems, undefined, state),
+				);
 
 				container.appendChild(subcontainer);
 			} else {
@@ -144,6 +150,8 @@ export class ViewManager {
 			}
 
 			root.appendChild(container);
+
+			state.index = state.index + 1;
 		}
 
 		return root;
@@ -168,7 +176,11 @@ export class ViewManager {
 
 		for (const chapter of textbook.chapters) {
 			if (chapter.root) {
-				const label = this.#labels.get(chapter.root);
+				let label = this.#labels.get(chapter.root);
+
+				if (!label && chapter.root.startsWith("label-")) {
+					label = this.#labels.get(chapter.root.substring(6));
+				}
 
 				if (label) {
 					const is_completed = completed.has(chapter.root);
@@ -188,7 +200,11 @@ export class ViewManager {
 			}
 			for (const group of chapter.groups) {
 				for (const section of group.sections) {
-					const label = this.#labels.get(section);
+					let label = this.#labels.get(section);
+
+					if (!label && section.startsWith("label-")) {
+						label = this.#labels.get(section.substring(6));
+					}
 
 					if (label) {
 						const is_completed = completed.has(section);
