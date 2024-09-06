@@ -96,6 +96,8 @@ pub enum CourseMapRelationType {
     Prerequisite,
     /// Corequisites are Courses which should be taken before *or* at the same time as the following Course
     Corequisite,
+    /// Layout relations change the Course hierarchy *without* being displayed visually
+    Layout,
 }
 
 /// A Course bundle index. Must be a valid TOML file

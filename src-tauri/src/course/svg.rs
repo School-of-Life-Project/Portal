@@ -89,24 +89,27 @@ impl CourseMap {
             if let Some(dest) = nodes.get(&course.uuid) {
                 for relation in &course.relations {
                     if let Some(source) = nodes.get(&relation.uuid) {
-                        let mut style = relation_style.clone();
-
-                        if let Some(color) = colors.get(&relation.uuid) {
-                            style.line_color = *color;
-                        }
-
-                        let end = match relation.r#type {
-                            CourseMapRelationType::Prerequisite => LineEndKind::Arrow,
-                            CourseMapRelationType::Corequisite => LineEndKind::None,
-                        };
-
-                        let line_style = if relation.optional {
-                            LineStyleKind::Dashed
+                        let arrow = if relation.r#type == CourseMapRelationType::Layout {
+                            Arrow::invisible()
                         } else {
-                            LineStyleKind::Normal
-                        };
+                            let mut style = relation_style.clone();
 
-                        graph.add_edge(
+                            if let Some(color) = colors.get(&relation.uuid) {
+                                style.line_color = *color;
+                            }
+
+                            let end = match relation.r#type {
+                                CourseMapRelationType::Prerequisite => LineEndKind::Arrow,
+                                CourseMapRelationType::Corequisite
+                                | CourseMapRelationType::Layout => LineEndKind::None,
+                            };
+
+                            let line_style = if relation.optional {
+                                LineStyleKind::Dashed
+                            } else {
+                                LineStyleKind::Normal
+                            };
+
                             Arrow {
                                 start: LineEndKind::None,
                                 end,
@@ -115,10 +118,10 @@ impl CourseMap {
                                 look: style,
                                 src_port: None,
                                 dst_port: None,
-                            },
-                            *source,
-                            *dest,
-                        );
+                            }
+                        };
+
+                        graph.add_edge(arrow, *source, *dest);
                     }
                 }
             }

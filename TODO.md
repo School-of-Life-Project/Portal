@@ -26,7 +26,6 @@ During the Beta period, the focus will shift towards developing tooling and cont
 - [ ] Fix known issues
 - [ ] Add mobile support
 - [ ] Add parallel decompression of individual ZIP archives?
-- [ ] Improve Course Map graphing
 
 ## pre-v1.0 checklist
 - [ ] Better enforce front-end/back-end separation
