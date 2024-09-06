@@ -34,7 +34,7 @@ impl CourseMap {
 
         let mut writer = SVGWriter::new();
 
-        graph.do_it(false, true, false, &mut writer);
+        graph.do_it(false, !self.optimize, false, &mut writer);
 
         writer.finalize()
     }
@@ -64,12 +64,10 @@ impl CourseMap {
         for course in &self.courses {
             let mut style = node_style.clone();
 
-            if let Some(colorstring) = &course.color {
-                if let Some(color) = Color::from_name(&colorstring.to_ascii_lowercase()) {
-                    style.line_color = color;
+            if let Some(color) = Color::from_name(&course.color.to_ascii_lowercase()) {
+                style.line_color = color;
 
-                    colors.insert(course.uuid, color);
-                }
+                colors.insert(course.uuid, color);
             }
 
             let node = Element {

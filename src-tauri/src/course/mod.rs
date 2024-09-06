@@ -47,26 +47,28 @@ pub struct CourseMap {
     pub title: String,
     /// Optional description for the Course Map
     pub description: Option<String>,
+    /// Optimize the CourseMap's layout for visual clarity
+    ///
+    /// If this is disabled, Courses and Course Relations will be graphed in the order they are specified in
+    #[serde(default = "default_optimize")]
+    pub optimize: bool,
     /// The Courses which are a part of this Course Map
     pub courses: Vec<CourseMapCourse>,
 }
 
 /// A representation of a Course within a Course Map
-///
-/// Courses will always be graphed in the order they are specified in
 #[derive(Serialize, Deserialize, JsonSchema, Debug)]
 pub struct CourseMapCourse {
     /// The unique identifier for the Course
     pub uuid: Uuid,
     /// A short title for the Course
     pub label: String,
-    /// The accent color of the Course, either specified in RGB hexadecimal format or as a CSS color keyword. Defaults to black if not specified
+    /// The accent color of the Course, either specified in RGB hexadecimal format or as a CSS color keyword
     ///
     /// This can be useful to visually differentiate courses by subject
-    pub color: Option<String>,
+    #[serde(default = "default_color")]
+    pub color: String,
     /// A list of unidirectional dependency relations for this course
-    ///
-    /// Relations will be graphed in the order they are specified in
     #[serde(default)]
     pub relations: Vec<CourseMapRelation>,
 }
@@ -74,8 +76,6 @@ pub struct CourseMapCourse {
 /// A representation of a Course's dependency relation
 ///
 /// Relations are always unidirectional: CourseMapRelation (source) -> CourseMapCourse (destination)
-///
-/// Attempting to create bidirectional relations will cause the graphing process to fail
 #[derive(Serialize, Deserialize, JsonSchema, Debug)]
 pub struct CourseMapRelation {
     /// The unique identifier of the (source) Course. Must correspond to an existing CourseMapCourse object
@@ -155,8 +155,21 @@ pub struct Chapter {
 /// sectionGroup.completedSections.length / sectionGroup.sections.length
 #[derive(Serialize, Deserialize, JsonSchema, Debug)]
 pub struct SectionGroup {
-    /// The relative weight of the group's completion. Defaults to 1.0
-    pub weight: Option<f32>,
+    /// The relative weight of the group's completion
+    #[serde(default = "default_weight")]
+    pub weight: f32,
     /// The user-completable sections included in the section group. Each item must be an href from the textbook's Table of Contents
     pub sections: Vec<String>,
+}
+
+fn default_optimize() -> bool {
+    true
+}
+
+fn default_color() -> String {
+    "black".to_string()
+}
+
+fn default_weight() -> f32 {
+    1.0
 }

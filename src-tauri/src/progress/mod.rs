@@ -87,7 +87,7 @@ impl CourseProgress {
                         let mut total = 0.0;
 
                         for group in &chapter.groups {
-                            let weight = group.weight.unwrap_or(1.0).max(0.0);
+                            let weight = group.weight.max(0.0);
 
                             let mut group_progress: usize = 0;
 
