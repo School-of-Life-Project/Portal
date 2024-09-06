@@ -3,6 +3,21 @@ import { ListingItem, ViewManager, DocumentViewer } from "./shared.ts";
 import Epub, { Book, EpubCFI } from "epubjs";
 import { NavItem } from "epubjs/types/navigation";
 
+// Based on https://github.com/futurepress/epub.js/issues/1084#issuecomment-647002309
+
+const resolveURL = (url: string, relativeTo: string) => {
+	// HACK-ish: abuse the URL API a little to resolve the path
+	// the base needs to be a valid URL, or it will throw a TypeError,
+	// so we just set a random base URI and remove it later
+	const base = "https://example.invalid/";
+	return new URL(url, base + relativeTo).href.replace(base, "");
+};
+
+function resolveNavUrl(book: Book, href: string) {
+	const basePath = book.packaging.navPath || book.packaging.ncxPath;
+	return resolveURL(href, basePath);
+}
+
 // Based on https://github.com/futurepress/epub.js/issues/759#issuecomment-1399499918
 function flatten(chapters: NavItem[]): NavItem[] {
 	return (<NavItem[]>[]).concat.apply(
@@ -78,7 +93,7 @@ function convertNavItems(items: NavItem[]): ListingItem[] {
 		}
 
 		convertedItems.push({
-			label: item.label,
+			label: item.label.trim(),
 			identifier,
 			subitems,
 		});
@@ -134,11 +149,11 @@ export class ePubViewer implements DocumentViewer {
 									document_index: this.document_index,
 								},
 								{
-									title: metadata.title,
+									title: metadata.title.trim(),
 									language: metadata.language,
 									items: convertNavItems(navigation.toc),
 									callback: (identifier) => {
-										rendition.display(identifier);
+										rendition.display(resolveNavUrl(book, identifier));
 									},
 								},
 							);
