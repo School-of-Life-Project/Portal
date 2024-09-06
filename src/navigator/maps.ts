@@ -120,6 +120,27 @@ function buildCourseMapInfo(
 		}
 	}
 
+	items.sort((a, b) => {
+		const aY = a.y.baseVal.value;
+		const aX = a.x.baseVal.value;
+		const bY = b.y.baseVal.value;
+		const bX = b.x.baseVal.value;
+
+		if (aY < bY) {
+			return -1;
+		} else if (aY > bY) {
+			return 1;
+		} else {
+			if (aX < bX) {
+				return -1;
+			} else if (aX > bX) {
+				return 1;
+			} else {
+				return 0;
+			}
+		}
+	});
+
 	for (const element of items) {
 		if (element.childNodes.length == 1) {
 			const item = element.childNodes[0] as HTMLElement;

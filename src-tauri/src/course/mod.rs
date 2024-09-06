@@ -49,7 +49,7 @@ pub struct CourseMap {
     pub description: Option<String>,
     /// Optimize the CourseMap's layout for visual clarity
     ///
-    /// If this is disabled, Courses and Course Relations will be graphed in the order they are specified in
+    /// CourseMap rendering techniques are subject to change between releases
     #[serde(default = "default_optimize")]
     pub optimize: bool,
     /// The Courses which are a part of this Course Map
