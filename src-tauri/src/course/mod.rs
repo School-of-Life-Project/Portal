@@ -38,6 +38,8 @@ fn into_relative_path(path: &Path) -> PathBuf {
 /// A dependency tree of Courses. Must be a valid TOML file
 ///
 /// The Course Map's filename must be a UUID in lowercase hexadecimal form without separator characters, with the `.toml`` file extension.
+///
+/// Note: If the Course Map fails to render, it may crash the rendering task. If this happens, try disabling layout optimization and/or removing excessive relations.
 #[derive(Serialize, Deserialize, JsonSchema, Debug)]
 pub struct CourseMap {
     #[serde(skip_deserializing)]
@@ -48,8 +50,6 @@ pub struct CourseMap {
     /// Optional description for the Course Map
     pub description: Option<String>,
     /// Optimize the CourseMap's layout for visual clarity
-    ///
-    /// CourseMap rendering techniques are subject to change between releases
     #[serde(default = "default_optimize")]
     pub optimize: bool,
     /// The Courses which are a part of this Course Map
@@ -57,6 +57,8 @@ pub struct CourseMap {
 }
 
 /// A representation of a Course within a Course Map
+///
+/// Courses can be specified in any order, and are added to the Course Map in the specified order
 #[derive(Serialize, Deserialize, JsonSchema, Debug)]
 pub struct CourseMapCourse {
     /// The unique identifier for the Course
@@ -69,6 +71,8 @@ pub struct CourseMapCourse {
     #[serde(default = "default_color")]
     pub color: String,
     /// A list of unidirectional dependency relations for this course
+    ///
+    /// Relations are added to the Course Map after all Courses are added, in the order that they are specified
     #[serde(default)]
     pub relations: Vec<CourseMapRelation>,
 }
@@ -76,6 +80,8 @@ pub struct CourseMapCourse {
 /// A representation of a Course's dependency relation
 ///
 /// Relations are always unidirectional: CourseMapRelation (source) -> CourseMapCourse (destination)
+///
+/// Note: It takes some trial and error to get a Course Map to display relations cleanly. Try rearranging Courses and/or Course relations, enabling or disabling layout optimization, and using Layout relations as necessary.
 #[derive(Serialize, Deserialize, JsonSchema, Debug)]
 pub struct CourseMapRelation {
     /// The unique identifier of the (source) Course. Must correspond to an existing CourseMapCourse object
