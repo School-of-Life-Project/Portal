@@ -66,9 +66,10 @@ dnf install Portal-*.rpm
 - In some EPUB documents, navigation using the Table of Contents is broken. This is a bug and will be fixed in the next release.
 - In some EPUB documents, Table of Contents items have excessive padding. This is a bug and will be fixed in the next release.
 - The tab order of Course Map items is incorrect. This is a bug and will be fixed in the next release.
-- In some EPUB documents, the textbook viewer fails to highlight the correct section. This is caused by a bug in Epub.js.
 - External links are broken inside the textbook viewer. This is caused by [a bug in Tauri](https://github.com/tauri-apps/tauri/issues/9912).
 - When compiling Portal as a Linux AppImage, external links and folder buttons are broken. This is caused by [a bug in Tauri](https://github.com/tauri-apps/tauri/issues/6172).
+- In some EPUB documents, the textbook viewer fails to highlight the correct section. This is caused by an unknown bug in Epub.js involving the `cfiFromElement()` function.
+- When running portal on Windows, the textbook viewer does not display the document until the user clicks on a Table of Contents item. This is caused by an unknown bug in Epub.js involving the `Rendition` API.
 - When compiling Portal for mobile platforms, the "Open Resource Folder" and "Open Data Folder" buttons do not function correctly.
 
 ## Building
