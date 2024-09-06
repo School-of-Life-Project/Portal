@@ -80,7 +80,7 @@ impl CourseMap {
                     Point::zero(),
                     Point::new(SIZE * RATIO, SIZE / RATIO),
                     Point::zero(),
-                    Point::splat(SIZE * 0.75),
+                    Point::new((SIZE * RATIO) * 0.75, (SIZE / RATIO) * 0.75),
                 ),
             };
 
