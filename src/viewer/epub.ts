@@ -53,14 +53,14 @@ function getChapter(
 	const match: NavItem | null = flatten(book.navigation.toc)
 		.filter((chapter) => {
 			return book
-				.canonical(chapter.href)
+				.canonical(resolveNavUrl(book, chapter.href))
 				.includes(book.canonical(locationHref));
 		}, null)
 		.reduce((result: NavItem | null, chapter) => {
 			const locationAfterChapter =
 				EpubCFI.prototype.compare(
 					location_cfi,
-					getCfiFromHref(book, chapter.href),
+					getCfiFromHref(book, resolveNavUrl(book, chapter.href)),
 				) > 0;
 			return locationAfterChapter ? chapter : result;
 		}, null);
@@ -76,20 +76,23 @@ interface EventLocation {
 	percentage: number;
 }
 
-function convertNavItems(items: NavItem[]): ListingItem[] {
+function convertNavItems(book: Book, items: NavItem[]): ListingItem[] {
 	const convertedItems: ListingItem[] = [];
 
 	for (const item of items) {
 		let subitems: ListingItem[] | undefined = undefined;
 
 		if (item.subitems && item.subitems.length > 0) {
-			subitems = convertNavItems(item.subitems);
+			subitems = convertNavItems(book, item.subitems);
 		}
 
-		let identifier = item.href;
+		let identifier;
+		if (item.href) {
+			identifier = resolveNavUrl(book, item.href);
 
-		if (identifier.startsWith("./")) {
-			identifier = identifier.substring(2);
+			if (identifier.startsWith("./")) {
+				identifier = identifier.substring(2);
+			}
 		}
 
 		convertedItems.push({
@@ -151,9 +154,9 @@ export class ePubViewer implements DocumentViewer {
 								{
 									title: metadata.title.trim(),
 									language: metadata.language,
-									items: convertNavItems(navigation.toc),
+									items: convertNavItems(book, navigation.toc),
 									callback: (identifier) => {
-										rendition.display(resolveNavUrl(book, identifier));
+										rendition.display(identifier);
 									},
 								},
 							);
@@ -162,40 +165,46 @@ export class ePubViewer implements DocumentViewer {
 						},
 					);
 
-					return rendition
-						.display(initialProgress.books[this.document_index]?.position)
-						.then(() => {
-							rendition.on("locationChanged", (location: EventLocation) => {
-								if (location.start) {
-									if (location.href) {
-										const chapter = getChapter(book, {
-											location_href: location.href,
-											location_cfi: location.start,
-										});
+					let position = initialProgress.books[this.document_index]?.position;
 
-										if (chapter) {
-											view.highlightListingItem(chapter.id);
-										}
+					if (!position) {
+						position = resolveNavUrl(book, book.navigation.toc[0].href);
+					}
 
-										if (view.savePosition) {
-											view.savePosition(location.start);
-										}
+					return rendition.display(position).then(() => {
+						rendition.on("locationChanged", (location: EventLocation) => {
+							if (location.start) {
+								if (location.href) {
+									const chapter = getChapter(book, {
+										location_href: location.href,
+										location_cfi: location.start,
+									});
+
+									if (chapter && chapter.href) {
+										view.highlightListingItem(
+											resolveNavUrl(book, chapter.href),
+										);
+									}
+
+									if (view.savePosition) {
+										view.savePosition(location.start);
 									}
 								}
-							});
-
-							if (this.#inner) {
-								this.#inner.resizeObserver = new ResizeObserver((_event) => {
-									// @ts-expect-error need to call rendition.resize() with zero arguments to resize without providing a specific length and height
-									rendition.resize();
-								});
-								this.#inner.resizeObserver.observe(view.container.content);
 							}
-
-							this.rendered = true;
-
-							return renderPromise;
 						});
+
+						if (this.#inner) {
+							this.#inner.resizeObserver = new ResizeObserver((_event) => {
+								// @ts-expect-error need to call rendition.resize() with zero arguments to resize without providing a specific length and height
+								rendition.resize();
+							});
+							this.#inner.resizeObserver.observe(view.container.content);
+						}
+
+						this.rendered = true;
+
+						return renderPromise;
+					});
 				},
 			);
 		});
