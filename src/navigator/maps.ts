@@ -109,7 +109,18 @@ function buildCourseMapInfo(
 	svgElement.getElementsByTagName("style")[0].innerHTML +=
 		" .course-map-item {cursor: pointer; outline-offset: -0.5lh}";
 
-	for (const element of svgElement.getElementsByTagName("foreignObject")) {
+	const items: SVGForeignObjectElement[] = [];
+
+	const elements = svgElement.getElementsByTagName("foreignObject");
+
+	while (elements.length > 0) {
+		for (const element of elements) {
+			svgElement.removeChild(element);
+			items.push(element);
+		}
+	}
+
+	for (const element of items) {
 		if (element.childNodes.length == 1) {
 			const item = element.childNodes[0] as HTMLElement;
 
@@ -143,6 +154,8 @@ function buildCourseMapInfo(
 				}
 			}
 		}
+
+		svgElement.appendChild(element);
 	}
 
 	const handleCourseDisplay = (identifier: string) => {
