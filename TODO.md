@@ -23,7 +23,6 @@ subject to change
 During the Beta period, the focus will shift towards developing tooling and content for the app, rather than developing the app itself.
 
 - [X] Add builds for ARM Linux
-- [ ] Improve Course Map graphing process
 - [ ] Fix known issues
 - [ ] Add mobile support
 - [ ] Add parallel decompression of individual ZIP archives?
