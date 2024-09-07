@@ -24,38 +24,36 @@ const internalFolderButton = document.getElementById("internalFolderButton");
 const settingsForm = document.getElementById("settingsRoot");
 const appVersionLabel = document.getElementById("appVersionLabel");
 
-function updateSettings(settings?: Settings) {
-	setSettings(settings).catch((error) => {
+async function updateSettings(settings?: Settings) {
+	return setSettings(settings).catch((error) => {
 		displayError(error);
 	});
 }
 
-function resetCourses() {
-	setActiveCourses([]).catch((error) => {
+async function resetCourses() {
+	return setActiveCourses([]).catch((error) => {
 		displayError(error);
 	});
 }
 
 if (resetSettingsButton) {
 	resetSettingsButton.addEventListener("click", () => {
-		updateSettings();
-		location.reload();
+		updateSettings().then(() => location.reload());
 	});
 	resetSettingsButton.addEventListener("keydown", (event) => {
 		if (event.code == "Enter") {
-			updateSettings();
-			location.reload();
+			updateSettings().then(() => location.reload());
 		}
 	});
 }
 
 if (resetCoursesButton) {
 	resetCoursesButton.addEventListener("click", () => {
-		resetCourses();
+		resetCourses().then(() => location.reload());
 	});
 	resetCoursesButton.addEventListener("keydown", (event) => {
 		if (event.code == "Enter") {
-			resetCourses();
+			resetCourses().then(() => location.reload());
 		}
 	});
 }
