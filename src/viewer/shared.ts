@@ -176,11 +176,11 @@ export class ViewManager {
 
 		for (const chapter of textbook.chapters) {
 			if (chapter.root) {
-				let label = this.#labels.get(chapter.root);
+				const label = this.#labels.get(chapter.root);
 
-				if (!label && chapter.root.startsWith("label-")) {
+				/*if (!label && chapter.root.startsWith("label-")) {
 					label = this.#labels.get(chapter.root.substring(6));
-				}
+				}*/
 
 				if (label) {
 					const is_completed = completed.has(chapter.root);
@@ -200,11 +200,11 @@ export class ViewManager {
 			}
 			for (const group of chapter.groups) {
 				for (const section of group.sections) {
-					let label = this.#labels.get(section);
+					const label = this.#labels.get(section);
 
-					if (!label && section.startsWith("label-")) {
+					/*if (!label && section.startsWith("label-")) {
 						label = this.#labels.get(section.substring(6));
-					}
+					}*/
 
 					if (label) {
 						const is_completed = completed.has(section);
