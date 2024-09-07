@@ -113,7 +113,7 @@ impl CourseProgress {
 
                         if progress > 0.0 {
                             chapter_progress.push(progress / total);
-                        } else if total > 0.0 {
+                        } else if total > 0.0 || chapter.root.is_some() {
                             chapter_progress.push(0.0);
                         }
                     }
