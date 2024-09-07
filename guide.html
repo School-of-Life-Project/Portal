@@ -428,8 +428,10 @@
 				<p>
 					In order for a textbook to be completable, a list of user-completable
 					chapters must be included in the configuration for that textbook. Each
-					referenced section in the chapter must match a valid
-					<code>href</code> from the EPUB's Table of Contents.
+					referenced section in the chapter must match a valid identifier from
+					the Table of Contents. ToC identifiers can be found by opening Inspect
+					Element inside the 📖&nbsp;Textbook&nbsp;Viewer and then clicking on
+					the Console tab.
 				</p>
 				<p>
 					ℹ Only make chapters or sections completable when their completion is
@@ -442,15 +444,6 @@
 					load the
 					<code>course.toml</code>). It will only load the textbook being
 					actively viewed.
-				</p>
-				<p>
-					Inspect Element can be used to get ToC <code>href</code>s from the
-					📖&nbsp;Textbook&nbsp;Viewer. These are stored in the
-					<code>id</code> attribute of <code>&lt;a&gt;</code> and
-					<code>&lt;span&gt;</code> elements on the navigation side-bar. These
-					identifiers are prefixed with <code>label-</code>, and this prefix
-					must be removed when adding the section to the
-					<code>course.toml</code>.
 				</p>
 				<p>
 					The &nbsp;Course&nbsp;Navigator is useful for checking the completion

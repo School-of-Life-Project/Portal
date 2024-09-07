@@ -64,6 +64,8 @@ export class ViewManager {
 		const listing = this.#buildListing(metadata.items, metadata.callback);
 		this.#buildProgressTracker(course, listing);
 
+		console.log("Table of Contents:", metadata.items);
+
 		this.rendered = true;
 	}
 	highlightListingItem(identifier: string) {
@@ -128,6 +130,7 @@ export class ViewManager {
 			} else {
 				label = document.createElement("span");
 				label.id = "label-span-" + state.index;
+				item.identifier = "span-" + state.index;
 
 				this.#labels.set("span-" + state.index, label);
 			}
