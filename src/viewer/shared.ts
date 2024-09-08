@@ -64,7 +64,11 @@ export class ViewManager {
 		const listing = this.#buildListing(metadata.items, metadata.callback);
 		this.#buildProgressTracker(course, listing);
 
-		console.log("Table of Contents:", metadata.items);
+		console.log({
+			title: metadata.title,
+			lang: metadata.language,
+			toc: metadata.items,
+		});
 
 		this.rendered = true;
 	}
