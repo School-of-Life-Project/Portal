@@ -62,7 +62,7 @@ Then, run the following command as root:
 dnf install Portal-*.rpm
 ```
 
-## Post-Installation
+## Usage
 
 Portal has a built-in user manual, which should be read if you are unfamiliar with the app. This can be accessed by pressing the `📜 Guide` button on the app's home screen.
 
