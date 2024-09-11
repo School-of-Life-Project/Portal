@@ -62,6 +62,12 @@ Then, run the following command as root:
 dnf install Portal-*.rpm
 ```
 
+## Post-Installation
+
+Portal has a built-in user manual, which should be read if you are unfamiliar with the app. This can be accessed by pressing the `📜 Guide` button on the app's home screen.
+
+[Find courses created by other users](https://github.com/School-of-Life-Project/Portal-App/discussions/categories/show-and-tell?discussions_q=is%3Aopen+category%3A%22Show+and+tell%22+sort%3Atopl)
+
 ## Known Issues
 - External links are broken inside the textbook viewer. This is caused by [a bug in Tauri](https://github.com/tauri-apps/tauri/issues/9912).
 - When compiling Portal as a Linux AppImage, external links and folder buttons are broken. This is caused by [a bug in Tauri](https://github.com/tauri-apps/tauri/issues/6172).
