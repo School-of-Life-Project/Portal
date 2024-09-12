@@ -183,9 +183,13 @@ export class ePubViewer implements DocumentViewer {
 									});
 
 									if (chapter && chapter.href) {
-										view.highlightListingItem(
-											resolveNavUrl(book, chapter.href),
-										);
+										// ! FIXME
+
+										// view.highlightListingItem(
+										// 	resolveNavUrl(book, chapter.href),
+										// );
+
+										view.highlightListingItem(chapter.href);
 									}
 
 									if (view.savePosition) {
