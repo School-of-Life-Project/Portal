@@ -69,7 +69,6 @@ Portal has a built-in user manual, which should be read if you are unfamiliar wi
 [Find courses created by other users](https://github.com/School-of-Life-Project/Portal-App/discussions/categories/show-and-tell?discussions_q=is%3Aopen+category%3A%22Show+and+tell%22+sort%3Atopl)
 
 ## Known Issues
-- If the app has not been used in a while, the progress display on the homescreen will be incorrect. This is a bug and will be fixed in the next release.
 - External links are broken inside the textbook viewer. This is caused by [a bug in Tauri](https://github.com/tauri-apps/tauri/issues/9912).
 - When compiling Portal as a Linux AppImage, external links and folder buttons are broken. This is caused by [a bug in Tauri](https://github.com/tauri-apps/tauri/issues/6172).
 - When running portal on Windows, the textbook viewer does not display the document until the user clicks on a Table of Contents item. This is caused by an unknown bug in Epub.js involving the `Rendition` API.
