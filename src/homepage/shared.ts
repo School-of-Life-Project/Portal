@@ -131,23 +131,27 @@ export function graphProgress(
 	}
 
 	let lastDate = currentDate;
+	let expectedDistance = 0;
 
 	for (const [date, data] of timeData) {
-		for (let ii = 1; ii < daysBetween(date, lastDate); ii++) {
+		for (let ii = expectedDistance; ii < daysBetween(date, lastDate); ii++) {
 			timeProgress.push(0);
 		}
 		lastDate = date;
+		expectedDistance = 1;
 
 		timeProgress.push(data);
 	}
 
 	lastDate = currentDate;
+	expectedDistance = 0;
 
 	for (const [date, data] of chapterData) {
-		for (let ii = 1; ii < daysBetween(date, lastDate); ii++) {
+		for (let ii = expectedDistance; ii < daysBetween(date, lastDate); ii++) {
 			chapterProgress.push(0);
 		}
 		lastDate = date;
+		expectedDistance = 1;
 
 		chapterProgress.push(data);
 	}
