@@ -57,6 +57,8 @@ if (contentListing && contentViewer) {
 				return;
 			}
 
+			console.log(listing);
+
 			const [courseListing, courseMapping] = buildCourseListing(
 				listing.courses,
 				new Set(activeCourses),

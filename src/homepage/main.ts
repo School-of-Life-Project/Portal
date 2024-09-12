@@ -33,6 +33,8 @@ if (courseContainer && progressContainer && settings) {
 			return;
 		}
 
+		console.log(courses);
+
 		if (courses.length == 0) {
 			const element = displayEmptyCourseNotice();
 
@@ -56,6 +58,8 @@ if (courseContainer && progressContainer && settings) {
 		if (!progress) {
 			return;
 		}
+
+		console.log(progress);
 
 		const [timeGraph, sectionGraph] = graphProgress(settings, progress);
 

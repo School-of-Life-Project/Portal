@@ -127,6 +127,8 @@ if (appVersionLabel) {
 
 const settings = await settingsPromise;
 
+console.log(settings);
+
 if (settingsForm && settings) {
 	const form = buildSettingsForm(settings);
 

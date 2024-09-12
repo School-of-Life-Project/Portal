@@ -74,6 +74,8 @@ if (
 				return;
 			}
 
+			console.log(result);
+
 			const viewer: DocumentViewer = new ePubViewer(result[0], document_index);
 
 			try {
