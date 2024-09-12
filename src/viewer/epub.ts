@@ -134,12 +134,14 @@ export class ePubViewer implements DocumentViewer {
 						book,
 					};
 
+					// @ts-expect-error RenditionOptions type is incomplete
 					const rendition = this.#inner.book.renderTo(view.container.content, {
 						view: "iframe",
 						flow: "scrolled-doc",
 						width: "100%",
 						height: "100%",
 						spread: "none",
+						allowPopups: true,
 						allowScriptedContent: true,
 					});
 
