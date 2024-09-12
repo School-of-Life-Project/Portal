@@ -70,8 +70,10 @@ Portal has a built-in user manual, which should be read if you are unfamiliar wi
 
 ## Known Issues
 - External links are broken inside the textbook viewer. This is caused by [a bug in Tauri](https://github.com/tauri-apps/tauri/issues/9912).
+	- Temporary Workaround: Right click the link and copy the URL.
 - When compiling Portal as a Linux AppImage, external links and folder buttons are broken. This is caused by [a bug in Tauri](https://github.com/tauri-apps/tauri/issues/6172).
-- When running portal on Windows, the textbook viewer does not display the document until the user clicks on a Table of Contents item. This is caused by an unknown bug in Epub.js involving the `Rendition` API.
+- When running portal on Windows, the textbook viewer does not reliably display the document on initial startup. This is due to an unknown bug in Epub.js.
+	- Temporary Workaround: Click on a table of contents item after opening the textbook viewer.
 - When compiling Portal for mobile platforms, the "Open Resource Folder" and "Open Data Folder" buttons do not function correctly.
 
 ## Building
