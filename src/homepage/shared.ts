@@ -120,21 +120,6 @@ export function graphProgress(
 	const timeData = sortProgressData(progress.time_spent);
 	const chapterData = sortProgressData(progress.chapters_completed);
 
-	let daysSinceLastTimeData = 0;
-	if (timeData.length > 0) {
-		daysSinceLastTimeData = daysBetween(
-			currentDate,
-			timeData[timeData.length - 1][0],
-		);
-	}
-	let daysSinceLastChapterData = 0;
-	if (chapterData.length > 0) {
-		daysSinceLastChapterData = daysBetween(
-			currentDate,
-			chapterData[chapterData.length - 1][0],
-		);
-	}
-
 	const currentDayIndex = dayMappings[currentDate.getDay()];
 
 	const timeProgress: number[] = [];
@@ -145,39 +130,24 @@ export function graphProgress(
 		chapterProgress.push(NaN);
 	}
 
-	for (let i = 0; i < daysSinceLastTimeData; i++) {
-		timeProgress.push(0);
-	}
-
-	for (let i = 0; i < daysSinceLastChapterData; i++) {
-		chapterProgress.push(0);
-	}
-
-	let lastDate: Date | undefined;
+	let lastDate = currentDate;
 
 	for (const [date, data] of timeData) {
-		if (!lastDate) {
-			lastDate = date;
-		} else {
-			for (let ii = 1; ii < daysBetween(date, lastDate); ii++) {
-				timeProgress.push(0);
-			}
-			lastDate = date;
+		for (let ii = 1; ii < daysBetween(date, lastDate); ii++) {
+			timeProgress.push(0);
 		}
+		lastDate = date;
 
 		timeProgress.push(data);
 	}
 
-	lastDate = undefined;
+	lastDate = currentDate;
+
 	for (const [date, data] of chapterData) {
-		if (!lastDate) {
-			lastDate = date;
-		} else {
-			for (let ii = 1; ii < daysBetween(date, lastDate); ii++) {
-				chapterProgress.push(0);
-			}
-			lastDate = date;
+		for (let ii = 1; ii < daysBetween(date, lastDate); ii++) {
+			chapterProgress.push(0);
 		}
+		lastDate = date;
 
 		chapterProgress.push(data);
 	}
