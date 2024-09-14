@@ -470,8 +470,6 @@ function handleListingItemVisibility(
 	currentItem: boolean,
 	scroll: boolean,
 ) {
-	console.log(element, completed, firstIncomplete, currentItem);
-
 	if (firstIncomplete) {
 		updateListingItemVisibility(
 			listing,
