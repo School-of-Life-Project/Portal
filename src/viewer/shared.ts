@@ -353,29 +353,33 @@ function handleProgressUpdate(
 	if (checked) {
 		completed.add(identifier);
 
-		let chapter_completed = true;
+		if (chapter.root) {
+			let chapter_completed = true;
 
-		if (identifier != chapter.root) {
-			outer: for (const group of chapter.groups) {
-				for (const section of group.sections) {
-					if (!completed.has(section)) {
-						chapter_completed = false;
-						break outer;
+			if (identifier != chapter.root) {
+				for (const group of chapter.groups) {
+					for (const section of group.sections) {
+						if (!completed.has(section)) {
+							chapter_completed = false;
+							break;
+						}
 					}
 				}
 			}
-		}
 
-		updated_chapter_completion = chapter_completed;
+			updated_chapter_completion = chapter_completed;
 
-		if (chapter_completed && chapter.root) {
-			completed.add(chapter.root);
+			if (chapter_completed) {
+				completed.add(chapter.root);
 
-			const chapter_checkbox = checkboxes.get(chapter.root);
+				const chapter_checkbox = checkboxes.get(chapter.root);
 
-			if (chapter_checkbox) {
-				chapter_checkbox.checked = true;
+				if (chapter_checkbox) {
+					chapter_checkbox.checked = true;
+				}
 			}
+		} else {
+			updated_chapter_completion = true;
 		}
 	} else {
 		completed.delete(identifier);
@@ -394,6 +398,8 @@ function handleProgressUpdate(
 			} else {
 				updated_chapter_completion = identifier == chapter.root;
 			}
+		} else {
+			updated_chapter_completion = true;
 		}
 	}
 
@@ -425,10 +431,10 @@ function showNextChapter(
 					identifier == chapter.root,
 					autoscroll,
 				);
-			}
 
-			if (!completed.has(chapter.root)) {
-				firstIncomplete = false;
+				if (!completed.has(chapter.root)) {
+					firstIncomplete = false;
+				}
 			}
 		} else {
 			// If the chapter has no root, treat individual sections as if they were chapters
@@ -445,10 +451,10 @@ function showNextChapter(
 							identifier == section,
 							autoscroll,
 						);
-					}
 
-					if (!completed.has(section)) {
-						firstIncomplete = false;
+						if (!completed.has(section)) {
+							firstIncomplete = false;
+						}
 					}
 				}
 			}
