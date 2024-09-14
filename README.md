@@ -69,6 +69,7 @@ Portal has a built-in user manual, which should be read if you are unfamiliar wi
 [Find courses created by other users](https://github.com/School-of-Life-Project/Portal-App/discussions/categories/show-and-tell?discussions_q=is%3Aopen+category%3A%22Show+and+tell%22+sort%3Atopl)
 
 ## Known Issues
+- In some courses, the textbook viewer does not reliably open/close sections correctly. This is a bug and will be fixed in the next release.
 - External links are broken inside the textbook viewer. This is caused by [a bug in Tauri](https://github.com/tauri-apps/tauri/issues/9912).
 	- Temporary Workaround: Right click the link and copy the URL.
 - When compiling Portal as a Linux AppImage, external links and folder buttons are broken. This is caused by [a bug in Tauri](https://github.com/tauri-apps/tauri/issues/6172).
