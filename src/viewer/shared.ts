@@ -470,6 +470,8 @@ function handleListingItemVisibility(
 	currentItem: boolean,
 	scroll: boolean,
 ) {
+	console.log(element, completed, firstIncomplete, currentItem);
+
 	if (firstIncomplete) {
 		updateListingItemVisibility(
 			listing,
@@ -499,7 +501,7 @@ function updateListingItemVisibility(
 	}
 
 	if (showItemList !== undefined) {
-		let currentElement = element?.parentElement?.parentElement?.parentElement;
+		let currentElement = itemContainer;
 		while (
 			currentElement &&
 			currentElement.parentElement &&
