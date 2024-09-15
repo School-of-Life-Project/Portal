@@ -70,7 +70,7 @@ impl CourseProgress {
 
         for (book_index, book) in course.books.iter().enumerate() {
             #[allow(clippy::cast_precision_loss)]
-            book_progress.push(match completion.books.get(&book_index) {
+            match completion.books.get(&book_index) {
                 Some(book_completion) => {
                     let mut chapter_progress = Vec::with_capacity(book.chapters.len());
 
@@ -120,31 +120,30 @@ impl CourseProgress {
 
                     let mut total_progress = 0.0;
 
+                    if chapter_progress.is_empty() {
+                        continue;
+                    }
+
                     for chapter in &chapter_progress {
                         total_progress += chapter;
                     }
 
                     total_progress /= chapter_progress.len() as f32;
 
-                    TextbookProgress {
+                    book_progress.push(TextbookProgress {
                         overall_completion: total_progress,
                         chapter_completion: chapter_progress,
-                    }
+                    });
                 }
                 None => {
-                    if book.chapters.is_empty() {
-                        TextbookProgress {
-                            overall_completion: 1.0,
-                            chapter_completion: Vec::new(),
-                        }
-                    } else {
-                        TextbookProgress {
+                    if !book.chapters.is_empty() {
+                        book_progress.push(TextbookProgress {
                             overall_completion: 0.0,
                             chapter_completion: Vec::new(),
-                        }
+                        });
                     }
                 }
-            });
+            };
         }
 
         let current_date = Local::now().date_naive();
