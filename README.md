@@ -69,12 +69,12 @@ Portal has a built-in user manual, which should be read if you are unfamiliar wi
 [Find courses created by other users](https://github.com/School-of-Life-Project/Portal-App/discussions/categories/show-and-tell?discussions_q=is%3Aopen+category%3A%22Show+and+tell%22+sort%3Atopl)
 
 ## Known Issues
+
 - When running Portal on macOS or Linux, external links are broken inside the textbook viewer. This is caused by [a bug in Tauri](https://github.com/tauri-apps/tauri/issues/9912).
 	- Temporary Workaround: Right click the link and copy the URL.
-- When compiling Portal as a Linux AppImage, external links and folder buttons are broken. This is caused by [a bug in Tauri](https://github.com/tauri-apps/tauri/issues/6172).
 - When running Portal on Windows, the textbook viewer does not reliably display the document on initial startup. This is due to an unknown bug in Epub.js and/or Tauri.
 	- Temporary Workaround: Click on a table of contents item after opening the textbook viewer.
-- When compiling Portal for mobile platforms, the "Open Resource Folder" and "Open Data Folder" buttons do not function correctly.
+
 
 ## Building
 
@@ -89,6 +89,11 @@ npm install
 Then, you can:
 - run the application in development mode with `npx tauri dev`
 - build an optimized desktop binary with `npx tauri build`
+
+### Known Build Issues
+
+- When compiling Portal as a Linux AppImage, external links and folder buttons are broken. This is caused by [a bug in Tauri](https://github.com/tauri-apps/tauri/issues/6172).
+- When compiling Portal for mobile platforms, the "Open Resource Folder" and "Open Data Folder" buttons do not function correctly.
 
 ## Architecture
 
