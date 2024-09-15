@@ -201,8 +201,6 @@ export class ePubViewer implements DocumentViewer {
 							}
 						});
 
-						rendition.display(position);
-
 						if (this.#inner) {
 							this.#inner.resizeObserver = new ResizeObserver((_event) => {
 								// @ts-expect-error need to call rendition.resize() with zero arguments to resize without providing a specific length and height
