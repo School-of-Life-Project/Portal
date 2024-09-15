@@ -118,7 +118,9 @@ impl CourseProgress {
                         }
                     }
 
-                    if !chapter_progress.is_empty() {
+                    if chapter_progress.is_empty() {
+                        None
+                    } else {
                         let mut total_progress = 0.0;
 
                         for chapter in &chapter_progress {
@@ -131,18 +133,16 @@ impl CourseProgress {
                             overall_completion: total_progress,
                             chapter_completion: chapter_progress,
                         })
-                    } else {
-                        None
                     }
                 }
                 None => {
-                    if !book.chapters.is_empty() {
+                    if book.chapters.is_empty() {
+                        None
+                    } else {
                         Some(TextbookProgress {
                             overall_completion: 0.0,
                             chapter_completion: Vec::new(),
                         })
-                    } else {
-                        None
                     }
                 }
             });
