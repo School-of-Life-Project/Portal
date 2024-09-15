@@ -69,11 +69,10 @@ Portal has a built-in user manual, which should be read if you are unfamiliar wi
 [Find courses created by other users](https://github.com/School-of-Life-Project/Portal-App/discussions/categories/show-and-tell?discussions_q=is%3Aopen+category%3A%22Show+and+tell%22+sort%3Atopl)
 
 ## Known Issues
-- In some courses, the textbook viewer does not reliably open/close sections correctly. This is a bug and will be fixed in the next release.
-- External links are broken inside the textbook viewer. This is caused by [a bug in Tauri](https://github.com/tauri-apps/tauri/issues/9912).
+- When running Portal on macOS or Linux, external links are broken inside the textbook viewer. This is caused by [a bug in Tauri](https://github.com/tauri-apps/tauri/issues/9912).
 	- Temporary Workaround: Right click the link and copy the URL.
 - When compiling Portal as a Linux AppImage, external links and folder buttons are broken. This is caused by [a bug in Tauri](https://github.com/tauri-apps/tauri/issues/6172).
-- When running portal on Windows, the textbook viewer does not reliably display the document on initial startup. This is due to an unknown bug in Epub.js.
+- When running Portal on Windows, the textbook viewer does not reliably display the document on initial startup. This is due to an unknown bug in Epub.js.
 	- Temporary Workaround: Click on a table of contents item after opening the textbook viewer.
 - When compiling Portal for mobile platforms, the "Open Resource Folder" and "Open Data Folder" buttons do not function correctly.
 
