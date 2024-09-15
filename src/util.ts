@@ -48,7 +48,7 @@ export function isComplete(progress: CourseProgress): boolean {
 	let completed = progress.completion.length > 0;
 
 	for (const textbookProgress of progress.completion) {
-		if (textbookProgress.overall_completion != 1) {
+		if (textbookProgress && textbookProgress.overall_completion != 1) {
 			completed = false;
 		}
 	}
@@ -61,6 +61,7 @@ export function isStarted(progress: CourseProgress): boolean {
 
 	for (const textbookProgress of progress.completion) {
 		if (
+			textbookProgress &&
 			textbookProgress.overall_completion > 0 &&
 			textbookProgress.chapter_completion.length > 0
 		) {

@@ -69,7 +69,7 @@ export function graphCourse(
 		params.set("document_index", String(i));
 
 		const chapterGraph = new BookChapterGraph(book.chapters.length, book.label);
-		chapterGraph.update(progress.completion[i].chapter_completion);
+		chapterGraph.update(progress.completion[i]?.chapter_completion);
 
 		const containerInner = document.createElement("a");
 		containerInner.href = "/viewer.html?" + params.toString();

@@ -67,7 +67,7 @@ export interface CourseCompletionTextbookData {
 }
 
 export interface CourseProgress {
-	completion: TextbookProgress[];
+	completion: (TextbookProgress | null)[];
 	time_spent_today: number;
 }
 

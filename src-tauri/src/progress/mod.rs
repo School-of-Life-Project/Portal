@@ -50,7 +50,7 @@ impl CourseCompletion {
 #[derive(Serialize, Debug)]
 pub struct CourseProgress {
     /// The completion of textbooks within the course, in the order they are included in the course.
-    pub completion: Vec<TextbookProgress>,
+    pub completion: Vec<Option<TextbookProgress>>,
     /// The amount of time spent on this course today.
     pub time_spent_today: i64,
 }
@@ -70,7 +70,7 @@ impl CourseProgress {
 
         for (book_index, book) in course.books.iter().enumerate() {
             #[allow(clippy::cast_precision_loss)]
-            match completion.books.get(&book_index) {
+            book_progress.push(match completion.books.get(&book_index) {
                 Some(book_completion) => {
                     let mut chapter_progress = Vec::with_capacity(book.chapters.len());
 
@@ -118,32 +118,34 @@ impl CourseProgress {
                         }
                     }
 
-                    let mut total_progress = 0.0;
+                    if !chapter_progress.is_empty() {
+                        let mut total_progress = 0.0;
 
-                    if chapter_progress.is_empty() {
-                        continue;
+                        for chapter in &chapter_progress {
+                            total_progress += chapter;
+                        }
+
+                        total_progress /= chapter_progress.len() as f32;
+
+                        Some(TextbookProgress {
+                            overall_completion: total_progress,
+                            chapter_completion: chapter_progress,
+                        })
+                    } else {
+                        None
                     }
-
-                    for chapter in &chapter_progress {
-                        total_progress += chapter;
-                    }
-
-                    total_progress /= chapter_progress.len() as f32;
-
-                    book_progress.push(TextbookProgress {
-                        overall_completion: total_progress,
-                        chapter_completion: chapter_progress,
-                    });
                 }
                 None => {
                     if !book.chapters.is_empty() {
-                        book_progress.push(TextbookProgress {
+                        Some(TextbookProgress {
                             overall_completion: 0.0,
                             chapter_completion: Vec::new(),
-                        });
+                        })
+                    } else {
+                        None
                     }
                 }
-            };
+            });
         }
 
         let current_date = Local::now().date_naive();
@@ -162,7 +164,7 @@ impl CourseProgress {
     fn calculate_chapter_diff(before: &Self, after: &Self) -> f32 {
         let mut before_total = 0.0;
 
-        for book in &before.completion {
+        for book in before.completion.iter().flatten() {
             for chapter_completion in &book.chapter_completion {
                 before_total += chapter_completion;
             }
@@ -170,7 +172,7 @@ impl CourseProgress {
 
         let mut after_total = 0.0;
 
-        for book in &after.completion {
+        for book in after.completion.iter().flatten() {
             for chapter_completion in &book.chapter_completion {
                 after_total += chapter_completion;
             }
