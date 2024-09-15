@@ -173,6 +173,8 @@ export class ePubViewer implements DocumentViewer {
 						position = resolveNavUrl(book, book.navigation.toc[0].href);
 					}
 
+					rendition.start();
+
 					return rendition.display(position).then(() => {
 						rendition.on("locationChanged", (location: EventLocation) => {
 							if (location.start) {
@@ -198,6 +200,8 @@ export class ePubViewer implements DocumentViewer {
 								}
 							}
 						});
+
+						rendition.display(position);
 
 						if (this.#inner) {
 							this.#inner.resizeObserver = new ResizeObserver((_event) => {
