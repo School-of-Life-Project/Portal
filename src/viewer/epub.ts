@@ -145,6 +145,8 @@ export class ePubViewer implements DocumentViewer {
 						allowScriptedContent: true,
 					});
 
+					rendition.themes.fontSize("17px");
+
 					const renderPromise = new Promise(
 						(resolve: (value: void) => void) => {
 							view.render(
