@@ -146,7 +146,7 @@ export class ePubViewer implements DocumentViewer {
 					});
 
 					rendition.themes.font("serif");
-					rendition.themes.fontSize("17px");
+					rendition.themes.fontSize("18px");
 					rendition.themes.override("line-height", "1.5");
 
 					const renderPromise = new Promise(
