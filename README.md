@@ -72,9 +72,9 @@ Portal has a built-in user manual, which should be read if you are unfamiliar wi
 
 - When running Portal on macOS or Linux, external links are broken inside the textbook viewer. This is caused by [a bug in Tauri](https://github.com/tauri-apps/tauri/issues/9912).
 	- Temporary Workaround: Right click the link and copy the URL.
-- When running Portal on Windows, the textbook viewer does not reliably display the document on initial startup. This is due to an unknown bug in Epub.js and/or Tauri.
+- When running Portal on Windows, the textbook viewer does not reliably display the document on initial startup. This is caused by an unknown bug in Epub.js and/or Tauri.
 	- Temporary Workaround: Click on a table of contents item after opening the textbook viewer.
-
+- When running Portal on macOS and Linux, homescreen items may appear discolored. This is caused by a unknown bug in Webkit.
 
 ## Building
 
