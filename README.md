@@ -70,7 +70,6 @@ Portal has a built-in user manual, which should be read if you are unfamiliar wi
 
 ## Known Issues
 
-- When viewing books which do not set a default font size, text is abnormally small. This is a bug and will be fixed in the next release.
 - When running Portal on macOS or Linux, external links are broken inside the textbook viewer. This is caused by [a bug in Tauri](https://github.com/tauri-apps/tauri/issues/9912).
 	- Temporary Workaround: Right click the link and copy the URL.
 - When running Portal on Windows, the textbook viewer does not reliably display the document on initial startup. This is due to an unknown bug in Epub.js and/or Tauri.
