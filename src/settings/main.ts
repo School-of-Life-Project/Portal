@@ -197,7 +197,7 @@ function buildSettingsForm(settings: Settings) {
 			weekInput.id = "weeks_displayed";
 			weekInput.min = "8";
 			weekInput.value = String(settings.weeks_displayed);
-			weekInput.max = "48";
+			weekInput.max = "52";
 			weekInput.step = "1";
 
 			const weekLabel = document.createElement("label");
