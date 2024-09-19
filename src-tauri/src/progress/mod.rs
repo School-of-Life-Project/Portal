@@ -41,6 +41,7 @@ impl CourseCompletion {
         }
 
         (i128::from(after_total) - i128::from(before_total))
+            .max(0)
             .try_into()
             .unwrap_or_default()
     }
