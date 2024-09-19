@@ -11,11 +11,30 @@ mod progress;
 pub fn run() {
     tauri::Builder::default()
         .setup(|app| {
+            #[cfg(target_os = "android")]
+            app.manage(api::State::new(
+                app.path()
+                    .document_dir()
+                    .expect("Unable to find application data directory")
+                    .join("Portal"),
+            ));
+
+            #[cfg(target_os = "ios")]
+            // ! FIXME
+            app.manage(api::State::new(
+                app.path()
+                    .download_dir()
+                    .expect("Unable to find application data directory")
+                    .join("Portal"),
+            ));
+
+            #[cfg(not(any(target_os = "android", target_os = "ios")))]
             app.manage(api::State::new(
                 app.path()
                     .app_data_dir()
                     .expect("Unable to find application data directory"),
             ));
+
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
