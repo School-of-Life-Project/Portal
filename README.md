@@ -93,6 +93,7 @@ Then, you can:
 
 - When compiling Portal as a Linux AppImage, external links and folder buttons are broken. This is caused by [a bug in Tauri](https://github.com/tauri-apps/tauri/issues/6172).
 - When compiling Portal for mobile platforms, the "Open Resource Folder" and "Open Data Folder" buttons do not function correctly.
+- When compiling Portal for mobile platforms, the Textbook Viewer does not work correctly.
 
 ## Architecture
 
