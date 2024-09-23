@@ -3,6 +3,7 @@ import {
 	displayError,
 	getSettings,
 	openDataDir,
+	openDiscussionBoard,
 	openInternalDataDir,
 	openIssueTracker,
 	openRepo,
@@ -19,6 +20,7 @@ const resetCoursesButton = document.getElementById("resetCoursesButton");
 const resetSettingsButton = document.getElementById("resetSettingsButton");
 const appWebsiteButton = document.getElementById("appWebsiteButton");
 const appIssueButton = document.getElementById("appIssueButton");
+const appDiscussionButton = document.getElementById("appDiscussionButton");
 const resourceButton = document.getElementById("resourceButton");
 const internalFolderButton = document.getElementById("internalFolderButton");
 const settingsForm = document.getElementById("settingsRoot");
@@ -82,6 +84,21 @@ if (appIssueButton) {
 	appIssueButton.addEventListener("keydown", (event) => {
 		if (event.code == "Enter") {
 			openIssueTracker(false).catch((error) => {
+				displayError(error);
+			});
+		}
+	});
+}
+
+if (appDiscussionButton) {
+	appDiscussionButton.addEventListener("click", () => {
+		openDiscussionBoard().catch((error) => {
+			displayError(error);
+		});
+	});
+	appDiscussionButton.addEventListener("keydown", (event) => {
+		if (event.code == "Enter") {
+			openDiscussionBoard().catch((error) => {
 				displayError(error);
 			});
 		}

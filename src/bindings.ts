@@ -6,6 +6,8 @@ const issueTrackerURL =
 	"https://github.com/School-of-Life-Project/Portal-App/issues";
 const newIssueURL =
 	"https://github.com/School-of-Life-Project/Portal-App/issues/new";
+const discussionBoardURL =
+	"https://github.com/School-of-Life-Project/Portal-App/discussions";
 
 // Based on /src-tauri/src/course/mod.rs
 
@@ -189,6 +191,14 @@ export async function openIssueTracker(newIssue: boolean): Promise<void> {
 export async function openRepo(): Promise<void> {
 	try {
 		return await open(projectRepoURL);
+	} catch (error) {
+		throw convertBackendAsyncError(error);
+	}
+}
+
+export async function openDiscussionBoard(): Promise<void> {
+	try {
+		return await open(discussionBoardURL);
 	} catch (error) {
 		throw convertBackendAsyncError(error);
 	}
