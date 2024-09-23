@@ -31,6 +31,9 @@ export function buildCourseListing(
 
 		fragment.appendChild(message);
 
+		contentViewer.innerHTML =
+			"<span>See the 📜&nbsp;Guide for further information.</span>";
+
 		return [fragment, new Map()];
 	}
 
