@@ -7,7 +7,7 @@ const issueTrackerURL =
 const newIssueURL =
 	"https://github.com/School-of-Life-Project/Portal-App/issues/new";
 const discussionBoardURL =
-	"https://github.com/School-of-Life-Project/Portal-App/discussions";
+	"https://github.com/School-of-Life-Project/Portal-App/discussions?discussions_q=is%3Aopen+sort%3Atop";
 
 // Based on /src-tauri/src/course/mod.rs
 
