@@ -90,12 +90,6 @@ Then, you can:
 - run the application in development mode with `npx tauri dev`
 - build an optimized desktop binary with `npx tauri build`
 
-### Known Build Issues
-
-- When compiling Portal as a Linux AppImage, external links and folder buttons are broken. This is caused by [a bug in Tauri](https://github.com/tauri-apps/tauri/issues/6172).
-- When compiling Portal for mobile platforms, the "Open Resource Folder" and "Open Data Folder" buttons do not function correctly.
-- When compiling Portal for mobile platforms, the Textbook Viewer does not work correctly.
-
 ## Architecture
 
 Portal is built using [Tauri](https://tauri.app) and [Vite](https://vitejs.dev).
