@@ -32,7 +32,7 @@ export function buildCourseListing(
 		fragment.appendChild(message);
 
 		contentViewer.innerHTML =
-			'<p>See the <a href="guide.html" style="text-decoration: underline">📜&nbsp;Guide</a> for further information.</p>';
+			'<p>Open the <a href="guide.html" style="text-decoration: underline">📜&nbsp;Guide</a> for additional information.</p>';
 
 		return [fragment, new Map()];
 	}
