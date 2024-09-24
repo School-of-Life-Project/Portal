@@ -13,15 +13,15 @@ Portal is designed to perform well on low-end hardware and does not require an i
 
 App releases can be found on the [releases page](https://github.com/School-of-Life-Project/Portal-App/releases/). Platform-specific installation instructions are provided below.
 
-> [!NOTE]
-> If you are using a lesser-used CPU architecture, you will need to [build the application from source code](#building).
-
 ### Windows
 
 Download and run the `.msi` file from the release you wish to install. Follow the prompts provided to install the application.
 
 > [!IMPORTANT]
 > If the device you are installing the application on does not have an internet connection, you will need to install the [WebView2 Runtime](https://developer.microsoft.com/en-us/microsoft-edge/webview2/#download) before running the installer. Windows 10 (version 1803 and later) and 11 come with WebView2 preinstalled.
+
+> [!NOTE]
+> If your device is 32-bit or ARM, you will need to [build the application from source code](#building).
 
 ### MacOS
 
@@ -37,6 +37,9 @@ Download and mount the `.dmg` file from the release you wish to install. Drag th
 ### Linux
 
 On Linux, installation instructions are distribution-specific.
+
+> [!NOTE]
+> If you are using a lesser-used CPU architecture, you will need to [build the application from source code](#building).
 
 #### DPKG-based distros
 
