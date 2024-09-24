@@ -200,7 +200,7 @@ export class ePubViewer implements DocumentViewer {
 					);
 
 					return rendition.display(position).then(() => {
-						// @ts-expect-error internal API access
+						// @ts-expect-error Workaround for epub.js bug
 						rendition.manager.currentLocation();
 
 						rendition.on("locationChanged", (location: EventLocation) => {
