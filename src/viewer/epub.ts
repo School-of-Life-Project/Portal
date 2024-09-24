@@ -234,9 +234,14 @@ export class ePubViewer implements DocumentViewer {
 
 							// Workaround for https://github.com/tauri-apps/tauri/issues/9912, copied from Tauri user scripts
 							if (navigator.platform != "Win32") {
-								view.container.content
-									.querySelector("iframe")
-									?.contentDocument?.body.addEventListener("click", (t) => {
+								const body =
+									view.container.content.querySelector("iframe")
+										?.contentDocument?.body;
+
+								if (body && !body.classList.contains("modifiedIframeInner")) {
+									body.classList.add("modifiedIframeInner");
+
+									body.addEventListener("click", (t) => {
 										let n = t.target as HTMLElement | null;
 										for (; null != n; ) {
 											if (n.matches("a")) {
@@ -260,6 +265,7 @@ export class ePubViewer implements DocumentViewer {
 											n = n.parentElement;
 										}
 									});
+								}
 							}
 						});
 
