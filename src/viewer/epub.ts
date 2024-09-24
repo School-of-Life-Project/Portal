@@ -200,8 +200,10 @@ export class ePubViewer implements DocumentViewer {
 					);
 
 					return rendition.display(position).then(() => {
-						// @ts-expect-error Workaround for epub.js bug
-						rendition.manager.currentLocation();
+						if (navigator.platform == "Win32") {
+							// @ts-expect-error Workaround for epub.js bug
+							rendition.manager.currentLocation();
+						}
 
 						rendition.on("locationChanged", (location: EventLocation) => {
 							if (location.start) {
@@ -231,32 +233,34 @@ export class ePubViewer implements DocumentViewer {
 							}
 
 							// Workaround for https://github.com/tauri-apps/tauri/issues/9912, copied from Tauri user scripts
-							view.container.content
-								.querySelector("iframe")
-								?.contentDocument?.body.addEventListener("click", (t) => {
-									let n = t.target as HTMLElement | null;
-									for (; null != n; ) {
-										if (n.matches("a")) {
-											const r = n as HTMLAnchorElement;
-											// eslint-disable-next-line @typescript-eslint/no-unused-expressions
-											"" !== r.href &&
-												["http://", "https://", "mailto:", "tel:"].some((e) =>
-													r.href.startsWith(e),
-												) &&
-												"_blank" === r.target &&
-												// @ts-expect-error accessing Tauri internals
-												(window.parent.__TAURI_INTERNALS__.invoke(
-													"plugin:shell|open",
-													{
-														path: r.href,
-													},
-												),
-												t.stopPropagation());
-											break;
+							if (navigator.platform != "Win32") {
+								view.container.content
+									.querySelector("iframe")
+									?.contentDocument?.body.addEventListener("click", (t) => {
+										let n = t.target as HTMLElement | null;
+										for (; null != n; ) {
+											if (n.matches("a")) {
+												const r = n as HTMLAnchorElement;
+												// eslint-disable-next-line @typescript-eslint/no-unused-expressions
+												"" !== r.href &&
+													["http://", "https://", "mailto:", "tel:"].some((e) =>
+														r.href.startsWith(e),
+													) &&
+													"_blank" === r.target &&
+													// @ts-expect-error accessing Tauri internals
+													(window.parent.__TAURI_INTERNALS__.invoke(
+														"plugin:shell|open",
+														{
+															path: r.href,
+														},
+													),
+													t.stopPropagation());
+												break;
+											}
+											n = n.parentElement;
 										}
-										n = n.parentElement;
-									}
-								});
+									});
+							}
 						});
 
 						if (this.#inner) {
