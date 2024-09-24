@@ -76,8 +76,8 @@
 
 body {
 	font:
-		1rem/1.2 "Liberation Sans",
-		Arial,
+		1rem/1.2 Arial,
+		"Liberation Sans",
 		OpenMoji,
 		sans-serif;
 }
