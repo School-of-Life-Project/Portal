@@ -68,11 +68,6 @@ Portal has a built-in user manual, which should be read if you are unfamiliar wi
 
 [Find courses created by other users](https://github.com/School-of-Life-Project/Portal-App/discussions/categories/show-and-tell?discussions_q=is%3Aopen+category%3A%22Show+and+tell%22+sort%3Atopl)
 
-## Known Issues
-
-- When running Portal on Windows, the textbook viewer does not reliably display the document on initial startup. This is caused by an unknown bug in Epub.js and/or Tauri.
-	- Temporary Workaround: Click on a table of contents item after opening the textbook viewer.
-
 ## Building
 
 You will need [Rust](https://www.rust-lang.org/tools/install) and [Node.js](https://nodejs.org/en/download) to build this application. In addition, you will need to install the build dependencies for [Tauri](https://v2.tauri.app/start/prerequisites/).

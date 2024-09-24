@@ -200,6 +200,9 @@ export class ePubViewer implements DocumentViewer {
 					);
 
 					return rendition.display(position).then(() => {
+						// @ts-expect-error internal API access
+						rendition.manager.currentLocation();
+
 						rendition.on("locationChanged", (location: EventLocation) => {
 							if (location.start) {
 								if (location.href) {
