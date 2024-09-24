@@ -25,10 +25,10 @@
 		},
 		"linux": {
 			"deb": {
-				"depends": []
+				"depends": ["fonts-liberation2"]
 			},
 			"rpm": {
-				"depends": []
+				"depends": ["liberation-fonts"]
 			}
 		},
 		"publisher": "School of Life Project",

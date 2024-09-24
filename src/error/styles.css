@@ -1,6 +1,7 @@
 @font-face {
 	font-family: OpenMoji;
 	src: url("/openmoji.woff2");
+	font-display: block;
 }
 
 body {
@@ -22,7 +23,8 @@ li {
 
 section {
 	font:
-		1rem/1.25 monospace,
+		1rem/1.25 "Liberation Mono",
+		monospace,
 		OpenMoji;
 	background-color: lightcoral;
 	border: 0.15em solid black;

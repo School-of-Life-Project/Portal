@@ -1,6 +1,7 @@
 @font-face {
 	font-family: OpenMoji;
 	src: url("/openmoji.woff2");
+	font-display: block;
 }
 
 /* border-radius is currently set to zero due to a Webkit bug */
@@ -41,7 +42,8 @@
 
 body {
 	font:
-		1rem/1.2 Arial,
+		1rem/1.2 "Liberation Sans",
+		Arial,
 		sans-serif,
 		OpenMoji;
 }

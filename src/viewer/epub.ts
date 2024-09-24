@@ -150,7 +150,7 @@ export class ePubViewer implements DocumentViewer {
 						allowScriptedContent: true,
 					});
 
-					rendition.themes.font("Times New Roman, serif");
+					rendition.themes.font("Liberation Serif, Times New Roman, serif");
 					rendition.themes.fontSize("18px");
 					rendition.themes.override("line-height", "1.5");
 
