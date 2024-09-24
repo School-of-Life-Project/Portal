@@ -105,6 +105,11 @@ function convertNavItems(book: Book, items: NavItem[]): ListingItem[] {
 	return convertedItems;
 }
 
+interface PositionData {
+	root: string;
+	sections: Record<string, string>;
+}
+
 interface InnerData {
 	book: Book;
 	resizeObserver?: ResizeObserver;
@@ -149,6 +154,25 @@ export class ePubViewer implements DocumentViewer {
 					rendition.themes.fontSize("18px");
 					rendition.themes.override("line-height", "1.5");
 
+					let position = initialProgress.books[this.document_index]?.position;
+
+					let positionData: PositionData | undefined;
+
+					if (position) {
+						if (position.startsWith("epubcfi")) {
+							positionData = {
+								root: position,
+								sections: {},
+							};
+						} else {
+							positionData = JSON.parse(position) as PositionData;
+							position = positionData.root;
+						}
+					} else {
+						positionData = { root: "", sections: {} };
+						position = resolveNavUrl(book, book.navigation.toc[0].href);
+					}
+
 					const renderPromise = new Promise(
 						(resolve: (value: void) => void) => {
 							view.render(
@@ -162,7 +186,11 @@ export class ePubViewer implements DocumentViewer {
 									language: metadata.language,
 									items: convertNavItems(book, navigation.toc),
 									callback: (identifier) => {
-										rendition.display(identifier);
+										if (positionData.sections[identifier]) {
+											rendition.display(positionData.sections[identifier]);
+										} else {
+											rendition.display(identifier);
+										}
 									},
 								},
 							);
@@ -170,12 +198,6 @@ export class ePubViewer implements DocumentViewer {
 							resolve();
 						},
 					);
-
-					let position = initialProgress.books[this.document_index]?.position;
-
-					if (!position) {
-						position = resolveNavUrl(book, book.navigation.toc[0].href);
-					}
 
 					return rendition.display(position).then(() => {
 						rendition.on("locationChanged", (location: EventLocation) => {
@@ -197,7 +219,10 @@ export class ePubViewer implements DocumentViewer {
 									}
 
 									if (view.savePosition) {
-										view.savePosition(location.start);
+										positionData.root = location.start;
+										positionData.sections[location.href] = location.start;
+
+										view.savePosition(JSON.stringify(positionData));
 									}
 								}
 							}
