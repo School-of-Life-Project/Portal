@@ -327,15 +327,13 @@ function updateCourseCompletion(course: Course, completed: boolean) {
 		setCourseCompletion(course, {
 			time_spent: {},
 			books,
-		});
+		}).then(() => location.reload());
 	} else {
 		setCourseCompletion(course, {
 			time_spent: {},
 			books: {},
-		});
+		}).then(() => location.reload());
 	}
-
-	location.reload();
 }
 
 export function displayCourse(
