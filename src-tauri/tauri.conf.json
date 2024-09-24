@@ -23,6 +23,14 @@
 		"macOS": {
 			"minimumSystemVersion": "10.13"
 		},
+		"linux": {
+			"deb": {
+				"depends": []
+			},
+			"rpm": {
+				"depends": []
+			}
+		},
 		"publisher": "School of Life Project",
 		"copyright": "Licensed under BSL-1.0",
 		"category": "Education",
