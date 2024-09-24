@@ -28,6 +28,7 @@ nav.related a {
 code {
 	font-size: 90%;
 	padding: 0.1em;
+	font-family: monospace, OpenMoji;
 }
 
 code,

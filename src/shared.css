@@ -1,5 +1,5 @@
 @font-face {
-	font-family: openmoji;
+	font-family: OpenMoji;
 	src: url("/openmoji.woff2");
 }
 
@@ -41,8 +41,9 @@
 
 body {
 	font:
-		1rem/1.2 sans-serif,
-		openmoji;
+		1rem/1.2 Arial,
+		sans-serif,
+		OpenMoji;
 }
 
 button {

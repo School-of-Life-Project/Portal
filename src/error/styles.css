@@ -1,5 +1,5 @@
 @font-face {
-	font-family: openmoji;
+	font-family: OpenMoji;
 	src: url("/openmoji.woff2");
 }
 
@@ -23,7 +23,7 @@ li {
 section {
 	font:
 		1rem/1.25 monospace,
-		openmoji;
+		OpenMoji;
 	background-color: lightcoral;
 	border: 0.15em solid black;
 	border-radius: 0.5em;
