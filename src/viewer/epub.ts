@@ -251,7 +251,7 @@ export class ePubViewer implements DocumentViewer {
 														path: r.href,
 													},
 												),
-												t.preventDefault());
+												t.stopPropagation());
 											break;
 										}
 										n = n.parentElement;
