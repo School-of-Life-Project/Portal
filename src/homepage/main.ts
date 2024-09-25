@@ -64,8 +64,13 @@ if (courseContainer && progressContainer && settings) {
 		const [timeGraph, sectionGraph] = graphProgress(settings, progress);
 
 		const fragment = document.createDocumentFragment();
-		fragment.appendChild(timeGraph);
-		fragment.appendChild(sectionGraph);
+		if (settings.show_daily_time) {
+			fragment.appendChild(timeGraph);
+		}
+
+		if (settings.show_daily_chapters) {
+			fragment.appendChild(sectionGraph);
+		}
 
 		progressContainer.innerHTML = "";
 		progressContainer.appendChild(fragment);
