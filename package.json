@@ -12,9 +12,9 @@
 		"@eslint/js": "^9.11.1",
 		"@tauri-apps/cli": "^2.0.0-rc.16",
 		"@types/eslint__js": "^8.42.3",
-		"@types/node": "^22.6.1",
+		"@types/node": "^22.7.0",
 		"@vitejs/plugin-legacy": "^5.4.2",
-		"browserslist": "^4.23.3",
+		"browserslist": "^4.24.0",
 		"eslint": "^9.11.1",
 		"globals": "^15.9.0",
 		"lightningcss": "^1.27.0",
@@ -22,7 +22,7 @@
 		"terser": "^5.33.0",
 		"typescript": "^5.6.2",
 		"typescript-eslint": "^8.7.0",
-		"vite": "^5.4.7",
+		"vite": "^5.4.8",
 		"vite-plugin-eslint": "^1.8.1"
 	},
 	"dependencies": {

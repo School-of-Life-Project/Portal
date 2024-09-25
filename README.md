@@ -86,6 +86,8 @@ Then, you can:
 
 Portal is built using [Tauri](https://tauri.app) and [Vite](https://vitejs.dev).
 
-The Rust-based backend of the application is used to load resources from disk and manage the state of the [embedded database](https://github.com/spacejam/sled). The TypeScript-based frontend of the application is used to render UI elements and display textbooks using [epub.js](https://github.com/futurepress/epub.js/). UI icons are provided by [OpenMoji](https://openmoji.org).
+The Rust-based backend of the application is used to load resources from disk and manage the state of the [embedded database](https://github.com/spacejam/sled). The TypeScript-based frontend of the application is used to render UI elements and display textbooks using [epub.js](https://github.com/futurepress/epub.js/).
+
+UI icons are provided by [OpenMoji](https://openmoji.org). Fonts are provided by the system on Windows and MacOS, and mix of system fonts and custom fonts is used on Linux. On Linux, [Liberation Fonts](https://github.com/liberationfonts/liberation-fonts) are used for the UI.
 
 Portal is a work in progress. View the [development task tracker](https://github.com/orgs/School-of-Life-Project/projects/1) to see what's being worked on.
