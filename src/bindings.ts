@@ -85,6 +85,8 @@ export interface OverallProgress {
 
 export interface Settings {
 	show_course_clock: boolean;
+	show_daily_time: boolean;
+	show_daily_chapters: boolean;
 	maximum_course_time: number;
 	maximum_daily_time: number;
 	maximum_daily_chapters: number;
@@ -287,7 +289,21 @@ export async function getOverallProgress(): Promise<OverallProgress> {
 
 export async function getSettings(): Promise<Settings> {
 	try {
-		return await invoke("get_settings");
+		return await invoke("get_settings").then((data) => {
+			if ((data as string).length == 0) {
+				return {
+					show_course_clock: true,
+					show_daily_time: true,
+					show_daily_chapters: true,
+					maximum_course_time: 150,
+					maximum_daily_time: 300,
+					maximum_daily_chapters: 1.5,
+					weeks_displayed: 24,
+				} as Settings;
+			} else {
+				return JSON.parse(data as string) as Settings;
+			}
+		});
 	} catch (error) {
 		throw convertBackendAsyncError(error);
 	}
@@ -295,8 +311,16 @@ export async function getSettings(): Promise<Settings> {
 
 export async function setSettings(settings?: Settings): Promise<null> {
 	try {
+		let data;
+
+		if (settings) {
+			data = JSON.stringify(settings);
+		} else {
+			data = "";
+		}
+
 		return await invoke("set_settings", {
-			settings,
+			settings: data,
 		});
 	} catch (error) {
 		throw convertBackendAsyncError(error);

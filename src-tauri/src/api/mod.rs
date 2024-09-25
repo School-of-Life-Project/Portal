@@ -14,7 +14,7 @@ use util::ErrorWrapper;
 
 use super::{
     course::{storage::DataStore, Course, CourseMap},
-    progress::{database::Database, CourseCompletion, CourseProgress, OverallProgress, Settings},
+    progress::{database::Database, CourseCompletion, CourseProgress, OverallProgress},
 };
 
 pub struct State {
@@ -222,7 +222,7 @@ pub async fn get_overall_progress(
 }
 
 #[tauri::command]
-pub async fn get_settings(state: tauri::State<'_, State>) -> Result<Settings, ErrorWrapper> {
+pub async fn get_settings(state: tauri::State<'_, State>) -> Result<String, ErrorWrapper> {
     state
         .get_database()
         .await?
@@ -234,7 +234,7 @@ pub async fn get_settings(state: tauri::State<'_, State>) -> Result<Settings, Er
 #[tauri::command]
 pub async fn set_settings(
     state: tauri::State<'_, State>,
-    settings: Option<Settings>,
+    settings: Option<String>,
 ) -> Result<(), ErrorWrapper> {
     state
         .get_database()

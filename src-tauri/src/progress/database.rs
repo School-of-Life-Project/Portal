@@ -8,7 +8,7 @@ use thiserror::Error;
 use tokio::task::{self, JoinError};
 use uuid::Uuid;
 
-use super::{super::course::Course, CourseCompletion, CourseProgress, OverallProgress, Settings};
+use super::{super::course::Course, CourseCompletion, CourseProgress, OverallProgress};
 
 #[derive(Error, Debug)]
 pub enum Error {
@@ -34,7 +34,7 @@ pub struct Database {
     root: Db,
 }
 
-const SETTINGS_KEY: &[u8] = b"settings";
+const SETTINGS_KEY: &[u8] = b"frontend_settings";
 const ACTIVE_COURSES_KEY: &[u8] = b"active_courses";
 const PROGRESS_TREE_KEY: &[u8] = b"course_progress";
 const OVERALL_PROGRESS_KEY: &[u8] = b"overall"; // Must have a length not equal to 16 bytes.
@@ -152,19 +152,19 @@ impl Database {
         })
         .await?
     }
-    pub async fn get_settings(&self) -> Result<Settings, Error> {
+    pub async fn get_settings(&self) -> Result<String, Error> {
         let root_tree = self.root.deref().clone();
 
         task::spawn_blocking(move || {
             if let Some(data) = root_tree.get(SETTINGS_KEY)? {
                 Ok(bincode::deserialize(&data)?)
             } else {
-                Ok(Settings::default())
+                Ok(String::new())
             }
         })
         .await?
     }
-    pub async fn set_settings(&self, data: Settings) -> Result<(), Error> {
+    pub async fn set_settings(&self, data: String) -> Result<(), Error> {
         let root_tree = self.root.deref().clone();
 
         task::spawn_blocking(move || {
