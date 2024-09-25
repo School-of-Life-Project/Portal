@@ -59,6 +59,17 @@ if (courseContainer && progressContainer && settings) {
 			return;
 		}
 
+		if (!(settings.show_daily_time || settings.show_daily_chapters)) {
+			const heading = document.getElementById("progressHeader");
+
+			if (heading) {
+				heading.style.display = "none";
+			}
+
+			progressContainer.innerHTML = "";
+			return;
+		}
+
 		console.log(progress);
 
 		const [timeGraph, sectionGraph] = graphProgress(settings, progress);

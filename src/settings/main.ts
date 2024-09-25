@@ -226,6 +226,20 @@ function buildSettingsForm(settings: Settings) {
 			fieldset2.appendChild(document.createElement("br"));
 			weekInput.addEventListener("change", handleInputUpdate);
 
+			const timeCheckbox = document.createElement("input");
+			timeCheckbox.type = "checkbox";
+			timeCheckbox.id = "show_daily_time";
+			timeCheckbox.checked = settings.show_daily_time;
+
+			const timeLabel = document.createElement("label");
+			timeLabel.setAttribute("for", "show_daily_time");
+			timeLabel.innerText = "⌛️ Show time progress: ";
+
+			fieldset2.appendChild(timeLabel);
+			fieldset2.appendChild(timeCheckbox);
+			fieldset2.appendChild(document.createElement("br"));
+			timeCheckbox.addEventListener("change", handleInputUpdate);
+
 			const maxTotalTimeInput = document.createElement("input");
 			maxTotalTimeInput.type = "number";
 			maxTotalTimeInput.id = "maximum_daily_time";
@@ -242,6 +256,20 @@ function buildSettingsForm(settings: Settings) {
 			fieldset2.appendChild(maxTotalTimeInput);
 			fieldset2.appendChild(document.createElement("br"));
 			maxTotalTimeInput.addEventListener("change", handleInputUpdate);
+
+			const chapterCheckbox = document.createElement("input");
+			chapterCheckbox.type = "checkbox";
+			chapterCheckbox.id = "show_daily_chapters";
+			chapterCheckbox.checked = settings.show_daily_chapters;
+
+			const chapterLabel = document.createElement("label");
+			chapterLabel.setAttribute("for", "show_daily_chapters");
+			chapterLabel.innerText = "📑 Show chapter progress: ";
+
+			fieldset2.appendChild(chapterLabel);
+			fieldset2.appendChild(chapterCheckbox);
+			fieldset2.appendChild(document.createElement("br"));
+			chapterCheckbox.addEventListener("change", handleInputUpdate);
 
 			const maxTotalChapterInput = document.createElement("input");
 			maxTotalChapterInput.type = "number";
