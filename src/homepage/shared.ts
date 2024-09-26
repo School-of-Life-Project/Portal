@@ -81,13 +81,20 @@ export function graphCourse(
 		container.appendChild(containerInner);
 
 		element.appendChild(container);
-		element.appendChild(document.createElement("br"));
+
+		if (i != course.books.length - 1) {
+			element.appendChild(document.createElement("br"));
+		}
 	}
 
-	const meter = new TimeProgressMeter(0, settings.maximum_course_time * 60);
-	meter.update(progress.time_spent_today);
+	if (settings.show_course_time) {
+		element.appendChild(document.createElement("br"));
 
-	element.appendChild(meter.element);
+		const meter = new TimeProgressMeter(0, settings.maximum_course_time * 60);
+		meter.update(progress.time_spent_today);
+
+		element.appendChild(meter.element);
+	}
 
 	return element;
 }

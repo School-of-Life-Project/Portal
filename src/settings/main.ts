@@ -226,6 +226,20 @@ function buildSettingsForm(settings: Settings) {
 			fieldset2.appendChild(document.createElement("br"));
 			weekInput.addEventListener("change", handleInputUpdate);
 
+			const courseTimeCheckbox = document.createElement("input");
+			courseTimeCheckbox.type = "checkbox";
+			courseTimeCheckbox.id = "show_course_time";
+			courseTimeCheckbox.checked = settings.show_course_time as boolean;
+
+			const courseTimeLabel = document.createElement("label");
+			courseTimeLabel.setAttribute("for", "show_course_time");
+			courseTimeLabel.innerText = "⏱ Show course stopwatch: ";
+
+			fieldset2.appendChild(courseTimeLabel);
+			fieldset2.appendChild(courseTimeCheckbox);
+			fieldset2.appendChild(document.createElement("br"));
+			courseTimeCheckbox.addEventListener("change", handleInputUpdate);
+
 			const timeCheckbox = document.createElement("input");
 			timeCheckbox.type = "checkbox";
 			timeCheckbox.id = "show_daily_time";

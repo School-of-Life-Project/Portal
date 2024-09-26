@@ -85,6 +85,7 @@ export interface OverallProgress {
 
 export interface Settings {
 	show_course_clock: boolean;
+	show_course_time?: boolean;
 	show_daily_time: boolean;
 	show_daily_chapters: boolean;
 	maximum_course_time: number;
@@ -293,6 +294,7 @@ export async function getSettings(): Promise<Settings> {
 			if ((data as string).length == 0) {
 				return {
 					show_course_clock: true,
+					show_course_time: true,
 					show_daily_time: true,
 					show_daily_chapters: true,
 					maximum_course_time: 150,
@@ -301,7 +303,13 @@ export async function getSettings(): Promise<Settings> {
 					weeks_displayed: 24,
 				} as Settings;
 			} else {
-				return JSON.parse(data as string) as Settings;
+				const settings = JSON.parse(data as string) as Settings;
+
+				if (settings.show_course_time == undefined) {
+					settings.show_course_time = true;
+				}
+
+				return settings;
 			}
 		});
 	} catch (error) {
