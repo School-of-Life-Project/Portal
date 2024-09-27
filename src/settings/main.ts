@@ -7,6 +7,7 @@ import {
 	openInternalDataDir,
 	openIssueTracker,
 	openRepo,
+	openWebsite,
 	setActiveCourses,
 	setSettings,
 	Settings,
@@ -21,6 +22,7 @@ const resetSettingsButton = document.getElementById("resetSettingsButton");
 const appWebsiteButton = document.getElementById("appWebsiteButton");
 const appIssueButton = document.getElementById("appIssueButton");
 const appDiscussionButton = document.getElementById("appDiscussionButton");
+const appRepoButton = document.getElementById("appRepoButton");
 const resourceButton = document.getElementById("resourceButton");
 const internalFolderButton = document.getElementById("internalFolderButton");
 const settingsForm = document.getElementById("settingsRoot");
@@ -62,11 +64,26 @@ if (resetCoursesButton) {
 
 if (appWebsiteButton) {
 	appWebsiteButton.addEventListener("click", () => {
-		openRepo().catch((error) => {
+		openWebsite().catch((error) => {
 			displayError(error);
 		});
 	});
 	appWebsiteButton.addEventListener("keydown", (event) => {
+		if (event.code == "Enter") {
+			openWebsite().catch((error) => {
+				displayError(error);
+			});
+		}
+	});
+}
+
+if (appRepoButton) {
+	appRepoButton.addEventListener("click", () => {
+		openRepo().catch((error) => {
+			displayError(error);
+		});
+	});
+	appRepoButton.addEventListener("keydown", (event) => {
 		if (event.code == "Enter") {
 			openRepo().catch((error) => {
 				displayError(error);

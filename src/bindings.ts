@@ -1,7 +1,8 @@
 import { invoke, convertFileSrc } from "@tauri-apps/api/core";
 import { open } from "@tauri-apps/plugin-shell";
 
-const projectRepoURL = "https://github.com/School-of-Life-Project/Portal";
+const websiteURL = "https://school-of-life-project.github.io/Portal/";
+const repoURL = "https://github.com/School-of-Life-Project/Portal";
 const issueTrackerURL =
 	"https://github.com/School-of-Life-Project/Portal/issues";
 const newIssueURL =
@@ -191,9 +192,17 @@ export async function openIssueTracker(newIssue: boolean): Promise<void> {
 	}
 }
 
+export async function openWebsite(): Promise<void> {
+	try {
+		return await open(websiteURL);
+	} catch (error) {
+		throw convertBackendAsyncError(error);
+	}
+}
+
 export async function openRepo(): Promise<void> {
 	try {
-		return await open(projectRepoURL);
+		return await open(repoURL);
 	} catch (error) {
 		throw convertBackendAsyncError(error);
 	}
