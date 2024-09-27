@@ -6,67 +6,113 @@
 		<link rel="stylesheet" href="styles.css" />
 	</head>
 	<body>
-		<section>
-			<h1>🏫 Portal</h1>
-			<p>Portal is an app built for independent learners.</p>
+		<h1>🏫 Portal</h1>
+
+		<p>Portal is an app built for independent learners.</p>
+		<p>
+			Unlike most eLearning applications, Portal is focused on making use of
+			existing learning materials. Any textbook or set of textbooks can be
+			converted into a Portal course, as long as it is available in the EPUB
+			format.
+		</p>
+		<p>
+			Portal is designed to perform well on low-end hardware and does not
+			require an internet connection to use.
+		</p>
+
+		<h2>📥 Installing</h2>
+		<p>🚧 Portal is a work in progress. Please report any issues you find.</p>
+		<details>
+			<summary>&nbsp;Windows</summary>
+			<p>⚠ This installer may require an internet connection.</p>
 			<p>
-				Unlike most eLearning applications, Portal is focused on making use of
-				existing learning materials. Any textbook or set of textbooks can be
-				converted into a Portal course, as long as it is available in the EPUB
-				format.
+				<a href="lol" class="button"
+					> Download Portal v0.3.9 Installer (64-bit x86)</a
+				>
 			</p>
-			<p>
-				Portal is designed to perform well on low-end hardware and does not
-				require an internet connection to use.
-			</p>
-		</section>
-		<section>
-			<h2>📥 Installing</h2>
+			<p>Follow the installer's prompts to install the application.</p>
 			<details>
-				<summary>&nbsp;Windows</summary>
-				<p>⚠ This installer may require an internet connection.</p>
+				<summary>Offline Installation</summary>
 				<p>
-					<a href="lol" class="button"> Download Installer (64-bit x86)</a>
-				</p>
-				<p>Follow the installer's prompts to install the application.</p>
-				<details>
-					<summary>Offline Installation</summary>
-					<p>
-						If the device you are installing the application on does not have an
-						internet connection, you will need to install the
-						<a
-							href="https://developer.microsoft.com/en-us/microsoft-edge/webview2/#download"
-							target="_blank"
-							rel="noopener"
-							>WebView2 Runtime</a
-						>
-						before running the installer.
-					</p>
-					<p>
-						Windows 10 (version 1803 and later) and 11 come with WebView2
-						preinstalled.
-					</p>
-				</details>
-			</details>
-			<br />
-			<details>
-				<summary>&nbsp;macOS</summary>
-				<p>
-					<a href="lol" class="button"
-						> Download Installer (Intel + Apple Silicon)</a
+					If the device you are installing the application on does not have an
+					internet connection, you will need to install the
+					<a
+						href="https://developer.microsoft.com/en-us/microsoft-edge/webview2/#download"
+						target="_blank"
+						rel="noopener"
+						>WebView2 Runtime</a
 					>
+					before running the installer.
 				</p>
 				<p>
-					Use the disk image to install the application to the
-					<code>/Applications</code> folder.
+					Windows 10 (version 1803 and later) and 11 come with WebView2
+					preinstalled.
 				</p>
-				<p>Then, open a Terminal window and run the following command:</p>
-				<pre><code>xattr -d com.apple.quarantine /Applications/Portal.app</code></pre>
+			</details>
+		</details>
+		<br />
+		<details>
+			<summary>&nbsp;macOS</summary>
+			<p>
+				<a href="lol" class="button"
+					> Download Portal v0.3.9 Installer (Intel + Apple Silicon)</a
+				>
+			</p>
+			<p>
+				Use the disk image to install the application to the
+				<code>/Applications</code> folder.
+			</p>
+			<p>Then, open a Terminal window and run the following command:</p>
+			<pre><code>xattr -d com.apple.quarantine /Applications/Portal.app</code></pre>
+		</details>
+		<br />
+		<details>
+			<summary>🐧&nbsp;Linux</summary>
+			<p>Installation instructions are distribution specific.</p>
+			<p>
+				If your distribution is not yet listed, you will need to
+				<a href="https://github.com/School-of-Life-Project/Portal#building"
+					>build the application from source code</a
+				>.
+			</p>
+			<details>
+				<summary>DPKG-based distros (Debian, Ubuntu, etc...)</summary>
 			</details>
 			<br />
 			<details>
-				<summary>🐧&nbsp;Linux</summary>
+				<summary>
+					RPM-based distros (Red Hat, Fedora, AlmaLinux, etc...)
+				</summary>
 			</details>
-		</section>
+		</details>
+
+		<h2>🧑‍🎓 Using Portal</h2>
+		<p>
+			Portal has a built-in user guide, which guides the user through
+			post-installation setup and usage.
+		</p>
+		<p>
+			This guide can be accessed using the
+			<a class="button">📜&nbsp;Guide</a> button on the application's home
+			screen.
+		</p>
+
+		<h2>🧑‍💻 Credits</h2>
+		<p>
+			Portal is built by the
+			<a href="https://github.com/School-of-Life-Project"
+				>School of Life Project</a
+			>, a group of software developers creating tools to empower self-guided
+			learning. Portal will always be free and open source.
+		</p>
+		<p>
+			<a href="https://github.com/School-of-Life-Project/Portal" class="button"
+				> View Source Code</a
+			>
+		</p>
+		<p>
+			All icons used in Portal and Portal's website are provided by
+			<a href="https://openmoji.org/">OpenMoji</a>.
+		</p>
 	</body>
 </html>
