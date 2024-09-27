@@ -1,0 +1,53 @@
+@font-face {
+	font-family: OpenMoji;
+	src: local("OpenMoji"), url("/openmoji.woff2");
+	font-display: block;
+}
+
+body {
+	font:
+		1rem/1.2 Arial,
+		sans-serif,
+		OpenMoji;
+	margin: 1lh;
+	background-color: #fef8ea;
+}
+
+a {
+	color: unset;
+	cursor: pointer;
+}
+
+details summary {
+	cursor: pointer;
+}
+
+details details {
+	margin-left: 1lh;
+}
+
+a.button {
+	text-decoration: unset;
+	background-color: #f1f0d9;
+	border: 0.1em solid #aeaeae;
+	padding: 0.4lh;
+	margin-left: 0.5lh;
+	white-space: nowrap;
+	display: inline-block;
+}
+
+code {
+	font-size: 90%;
+	padding: 0.1em;
+	font-family: monospace, OpenMoji;
+}
+
+code,
+pre {
+	background-color: #e4e4fa;
+}
+
+pre {
+	display: inline-block;
+	margin: 0;
+}
