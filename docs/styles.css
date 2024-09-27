@@ -37,6 +37,7 @@ a.button {
 }
 
 p a.button:not([href]) {
+	cursor: unset;
 	font-size: 90%;
 	padding: 0.3em;
 	margin-left: 0;
