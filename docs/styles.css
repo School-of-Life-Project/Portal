@@ -22,7 +22,7 @@ details summary {
 	cursor: pointer;
 }
 
-details details {
+details > details {
 	margin-left: 1lh;
 }
 
