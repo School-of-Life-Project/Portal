@@ -1,13 +1,13 @@
 import { invoke, convertFileSrc } from "@tauri-apps/api/core";
 import { open } from "@tauri-apps/plugin-shell";
 
-const projectRepoURL = "https://github.com/School-of-Life-Project/Portal-App";
+const projectRepoURL = "https://github.com/School-of-Life-Project/Portal";
 const issueTrackerURL =
-	"https://github.com/School-of-Life-Project/Portal-App/issues";
+	"https://github.com/School-of-Life-Project/Portal/issues";
 const newIssueURL =
-	"https://github.com/School-of-Life-Project/Portal-App/issues/new";
+	"https://github.com/School-of-Life-Project/Portal/issues/new";
 const discussionBoardURL =
-	"https://github.com/School-of-Life-Project/Portal-App/discussions?discussions_q=is%3Aopen+sort%3Atop";
+	"https://github.com/School-of-Life-Project/Portal/discussions?discussions_q=is%3Aopen+sort%3Atop";
 
 // Based on /src-tauri/src/course/mod.rs
 

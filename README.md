@@ -11,7 +11,7 @@ Portal is designed to perform well on low-end hardware and does not require an i
 > [!WARNING]
 > Portal is a work in progress. Please check for app updates frequently, and report any issues you find.
 
-App releases can be found on the [releases page](https://github.com/School-of-Life-Project/Portal-App/releases/). Platform-specific installation instructions are provided below.
+App releases can be found on the [releases page](https://github.com/School-of-Life-Project/Portal/releases/). Platform-specific installation instructions are provided below.
 
 ### Windows
 
@@ -66,7 +66,7 @@ dnf install Portal-*.rpm
 
 Portal has a built-in user manual, which should be read if you are unfamiliar with the app. This can be accessed by pressing the `📜 Guide` button on the app's home screen.
 
-[Find courses created by other users](https://github.com/School-of-Life-Project/Portal-App/discussions/categories/show-and-tell?discussions_q=is%3Aopen+category%3A%22Show+and+tell%22+sort%3Atopl)
+[Find courses created by other users](https://github.com/School-of-Life-Project/Portal/discussions/categories/show-and-tell?discussions_q=is%3Aopen+category%3A%22Show+and+tell%22+sort%3Atopl)
 
 ## Building
 
