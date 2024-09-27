@@ -32,7 +32,6 @@ a.button {
 	border: 0.1em solid #aeaeae;
 	padding: 0.4lh;
 	margin-left: 0.5lh;
-	white-space: nowrap;
 	display: inline-block;
 }
 
@@ -57,4 +56,6 @@ pre {
 pre {
 	display: inline-block;
 	margin: 0;
+	overflow: auto;
+	max-width: 100%;
 }
