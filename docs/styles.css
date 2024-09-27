@@ -1,6 +1,6 @@
 @font-face {
 	font-family: OpenMoji;
-	src: local("OpenMoji"), url("/openmoji.woff2");
+	src: local("OpenMoji"), url("openmoji.woff2");
 	font-display: block;
 }
 
