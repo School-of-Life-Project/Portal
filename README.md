@@ -11,7 +11,7 @@ Portal is designed to perform well on low-end hardware and does not require an i
 
 ## Binary Installation
 
-Binary releases of Portal can be found on the [releases page](https://github.com/School-of-Life-Project/Portal/releases).
+Binary releases of Portal can be found on the [releases page](https://github.com/School-of-Life-Project/Portal/releases), and detailed installation instructions can be found on [Portal's website](https://school-of-life-project.github.io/Portal/).
 
 ## Building
 
