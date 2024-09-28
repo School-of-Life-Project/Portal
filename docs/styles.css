@@ -67,12 +67,16 @@ img {
 }
 
 @media (width > 45em) {
-	img {
+	.gallery img {
 		width: 34em;
 		margin: 0.2lh;
 	}
+
+	.gallery {
+		max-width: 90em;
+	}
 }
 
-a.first > img {
+.gallery a:first-of-type img {
 	margin-top: 0.5lh;
 }
