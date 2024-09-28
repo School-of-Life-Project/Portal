@@ -272,11 +272,6 @@ function buildCourseInfo(course: Course, progress: CourseProgress) {
 		completeButton.addEventListener("click", () => {
 			updateCourseCompletion(course, true);
 		});
-		completeButton.addEventListener("keydown", (event) => {
-			if (event.code == "Enter") {
-				updateCourseCompletion(course, true);
-			}
-		});
 
 		optionsWrapper.appendChild(completeButton);
 
@@ -285,11 +280,6 @@ function buildCourseInfo(course: Course, progress: CourseProgress) {
 		resetButton.innerText = " Clear All Progress";
 		resetButton.addEventListener("click", () => {
 			updateCourseCompletion(course, false);
-		});
-		resetButton.addEventListener("keydown", (event) => {
-			if (event.code == "Enter") {
-				updateCourseCompletion(course, false);
-			}
 		});
 		optionsWrapper.appendChild(resetButton);
 

@@ -32,21 +32,11 @@ if (folderButton) {
 	folderButton.addEventListener("click", () => {
 		openFolder();
 	});
-	folderButton.addEventListener("keydown", (event) => {
-		if (event.code == "Enter") {
-			openFolder();
-		}
-	});
 }
 
 if (refreshButton) {
 	refreshButton.addEventListener("click", () => {
 		location.reload();
-	});
-	refreshButton.addEventListener("keydown", (event) => {
-		if (event.code == "Enter") {
-			location.reload();
-		}
 	});
 }
 

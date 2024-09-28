@@ -44,21 +44,11 @@ if (resetSettingsButton) {
 	resetSettingsButton.addEventListener("click", () => {
 		updateSettings().then(() => location.reload());
 	});
-	resetSettingsButton.addEventListener("keydown", (event) => {
-		if (event.code == "Enter") {
-			updateSettings().then(() => location.reload());
-		}
-	});
 }
 
 if (resetCoursesButton) {
 	resetCoursesButton.addEventListener("click", () => {
 		resetCourses().then(() => location.reload());
-	});
-	resetCoursesButton.addEventListener("keydown", (event) => {
-		if (event.code == "Enter") {
-			resetCourses().then(() => location.reload());
-		}
 	});
 }
 
@@ -68,13 +58,6 @@ if (appWebsiteButton) {
 			displayError(error);
 		});
 	});
-	appWebsiteButton.addEventListener("keydown", (event) => {
-		if (event.code == "Enter") {
-			openWebsite().catch((error) => {
-				displayError(error);
-			});
-		}
-	});
 }
 
 if (appRepoButton) {
@@ -82,13 +65,6 @@ if (appRepoButton) {
 		openRepo().catch((error) => {
 			displayError(error);
 		});
-	});
-	appRepoButton.addEventListener("keydown", (event) => {
-		if (event.code == "Enter") {
-			openRepo().catch((error) => {
-				displayError(error);
-			});
-		}
 	});
 }
 
@@ -98,13 +74,6 @@ if (appIssueButton) {
 			displayError(error);
 		});
 	});
-	appIssueButton.addEventListener("keydown", (event) => {
-		if (event.code == "Enter") {
-			openIssueTracker(false).catch((error) => {
-				displayError(error);
-			});
-		}
-	});
 }
 
 if (appDiscussionButton) {
@@ -112,13 +81,6 @@ if (appDiscussionButton) {
 		openDiscussionBoard().catch((error) => {
 			displayError(error);
 		});
-	});
-	appDiscussionButton.addEventListener("keydown", (event) => {
-		if (event.code == "Enter") {
-			openDiscussionBoard().catch((error) => {
-				displayError(error);
-			});
-		}
 	});
 }
 
@@ -128,13 +90,6 @@ if (resourceButton) {
 			displayError(error);
 		});
 	});
-	resourceButton.addEventListener("keydown", (event) => {
-		if (event.code == "Enter") {
-			openDataDir().catch((error) => {
-				displayError(error);
-			});
-		}
-	});
 }
 
 if (internalFolderButton) {
@@ -142,13 +97,6 @@ if (internalFolderButton) {
 		openInternalDataDir().catch((error) => {
 			displayError(error);
 		});
-	});
-	internalFolderButton.addEventListener("keydown", (event) => {
-		if (event.code == "Enter") {
-			openInternalDataDir().catch((error) => {
-				displayError(error);
-			});
-		}
 	});
 }
 
