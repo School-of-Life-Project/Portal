@@ -66,9 +66,9 @@ img {
 	margin: 0.5lh 0;
 }
 
-@media (width > 70em) {
+@media (width > 45em) {
 	img {
-		width: 30em;
+		width: 34em;
 		margin: 0.2lh;
 	}
 }
