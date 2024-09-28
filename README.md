@@ -6,12 +6,9 @@ Unlike most eLearning applications, Portal is focused on making use of existing 
 
 Portal is designed to perform well on low-end hardware and does not require an internet connection to use. It can run on Windows >= 7, macOS >= 10.15, and popular Linux distributions.
 
-> [!IMPORTANT]
-> This page is aimed at software developers. Setup instructions aimed at non-technical users can be found on [Portal's website](https://school-of-life-project.github.io/Portal/).
-
 ## Binary Installation
 
-Binary releases of Portal can be found on the [releases page](https://github.com/School-of-Life-Project/Portal/releases), and detailed installation instructions can be found on [Portal's website](https://school-of-life-project.github.io/Portal/).
+Binary releases of Portal can be found on the [releases page](https://github.com/School-of-Life-Project/Portal/releases), and installation instructions can be found on [Portal's website](https://school-of-life-project.github.io/Portal/).
 
 ## Building
 
