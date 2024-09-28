@@ -59,3 +59,16 @@ pre {
 	overflow: auto;
 	max-width: 100%;
 }
+
+img {
+	width: 100%;
+	border: 0.1em solid #aeaeae;
+	margin: 0.5lh 0;
+}
+
+@media (width > 70em) {
+	img {
+		width: 30em;
+		margin: 0.2lh;
+	}
+}
