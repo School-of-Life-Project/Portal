@@ -72,3 +72,7 @@ img {
 		margin: 0.2lh;
 	}
 }
+
+a.first > img {
+	margin-top: 0.5lh;
+}
