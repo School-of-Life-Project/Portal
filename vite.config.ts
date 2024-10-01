@@ -4,6 +4,7 @@ import eslint from "vite-plugin-eslint";
 import browserslist from "browserslist";
 import { browserslistToTargets } from "lightningcss";
 import legacy from "@vitejs/plugin-legacy";
+import { createHtmlPlugin } from "vite-plugin-html";
 import { createWriteStream, existsSync, mkdirSync } from "fs";
 
 if (!existsSync("node_modules/jszip/dist/jszip.js")) {
@@ -68,5 +69,6 @@ export default defineConfig({
 			additionalLegacyPolyfills: [],
 			modernTargets,
 		}),
+		createHtmlPlugin({ minify: true }),
 	],
 });
