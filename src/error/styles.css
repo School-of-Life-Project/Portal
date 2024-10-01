@@ -1,8 +1,4 @@
-@font-face {
-	font-family: OpenMoji;
-	src: url("/openmoji.woff2");
-	font-display: block;
-}
+@import "../shared.css";
 
 body {
 	margin: 2em;
