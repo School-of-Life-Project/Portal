@@ -1,13 +1,13 @@
 oxipng --zopfli -o max --strip all docs/icon.png
 oxipng --zopfli -o max --strip all src-tauri/icons/*.png
 
-iconutil --convert iconset src-tauri/icons/icon.icns
-rm src-tauri/icons/icon.icns
+# iconutil --convert iconset src-tauri/icons/icon.icns
+# rm src-tauri/icons/icon.icns
 
-oxipng --zopfli -o max --strip all src-tauri/icons/icon.iconset/*.png
-iconutil --convert icns src-tauri/icons/icon.iconset
+# oxipng --zopfli -o max --strip all src-tauri/icons/icon.iconset/*.png
+# iconutil --convert icns src-tauri/icons/icon.iconset
 
-rm -r src-tauri/icons/icon.iconset
+# rm -r src-tauri/icons/icon.iconset
 
 mkdir src-tauri/icons/icon.ico.images
 icotool -x src-tauri/icons/icon.ico -o src-tauri/icons/icon.ico.images
