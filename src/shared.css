@@ -38,23 +38,17 @@
 		U+E0069, U+E006C-E006E, U+E0070-E0079, U+E007F;
 }
 
-/* border-radius is currently set to zero due to a Webkit bug */
-
 :root {
 	--background-color: oklch(98% 0.02 calc(75 + (30 / 2)));
 
 	--primary-card-color: oklch(95% 0.03 calc(75 + 30));
 	--secondary-card-color: oklch(95% 0.04 75);
-	/* --card-border-radius: 0.2lh; */
-	--card-border-radius: 0;
 	--large-card-padding: 1.25lh;
 	--small-card-padding: 0.5lh;
 
 	--mini-card-color: oklch(95% 0.03 calc(75 + (30 / 2)));
 
 	--button-color: var(--primary-card-color);
-	/* --button-border-radius: 0.3lh; */
-	--button-border-radius: 0;
 	--button-padding: 0.4lh;
 
 	--top-navbar-color: oklch(80% 0.06 75);

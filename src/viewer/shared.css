@@ -93,7 +93,6 @@ header nav {
 header nav a {
 	background-color: var(--button-color);
 	border: var(--secondary-border);
-	border-radius: var(--button-border-radius);
 	padding: var(--button-padding);
 	margin-left: 0.8lh;
 	white-space: nowrap;

@@ -27,7 +27,6 @@
 button[type="button"] {
 	background-color: var(--button-color);
 	border: var(--secondary-border);
-	border-radius: var(--button-border-radius);
 	font-size: 0.8em;
 	padding: var(--button-padding);
 	cursor: pointer;
@@ -49,7 +48,6 @@ section {
 	background-color: var(--secondary-card-color);
 	padding: var(--small-card-padding);
 	border: var(--primary-border);
-	border-radius: var(--card-border-radius);
 }
 
 section table {

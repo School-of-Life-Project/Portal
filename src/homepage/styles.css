@@ -48,7 +48,6 @@ section.course h3 {
 section,
 .textbook {
 	border: var(--primary-border);
-	border-radius: var(--card-border-radius);
 }
 
 .section-container {
@@ -64,7 +63,6 @@ nav.related {
 nav.related a {
 	background-color: var(--button-color);
 	border: var(--primary-border);
-	border-radius: var(--button-border-radius);
 	padding: var(--button-padding);
 	margin-left: 0.5lh;
 	white-space: nowrap;
