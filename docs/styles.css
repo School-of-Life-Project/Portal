@@ -81,3 +81,7 @@ img {
 .gallery a:first-of-type img {
 	margin-top: 0.5lh;
 }
+
+.gallery a {
+	cursor: zoom-in;
+}
