@@ -6,6 +6,17 @@ Unlike most eLearning applications, Portal is focused on making use of existing 
 
 Portal is designed to perform well on low-end hardware and does not require an internet connection to use. It can run on all desktop [platforms supported by Tauri](https://github.com/tauri-apps/tauri#platforms).
 
+<details>
+
+<summary>Screenshots</summary>
+
+![](docs/screenshots/screenshot-home.png)
+![](docs/screenshots/screenshot-viewer.png)
+![](docs/screenshots/screenshot-navigator-course.png)
+![](docs/screenshots/screenshot-navigator-map.png)
+
+</details>
+
 ## Binary Installation
 
 Binary releases of Portal can be found on the [releases page](https://github.com/School-of-Life-Project/Portal/releases), and installation instructions can be found on [Portal's website](https://school-of-life-project.github.io/Portal/).
