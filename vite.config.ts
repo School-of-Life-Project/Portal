@@ -3,7 +3,6 @@ import { defineConfig } from "vite";
 import eslint from "vite-plugin-eslint";
 import browserslist from "browserslist";
 import { browserslistToTargets } from "lightningcss";
-import legacy from "@vitejs/plugin-legacy";
 import { createHtmlPlugin } from "vite-plugin-html";
 import { createWriteStream, existsSync, mkdirSync } from "fs";
 
@@ -15,14 +14,6 @@ if (!existsSync("node_modules/jszip/dist/jszip.js")) {
 	writeStream.write("module.exports = {};");
 	writeStream.end();
 }
-
-// Tauri uses Edge on Windows and WebKit on macOS and Linux
-const targets =
-	process.env.TAURI_ENV_PLATFORM == "windows" ? "edge>=89" : "safari>=11";
-
-// Consider browser versions released since 2023 as modern
-const modernTargets =
-	process.env.TAURI_ENV_PLATFORM == "windows" ? "edge>=109" : "safari>=16.3";
 
 export default defineConfig({
 	// prevent vite from obscuring rust errors
@@ -42,6 +33,8 @@ export default defineConfig({
 		"TAURI_ENV_DEBUG",
 	],
 	build: {
+		// Tauri uses Edge on Windows and WebKit on macOS and Linux
+		target: process.env.TAURI_ENV_PLATFORM == "windows" ? "edge89" : "safari15",
 		minify: "terser",
 		cssMinify: "lightningcss",
 		rollupOptions: {
@@ -59,16 +52,15 @@ export default defineConfig({
 	css: {
 		transformer: "lightningcss",
 		lightningcss: {
-			targets: browserslistToTargets(browserslist(targets)),
+			targets: browserslistToTargets(
+				browserslist(
+					// Tauri uses Edge on Windows and WebKit on macOS and Linux
+					process.env.TAURI_ENV_PLATFORM == "windows"
+						? "edge>=89"
+						: "safari>=15",
+				),
+			),
 		},
 	},
-	plugins: [
-		eslint(),
-		legacy({
-			targets,
-			additionalLegacyPolyfills: [],
-			modernTargets,
-		}),
-		createHtmlPlugin({ minify: true }),
-	],
+	plugins: [eslint(), createHtmlPlugin({ minify: true })],
 });
