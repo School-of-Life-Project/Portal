@@ -25,11 +25,7 @@ Binary releases of Portal can be found on the [releases page](https://github.com
 
 You will need [Rust](https://www.rust-lang.org/tools/install) and [Node.js](https://nodejs.org/en/download) to build this application. In addition, you will need to install the build dependencies for [Tauri](https://v2.tauri.app/start/prerequisites/).
 
-After installing the required dependencies, run the following command in the repository folder:
-
-```bash
-npm install
-```
+After installing the required dependencies, run `npm install` in the repository folder.
 
 Then, you can:
 - run the application in development mode with `npx tauri dev`
