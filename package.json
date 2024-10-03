@@ -10,13 +10,13 @@
 	},
 	"devDependencies": {
 		"@eslint/js": "^9.11.1",
-		"@tauri-apps/cli": "^2.0.0-rc.17",
+		"@tauri-apps/cli": "^2.0.0",
 		"@types/eslint__js": "^8.42.3",
 		"@types/node": "^22.7.4",
 		"@vitejs/plugin-legacy": "^5.4.2",
 		"browserslist": "^4.24.0",
 		"eslint": "^9.11.1",
-		"globals": "^15.9.0",
+		"globals": "^15.10.0",
 		"lightningcss": "^1.27.0",
 		"prettier": "^3.3.3",
 		"terser": "^5.34.1",
@@ -27,8 +27,8 @@
 		"vite-plugin-html": "^3.2.2"
 	},
 	"dependencies": {
-		"@tauri-apps/api": "^2.0.0-rc.6",
-		"@tauri-apps/plugin-shell": "^2.0.0-rc.1",
+		"@tauri-apps/api": "^2.0.1",
+		"@tauri-apps/plugin-shell": "^2.0.0",
 		"epubjs": "0.3.93"
 	},
 	"overrides": {
