@@ -10,7 +10,7 @@
 	},
 	"devDependencies": {
 		"@eslint/js": "^9.11.1",
-		"@tauri-apps/cli": "^2.0.0",
+		"@tauri-apps/cli": "^2.0.1",
 		"@types/eslint__js": "^8.42.3",
 		"@types/node": "^22.7.4",
 		"browserslist": "^4.24.0",

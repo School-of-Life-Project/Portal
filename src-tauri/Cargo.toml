@@ -16,7 +16,7 @@ crate-type = [
 ]
 
 [build-dependencies]
-tauri-build = { version = "2.0.0", features = [
+tauri-build = { version = "2.0.1", features = [
 ] }
 
 [dependencies]
@@ -24,11 +24,11 @@ serde_json = "1"
 serde = { version = "1", features = [
 	"derive",
 ] }
-tauri = { version = "2.0.0", features = [
+tauri = { version = "2.0.1", features = [
 	"protocol-asset",
 	"devtools",
 ] }
-tauri-plugin-shell = "2.0.0"
+tauri-plugin-shell = "2.0.1"
 uuid = { version = "1.10", features = [
 	"v4",
 	"serde",
