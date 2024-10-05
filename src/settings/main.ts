@@ -163,17 +163,34 @@ function buildSettingsForm(settings: Settings) {
 			fieldset1.appendChild(document.createElement("br"));
 			listingCheckbox.addEventListener("change", handleInputUpdate);
 
+			const courseChunkInput = document.createElement("input");
+			courseChunkInput.type = "number";
+			courseChunkInput.id = "course_time_chunks";
+			courseChunkInput.min = "30";
+			courseChunkInput.value = String(settings.course_time_chunks);
+			courseChunkInput.max = "360";
+			courseChunkInput.step = "1";
+
+			const courseChunkLabel = document.createElement("label");
+			courseChunkLabel.setAttribute("for", "course_time_chunks");
+			courseChunkLabel.innerText = "🟩 Block count: ";
+
+			fieldset1.appendChild(courseChunkLabel);
+			fieldset1.appendChild(courseChunkInput);
+			fieldset1.appendChild(document.createElement("br"));
+			courseChunkInput.addEventListener("change", handleInputUpdate);
+
 			const courseTimeInput = document.createElement("input");
 			courseTimeInput.type = "number";
-			courseTimeInput.id = "maximum_course_time";
+			courseTimeInput.id = "time_chunk_size";
 			courseTimeInput.min = "30";
-			courseTimeInput.value = String(settings.maximum_course_time);
+			courseTimeInput.value = String(settings.time_chunk_size);
 			courseTimeInput.max = "360";
 			courseTimeInput.step = "1";
 
 			const courseTimeLabel = document.createElement("label");
-			courseTimeLabel.setAttribute("for", "maximum_course_time");
-			courseTimeLabel.innerText = "⌛️ Maximum time (in minutes): ";
+			courseTimeLabel.setAttribute("for", "time_chunk_size");
+			courseTimeLabel.innerText = "⌛️ Block size (in minutes): ";
 
 			fieldset1.appendChild(courseTimeLabel);
 			fieldset1.appendChild(courseTimeInput);
@@ -212,7 +229,7 @@ function buildSettingsForm(settings: Settings) {
 
 			const timeLabel = document.createElement("label");
 			timeLabel.setAttribute("for", "show_daily_time");
-			timeLabel.innerText = "⌛️ Show time progress: ";
+			timeLabel.innerText = "🟩 Show time progress: ";
 
 			fieldset2.appendChild(timeLabel);
 			fieldset2.appendChild(timeCheckbox);
@@ -243,7 +260,7 @@ function buildSettingsForm(settings: Settings) {
 
 			const chapterLabel = document.createElement("label");
 			chapterLabel.setAttribute("for", "show_daily_chapters");
-			chapterLabel.innerText = "📑 Show chapter progress: ";
+			chapterLabel.innerText = "🟥 Show chapter progress: ";
 
 			fieldset2.appendChild(chapterLabel);
 			fieldset2.appendChild(chapterCheckbox);

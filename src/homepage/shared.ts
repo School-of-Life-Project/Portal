@@ -87,10 +87,18 @@ export function graphCourse(
 		}
 	}
 
-	if (settings.show_course_time) {
+	if (
+		settings.show_course_time &&
+		settings.time_chunk_size &&
+		settings.course_time_chunks
+	) {
 		element.appendChild(document.createElement("br"));
 
-		const meter = new TimeProgressMeter(0, settings.maximum_course_time * 60);
+		const meter = new TimeProgressMeter(
+			0,
+			settings.time_chunk_size * settings.course_time_chunks * 60,
+			settings.course_time_chunks,
+		);
 		meter.update(progress.time_spent_today);
 
 		element.appendChild(meter.element);

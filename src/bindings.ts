@@ -87,9 +87,11 @@ export interface OverallProgress {
 export interface Settings {
 	show_course_clock: boolean;
 	show_course_time?: boolean;
+	time_chunk_size?: number;
+	course_time_chunks?: number;
 	show_daily_time: boolean;
 	show_daily_chapters: boolean;
-	maximum_course_time: number;
+	maximum_course_time?: number;
 	maximum_daily_time: number;
 	maximum_daily_chapters: number;
 	weeks_displayed: number;
@@ -316,6 +318,20 @@ export async function getSettings(): Promise<Settings> {
 
 				if (settings.show_course_time == undefined) {
 					settings.show_course_time = true;
+				}
+
+				if (settings.time_chunk_size == undefined) {
+					if (settings.maximum_course_time) {
+						settings.time_chunk_size = Math.round(
+							settings.maximum_course_time / 5,
+						);
+					} else {
+						settings.time_chunk_size = 30;
+					}
+				}
+
+				if (settings.course_time_chunks == undefined) {
+					settings.course_time_chunks = 5;
 				}
 
 				return settings;
