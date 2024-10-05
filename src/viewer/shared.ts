@@ -269,12 +269,20 @@ export class ViewManager {
 		if (this.settings.show_course_clock) {
 			getBackendDate()
 				.then((backendDate) => {
-					timeDisplay = new TimeProgressMeter(
-						0,
-						this.settings.maximum_course_time * 60,
-					);
-					timeDisplay.update(course.completion.time_spent[backendDate]);
-					this.container.timer.appendChild(timeDisplay.element);
+					if (
+						this.settings.time_chunk_size &&
+						this.settings.course_time_chunks
+					) {
+						timeDisplay = new TimeProgressMeter(
+							0,
+							this.settings.time_chunk_size *
+								this.settings.course_time_chunks *
+								60,
+							this.settings.course_time_chunks,
+						);
+						timeDisplay.update(course.completion.time_spent[backendDate]);
+						this.container.timer.appendChild(timeDisplay.element);
+					}
 				})
 				.catch((error: Error) => {
 					displayError(error);

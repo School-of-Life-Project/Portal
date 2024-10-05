@@ -166,9 +166,9 @@ function buildSettingsForm(settings: Settings) {
 			const courseChunkInput = document.createElement("input");
 			courseChunkInput.type = "number";
 			courseChunkInput.id = "course_time_chunks";
-			courseChunkInput.min = "30";
+			courseChunkInput.min = "1";
 			courseChunkInput.value = String(settings.course_time_chunks);
-			courseChunkInput.max = "360";
+			courseChunkInput.max = "10";
 			courseChunkInput.step = "1";
 
 			const courseChunkLabel = document.createElement("label");
@@ -183,9 +183,9 @@ function buildSettingsForm(settings: Settings) {
 			const courseTimeInput = document.createElement("input");
 			courseTimeInput.type = "number";
 			courseTimeInput.id = "time_chunk_size";
-			courseTimeInput.min = "30";
+			courseTimeInput.min = "5";
 			courseTimeInput.value = String(settings.time_chunk_size);
-			courseTimeInput.max = "360";
+			courseTimeInput.max = "60";
 			courseTimeInput.step = "1";
 
 			const courseTimeLabel = document.createElement("label");
