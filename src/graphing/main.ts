@@ -285,15 +285,19 @@ export class LongTermProgressGraph {
 				continue;
 			}
 
-			const level = Math.min(
+			const normalizedValue = Math.min(
 				Math.max(
-					Math.floor(
-						(progress[i] - this.min) / ((this.max - this.min) / this.#levels),
-					),
+					(progress[i] - this.min) / ((this.max - this.min) / this.#levels),
 					0,
 				),
 				this.#levels,
 			);
+
+			let level = Math.floor(normalizedValue);
+
+			if (level == 0 && normalizedValue >= 0.5) {
+				level = 1;
+			}
 
 			element.className = "level-" + level;
 
