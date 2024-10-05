@@ -310,7 +310,7 @@ export async function getSettings(): Promise<Settings> {
 					course_time_chunks: 5,
 					show_daily_time: true,
 					show_daily_chapters: true,
-					maximum_daily_time: 300,
+					maximum_daily_time: 360,
 					maximum_daily_chapters: 1.5,
 					weeks_displayed: 24,
 				} as Settings;

@@ -273,7 +273,7 @@ function buildSettingsForm(settings: Settings) {
 			maxTotalChapterInput.min = "0.2";
 			maxTotalChapterInput.value = String(settings.maximum_daily_chapters);
 			maxTotalChapterInput.max = "8";
-			maxTotalChapterInput.step = "0.1";
+			maxTotalChapterInput.step = "0.05";
 
 			const maxTotalChapterLabel = document.createElement("label");
 			maxTotalChapterLabel.setAttribute("for", "maximum_daily_chapters");
