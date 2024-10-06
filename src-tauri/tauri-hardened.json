@@ -53,13 +53,7 @@
 				}
 			],
 			"csp": {
-				"default-src": [
-					"'self'",
-					"asset:",
-					"http://asset.localhost",
-					"data:",
-					"blob:"
-				],
+				"default-src": ["'self'", "asset:", "http://asset.localhost"],
 				"connect-src": [
 					"ipc:",
 					"http://ipc.localhost",
@@ -73,9 +67,14 @@
 					"'unsafe-inline'",
 					"'unsafe-eval'"
 				],
+				"font-src": ["'self'", "asset:", "http://asset.localhost", "data:"],
+				"img-src": ["asset:", "http://asset.localhost", "data:"],
+				"media-src": ["asset:", "http://asset.localhost", "data:"],
 				"script-src": ["'self'"],
 				"frame-src": ["asset:", "http://asset.localhost"],
 				"object-src": ["'none'"],
+				"worker-src": ["'none'"],
+				"base-uri": ["'none'"],
 				"sandbox": ["allow-popups", "allow-same-origin", "allow-scripts"]
 			},
 			"assetProtocol": {

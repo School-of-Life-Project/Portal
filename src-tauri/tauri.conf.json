@@ -84,7 +84,7 @@
 					"data:",
 					"blob:"
 				],
-				"frame-src": ["asset:", "http://asset.localhost"],
+				"frame-src": ["asset:", "http://asset.localhost", "data:", "blob:"],
 				"object-src": ["'none'"],
 				"sandbox": ["allow-popups", "allow-same-origin", "allow-scripts"]
 			},
