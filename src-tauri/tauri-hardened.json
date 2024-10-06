@@ -36,7 +36,7 @@
 		"category": "Education",
 		"shortDescription": "An app built for independent learners."
 	},
-	"productName": "Portal",
+	"productName": "Portal (Hardened)",
 	"identifier": "com.schoolOfLifeProject.Portal",
 	"plugins": {
 		"shell": {
