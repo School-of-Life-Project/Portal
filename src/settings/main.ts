@@ -173,7 +173,7 @@ function buildSettingsForm(settings: Settings) {
 
 			const courseChunkLabel = document.createElement("label");
 			courseChunkLabel.setAttribute("for", "course_time_chunks");
-			courseChunkLabel.innerText = "🟩 Block count: ";
+			courseChunkLabel.innerText = "🟩 Time block count: ";
 
 			fieldset1.appendChild(courseChunkLabel);
 			fieldset1.appendChild(courseChunkInput);
@@ -190,7 +190,7 @@ function buildSettingsForm(settings: Settings) {
 
 			const courseTimeLabel = document.createElement("label");
 			courseTimeLabel.setAttribute("for", "time_chunk_size");
-			courseTimeLabel.innerText = "⌛️ Block size (in minutes): ";
+			courseTimeLabel.innerText = "⌛️ Time block length (in minutes): ";
 
 			fieldset1.appendChild(courseTimeLabel);
 			fieldset1.appendChild(courseTimeInput);
