@@ -15,11 +15,6 @@
 			"icons/icon.icns",
 			"icons/icon.ico"
 		],
-		"windows": {
-			"webviewInstallMode": {
-				"type": "embedBootstrapper"
-			}
-		},
 		"macOS": {
 			"minimumSystemVersion": "12.0"
 		},

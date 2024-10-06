@@ -18,6 +18,10 @@ a {
 	cursor: pointer;
 }
 
+details {
+	margin: 1lh 0;
+}
+
 details summary {
 	cursor: pointer;
 }
