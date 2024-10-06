@@ -53,12 +53,24 @@
 				}
 			],
 			"csp": {
-				"default-src": "'self' customprotocol: asset: http://asset.localhost",
-				"connect-src": "ipc: http://ipc.localhost customprotocol: asset: http://asset.localhost",
-				"style-src": "'self' customprotocol: asset: http://asset.localhost 'unsafe-inline' 'unsafe-eval'",
-				"script-src": "'self'",
-				"frame-src": "customprotocol: asset: http://asset.localhost",
-				"sandbox": "allow-popups allow-same-origin allow-scripts"
+				"default-src": ["'self'", "asset:", "http://asset.localhost"],
+				"connect-src": [
+					"ipc:",
+					"http://ipc.localhost",
+					"asset:",
+					"http://asset.localhost"
+				],
+				"style-src": [
+					"'self'",
+					"asset:",
+					"http://asset.localhost",
+					"'unsafe-inline'",
+					"'unsafe-eval'"
+				],
+				"script-src": ["'self'"],
+				"frame-src": ["asset:", "http://asset.localhost"],
+				"object-src": ["'none'"],
+				"sandbox": ["allow-popups", "allow-same-origin", "allow-scripts"]
 			},
 			"assetProtocol": {
 				"enable": true,
