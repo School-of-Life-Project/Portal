@@ -31,6 +31,14 @@ Then, you can:
 - run the application in development mode with `npx tauri dev`
 - build an optimized desktop binary with `npx tauri build`
 
+### Hardening
+
+By default, Courses can run arbitrary javascript. Although the application frontend is sandboxed, it is possible that malicious javascript could escape the sandbox and compromise the system's security.
+
+If you are planning on running Portal in a high-risk environment, you may want to compile a hardened build to disable javascript in the Textbook Viewer (at the expense of breaking some Courses). You can do so by running `sh harden.sh` before compiling the application with `npx tauri build`.
+
+To validate that you were running a hardened build, press the `⚙️ Settings` button on the app's home screen. The application version should no longer be displayed.
+
 ## Usage
 
 Portal has a built-in user manual, which can be accessed by pressing the `📜 Guide` button on the app's home screen.

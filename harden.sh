@@ -1,4 +1,6 @@
-sed -e 's/⚠ You should only import resources from creators you trust\. Malicious resources could pose a security risk\./⚠ You are running a hardened version of Portal. Some resources may not function properly./g' guide.html
+if [ -f src-tauri/tauri-hardened.json ]; then
+	rm src-tauri/tauri.conf.json
+	mv src-tauri/tauri-hardened.json src-tauri/tauri.conf.json
 
-rm src-tauri/tauri.conf.json
-mv src-tauri/tauri-hardened.json src-tauri/tauri.conf.json
+	echo "Successfully applied application hardening. Rerun the compiler to create a hardened build."
+fi

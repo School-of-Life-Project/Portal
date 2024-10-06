@@ -49,7 +49,7 @@
 				{
 					"identifier": "default",
 					"windows": ["main"],
-					"permissions": ["core:app:allow-version", "shell:allow-open"]
+					"permissions": ["shell:allow-open"]
 				}
 			],
 			"csp": {
