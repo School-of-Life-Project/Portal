@@ -65,7 +65,7 @@
 					"asset:",
 					"http://asset.localhost",
 					"'unsafe-inline'",
-					"'unsafe-eval'"
+					"data:"
 				],
 				"font-src": ["'self'", "asset:", "http://asset.localhost", "data:"],
 				"img-src": ["asset:", "http://asset.localhost", "data:"],
