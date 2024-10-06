@@ -2676,7 +2676,7 @@ dependencies = [
 
 [[package]]
 name = "school-of-life-portal"
-version = "0.3.15"
+version = "0.3.16"
 dependencies = [
  "bincode",
  "chrono",
