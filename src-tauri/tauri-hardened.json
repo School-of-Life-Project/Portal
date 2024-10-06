@@ -74,7 +74,7 @@
 				"frame-src": ["asset:", "http://asset.localhost", "data:"],
 				"object-src": ["'none'"],
 				"worker-src": ["'none'"],
-				"base-uri": ["'none'"],
+				"base-uri": ["asset:", "http://asset.localhost"],
 				"sandbox": ["allow-popups", "allow-same-origin", "allow-scripts"]
 			},
 			"assetProtocol": {
