@@ -67,7 +67,9 @@
 					"http://ipc.localhost",
 					"asset:",
 					"http://asset.localhost"
-				]
+				],
+				"base-uri": ["asset:", "http://asset.localhost"],
+				"sandbox": ["allow-popups", "allow-same-origin", "allow-scripts"]
 			},
 			"assetProtocol": {
 				"enable": true,
