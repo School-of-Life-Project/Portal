@@ -18,34 +18,36 @@
 			<footer>
 				<p>
 					🐞 Believe this is a bug in the app? Please
-					<a href="javascript:window.openIssueTracker(true)">📝 file an issue</a
+					<a
+						href="https://github.com/School-of-Life-Project/Portal/issues/new"
+						target="_blank"
+						>📝 file an issue</a
 					>.
 				</p>
 				<ul>
 					<li><a href="/">🏫 Go home</a></li>
-					<li>
-						<a href="javascript:history.back()">🔙 Return to previous page</a>
-					</li>
 					<li>
 						<a href="/guide.html#troubleshooting"
 							>📜 View troubleshooting guide</a
 						>
 					</li>
 					<li>
-						<a href="javascript:window.openDataDir()"
-							>📂 Open resource folder</a
+						<a id="resourceButton" href="#">📂 Open resource folder</a>
+					</li>
+					<li>
+						<a id="internalFolderButton" href="#">📂 Open data folder</a>
+					</li>
+					<li>
+						<a
+							href="https://github.com/School-of-Life-Project/Portal"
+							target="_blank"
+							>🔗 App source code</a
 						>
 					</li>
 					<li>
-						<a href="javascript:window.openInternalDataDir()"
-							>📂 Open data folder</a
-						>
-					</li>
-					<li>
-						<a href="javascript:window.openRepo()">🔗 App source code</a>
-					</li>
-					<li>
-						<a href="javascript:window.openIssueTracker()"
+						<a
+							href="https://github.com/School-of-Life-Project/Portal/issues"
+							target="_blank"
 							>🔗 App issue tracker</a
 						>
 					</li>
@@ -58,14 +60,12 @@
 					</p>
 					<ul>
 						<li>
-							<a href="javascript:window.resetSettings()"
+							<a id="resetSettingsButton" href="#"
 								>⚙️ Reset settings to defaults</a
 							>
 						</li>
 						<li>
-							<a href="javascript:window.resetActiveCourses()"
-								>📚 Reset active courses</a
-							>
+							<a id="resetCoursesButton" href="#">📚 Reset active courses</a>
 						</li>
 					</ul>
 				</details>

@@ -1,10 +1,10 @@
 import {
+	displayError,
 	openDataDir,
 	openInternalDataDir,
-	openIssueTracker,
-	openRepo,
 	setActiveCourses,
 	setSettings,
+	Settings,
 } from "../bindings.ts";
 
 const params = new URLSearchParams(window.location.search);
@@ -27,23 +27,47 @@ if (cause) {
 	}
 }
 
-function resetSettings() {
-	setSettings();
+const resetCoursesButton = document.getElementById("resetCoursesButton");
+const resetSettingsButton = document.getElementById("resetSettingsButton");
+const resourceButton = document.getElementById("resourceButton");
+const internalFolderButton = document.getElementById("internalFolderButton");
+
+async function updateSettings(settings?: Settings) {
+	return setSettings(settings).catch((error) => {
+		displayError(error);
+	});
 }
 
-function resetActiveCourses() {
-	setActiveCourses([]);
+async function resetCourses() {
+	return setActiveCourses([]).catch((error) => {
+		displayError(error);
+	});
 }
 
-// @ts-expect-error global
-window.openDataDir = openDataDir;
-// @ts-expect-error global
-window.openInternalDataDir = openInternalDataDir;
-// @ts-expect-error global
-window.openRepo = openRepo;
-// @ts-expect-error global
-window.openIssueTracker = openIssueTracker;
-// @ts-expect-error global
-window.resetSettings = resetSettings;
-// @ts-expect-error global
-window.resetActiveCourses = resetActiveCourses;
+if (resetSettingsButton) {
+	resetSettingsButton.addEventListener("click", () => {
+		updateSettings().then(() => location.reload());
+	});
+}
+
+if (resetCoursesButton) {
+	resetCoursesButton.addEventListener("click", () => {
+		resetCourses().then(() => location.reload());
+	});
+}
+
+if (resourceButton) {
+	resourceButton.addEventListener("click", () => {
+		openDataDir().catch((error) => {
+			displayError(error);
+		});
+	});
+}
+
+if (internalFolderButton) {
+	internalFolderButton.addEventListener("click", () => {
+		openInternalDataDir().catch((error) => {
+			displayError(error);
+		});
+	});
+}

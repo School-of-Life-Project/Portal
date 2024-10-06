@@ -147,7 +147,7 @@ export class ePubViewer implements DocumentViewer {
 						height: "100%",
 						spread: "none",
 						allowPopups: true,
-						allowScriptedContent: true,
+						allowScriptedContent: true, // required for document links to work correctly; scripts within EPUB are blocked by CSP
 					});
 
 					rendition.themes.font("serif");
