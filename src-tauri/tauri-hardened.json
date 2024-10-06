@@ -71,7 +71,7 @@
 				"img-src": ["asset:", "http://asset.localhost", "data:"],
 				"media-src": ["asset:", "http://asset.localhost", "data:"],
 				"script-src": ["'self'"],
-				"frame-src": ["asset:", "http://asset.localhost"],
+				"frame-src": ["asset:", "http://asset.localhost", "data:"],
 				"object-src": ["'none'"],
 				"worker-src": ["'none'"],
 				"base-uri": ["'none'"],
