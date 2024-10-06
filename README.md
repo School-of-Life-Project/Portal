@@ -33,9 +33,9 @@ Then, you can:
 
 ### Hardening
 
-By default, Courses can run arbitrary javascript. Although the application frontend is sandboxed, it is possible that malicious javascript could escape the sandbox and compromise the system's security.
+By default, Courses can run arbitrary JavaScript. Although the application frontend is sandboxed, it is possible that malicious JavaScript could escape the sandbox and compromise the system's security.
 
-If you are planning on running Portal in a high-risk environment, you may want to compile a hardened build to disable javascript in the Textbook Viewer (at the expense of breaking some Courses). You can do so by running `sh harden.sh` before compiling the application with `npx tauri build`.
+If you are planning on running Portal in a high-risk environment, you may want to compile a hardened build to disable JavaScript in the Textbook Viewer (at the expense of potentially breaking some Courses). You can do so by running `sh harden.sh` before compiling the application with `npx tauri build`.
 
 To validate that you were running a hardened build, press the `⚙️ Settings` button on the app's home screen. The application version should no longer be displayed.
 
