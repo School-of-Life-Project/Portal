@@ -71,6 +71,7 @@
 				"base-uri": ["asset:", "http://asset.localhost"],
 				"sandbox": ["allow-popups", "allow-same-origin", "allow-scripts"]
 			},
+			"dangerousDisableAssetCspModification": true,
 			"assetProtocol": {
 				"enable": true,
 				"scope": ["$APPDATA/User Resources/*/**"]
