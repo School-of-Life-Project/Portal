@@ -52,6 +52,42 @@
 					"permissions": ["core:app:allow-version", "shell:allow-open"]
 				}
 			],
+			"csp": {
+				"default-src": [
+					"'self'",
+					"asset:",
+					"http://asset.localhost",
+					"data:",
+					"blob:"
+				],
+				"connect-src": [
+					"ipc:",
+					"http://ipc.localhost",
+					"asset:",
+					"http://asset.localhost"
+				],
+				"style-src": [
+					"'self'",
+					"asset:",
+					"http://asset.localhost",
+					"'unsafe-inline'",
+					"'unsafe-eval'",
+					"data:",
+					"blob:"
+				],
+				"script-src": [
+					"'self'",
+					"asset:",
+					"http://asset.localhost",
+					"'unsafe-inline'",
+					"'unsafe-eval'",
+					"data:",
+					"blob:"
+				],
+				"frame-src": ["asset:", "http://asset.localhost"],
+				"object-src": ["'none'"],
+				"sandbox": ["allow-popups", "allow-same-origin", "allow-scripts"]
+			},
 			"assetProtocol": {
 				"enable": true,
 				"scope": ["$APPDATA/User Resources/*/**"]

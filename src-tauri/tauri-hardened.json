@@ -53,7 +53,13 @@
 				}
 			],
 			"csp": {
-				"default-src": ["'self'", "asset:", "http://asset.localhost"],
+				"default-src": [
+					"'self'",
+					"asset:",
+					"http://asset.localhost",
+					"data:",
+					"blob:"
+				],
 				"connect-src": [
 					"ipc:",
 					"http://ipc.localhost",
