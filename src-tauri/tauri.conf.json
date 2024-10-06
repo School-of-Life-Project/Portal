@@ -45,7 +45,21 @@
 	},
 	"app": {
 		"security": {
-			"csp": null,
+			"capabilities": [
+				{
+					"identifier": "default",
+					"windows": ["main"],
+					"permissions": ["core:app:allow-version", "shell:allow-open"]
+				}
+			],
+			"csp": {
+				"default-src": "'self' customprotocol: asset: http://asset.localhost",
+				"connect-src": "ipc: http://ipc.localhost customprotocol: asset: http://asset.localhost",
+				"style-src": "'self' customprotocol: asset: http://asset.localhost 'unsafe-inline' 'unsafe-eval'",
+				"script-src": "'self'",
+				"frame-src": "customprotocol: asset: http://asset.localhost",
+				"sandbox": "allow-popups allow-same-origin allow-scripts"
+			},
 			"assetProtocol": {
 				"enable": true,
 				"scope": ["$APPDATA/User Resources/*/**"]
