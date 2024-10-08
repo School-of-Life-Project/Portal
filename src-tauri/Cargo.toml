@@ -1,6 +1,6 @@
 [package]
 name = "school-of-life-portal"
-version = "0.3.16"
+version = "0.3.17"
 description = "An app built for independent learners."
 authors = [
 	"School of Life Project",
