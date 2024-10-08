@@ -197,7 +197,7 @@ export class LongTermProgressGraph {
 
 			row.appendChild(rowHeader);
 
-			for (let i = 0; i < this.weeks; i++) {
+			for (let i = 0; i <= this.weeks; i++) {
 				const dataElement = document.createElement("td");
 				this.#dataElements.push(dataElement);
 				row.appendChild(dataElement);
@@ -212,9 +212,9 @@ export class LongTermProgressGraph {
 		footerCornerItem.innerText = "Week";
 		footerRow.appendChild(footerCornerItem);
 
-		for (let i = this.weeks; i > 0; i--) {
+		for (let i = this.weeks; i >= 0; i--) {
 			const label = document.createElement("th");
-			if (i % 4 == 0) {
+			if (i % 4 == 0 && i != 0) {
 				label.innerText = String(i);
 			}
 			footerRow.appendChild(label);
@@ -267,9 +267,11 @@ export class LongTermProgressGraph {
 		return root;
 	}
 	#getDay(day: number) {
-		day = this.weeks * 7 - day;
+		day = (this.weeks + 1) * 7 - day;
 
-		return this.#dataElements[(day % 7) * this.weeks + Math.floor(day / 7)];
+		return this.#dataElements[
+			(day % 7) * (this.weeks + 1) + Math.floor(day / 7)
+		];
 	}
 	update(progress: number[] = [], activeIndex?: number) {
 		for (let i = 0; i < this.#dataElements.length; i++) {
