@@ -298,6 +298,8 @@ function buildSettingsForm(settings: Settings) {
 			if (settings.custom_css) {
 				customCSSInput.value = settings.custom_css;
 			}
+			customCSSInput.placeholder =
+				'/* Learn a bit of CSS and make Portal your own! */\n\nbody {\n    font-family: "Comic Sans MS", OpenMoji;\n}\n\n/* Note: Custom themes do not apply to the Guide, Settings, or error pages.\n\nWarning: Custom CSS is not yet stable!\nYour themes may break between minor releases of the app. */';
 
 			const customCSSLabel = document.createElement("label");
 			customCSSLabel.setAttribute("for", "custom_css");

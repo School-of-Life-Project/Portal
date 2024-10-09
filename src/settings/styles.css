@@ -52,8 +52,8 @@ fieldset legend {
 }
 
 textarea {
-	width: 16em;
-	height: 8em;
+	width: 24em;
+	height: 16em;
 	border: var(--secondary-border);
 	font:
 		0.9em "Liberation Mono",
