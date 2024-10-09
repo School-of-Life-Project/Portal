@@ -2,6 +2,6 @@
 @import "../graphing/styles.css";
 
 .epub-view {
-	padding: 1.2em 0;
+	padding: 1.2em 0 1.5em;
 	/* Hacky fix */
 }
