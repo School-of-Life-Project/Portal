@@ -291,15 +291,9 @@ function buildSettingsForm(settings: Settings) {
 
 		{
 			const title = document.createElement("legend");
-			title.innerText = " Custom Stylesheets";
+			title.innerText = "🖌️ Custom Stylesheets";
 
 			fieldset3.appendChild(title);
-
-			const customCSSWarning = document.createElement("p");
-			customCSSWarning.innerText =
-				"⚠ Custom stylesheets are a work in progress.\nYour stylesheets may break between minor app releases.";
-			customCSSWarning.style.marginTop = "0";
-			fieldset3.appendChild(customCSSWarning);
 
 			const customCSSLabel = document.createElement("label");
 			customCSSLabel.setAttribute("for", "custom_css");
@@ -320,7 +314,7 @@ function buildSettingsForm(settings: Settings) {
 
 			const customBookCSSLabel = document.createElement("label");
 			customBookCSSLabel.setAttribute("for", "custom_book_css");
-			customBookCSSLabel.innerText = "📖 Course Stylesheet:";
+			customBookCSSLabel.innerText = "📖 Textbook Stylesheet:";
 
 			const customBookCSSInput = document.createElement("textarea");
 			customBookCSSInput.id = "custom_book_css";
@@ -338,7 +332,19 @@ function buildSettingsForm(settings: Settings) {
 		appearance.appendChild(title);
 		appearance.appendChild(fieldset1);
 		appearance.appendChild(fieldset2);
-		appearance.appendChild(fieldset3);
+
+		const details = document.createElement("details");
+
+		const summary = document.createElement("summary");
+		summary.innerText = " Advanced Settings";
+		details.appendChild(summary);
+		if (settings.custom_css || settings.custom_book_css) {
+			details.open = true;
+		}
+
+		details.appendChild(fieldset3);
+
+		appearance.appendChild(details);
 	}
 
 	root.appendChild(appearance);
