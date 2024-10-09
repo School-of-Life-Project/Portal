@@ -95,7 +95,7 @@ if (courseContainer && progressContainer && settings) {
 					.then((currentBackendDate) => {
 						if (currentBackendDate != lastBackendDate) {
 							console.log(lastBackendDate, currentBackendDate);
-							window.location.reload();
+							location.reload();
 						}
 					})
 					.catch((error) => {
