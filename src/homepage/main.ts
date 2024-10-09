@@ -1,6 +1,7 @@
 import {
 	displayError,
 	getActive,
+	getBackendDate,
 	getOverallProgress,
 	getSettings,
 } from "../bindings.ts";
@@ -86,4 +87,23 @@ if (courseContainer && progressContainer && settings) {
 		progressContainer.innerHTML = "";
 		progressContainer.appendChild(fragment);
 	});
+
+	getBackendDate()
+		.then((lastBackendDate) => {
+			window.setInterval(() => {
+				getBackendDate()
+					.then((currentBackendDate) => {
+						if (currentBackendDate != lastBackendDate) {
+							console.log(lastBackendDate, currentBackendDate);
+							window.location.reload();
+						}
+					})
+					.catch((error) => {
+						displayError(error);
+					});
+			}, 15000);
+		})
+		.catch((error) => {
+			displayError(error);
+		});
 }
