@@ -295,6 +295,12 @@ function buildSettingsForm(settings: Settings) {
 
 			fieldset3.appendChild(title);
 
+			const customCSSWarning = document.createElement("p");
+			customCSSWarning.innerText =
+				"⚠ Custom stylesheets are a work in progress.\nYour stylesheets may break between minor app releases.";
+			customCSSWarning.style.marginTop = "0";
+			fieldset3.appendChild(customCSSWarning);
+
 			const customCSSLabel = document.createElement("label");
 			customCSSLabel.setAttribute("for", "custom_css");
 			customCSSLabel.innerText = " App Stylesheet:";
