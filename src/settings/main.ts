@@ -1,6 +1,5 @@
 import { getVersion } from "@tauri-apps/api/app";
 import {
-	applyTheme,
 	displayError,
 	getSettings,
 	openDataDir,
@@ -117,8 +116,6 @@ if (settingsForm && settings) {
 
 	settingsForm.innerHTML = "";
 	settingsForm.appendChild(form);
-
-	applyTheme(settings);
 }
 
 function buildSettingsForm(settings: Settings) {
@@ -288,7 +285,32 @@ function buildSettingsForm(settings: Settings) {
 			maxTotalChapterInput.addEventListener("change", handleInputUpdate);
 		}
 
+		const fieldset3 = document.createElement("fieldset");
+
+		{
+			const title = document.createElement("legend");
+			title.innerText = "🖌 Interface Theme";
+
+			fieldset3.appendChild(title);
+
+			const customCSSInput = document.createElement("textarea");
+			customCSSInput.id = "custom_css";
+			if (settings.custom_css) {
+				customCSSInput.value = settings.custom_css;
+			}
+
+			const customCSSLabel = document.createElement("label");
+			customCSSLabel.setAttribute("for", "custom_css");
+			customCSSLabel.innerText = " Custom CSS:";
+
+			fieldset3.appendChild(customCSSLabel);
+			fieldset3.appendChild(document.createElement("br"));
+			fieldset3.appendChild(customCSSInput);
+			fieldset3.addEventListener("input", handleInputUpdate);
+		}
+
 		appearance.appendChild(title);
+		appearance.appendChild(fieldset3);
 		appearance.appendChild(fieldset1);
 		appearance.appendChild(fieldset2);
 	}
@@ -301,7 +323,8 @@ function buildSettingsForm(settings: Settings) {
 function handleInputUpdate(event: Event) {
 	if (
 		event.target &&
-		(event.target as HTMLElement).tagName == "INPUT" &&
+		((event.target as HTMLElement).tagName == "INPUT" ||
+			(event.target as HTMLElement).tagName == "TEXTAREA") &&
 		(event.target as HTMLElement).id &&
 		settings
 	) {
@@ -322,6 +345,13 @@ function handleInputUpdate(event: Event) {
 		if (target.type == "checkbox") {
 			// @ts-expect-error direct Settings access
 			settings[target.id] = target.checked;
+
+			updateSettings(settings);
+		}
+
+		if (target.tagName == "TEXTAREA") {
+			// @ts-expect-error direct Settings access
+			settings[target.id] = target.value;
 
 			updateSettings(settings);
 		}

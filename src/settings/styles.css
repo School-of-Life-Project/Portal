@@ -52,11 +52,11 @@ fieldset legend {
 }
 
 textarea {
-	width: 24em;
-	height: 12em;
+	width: 16em;
+	height: 8em;
 	border: var(--secondary-border);
 	font:
-		1em "Liberation Mono",
+		0.9em "Liberation Mono",
 		monospace,
 		OpenMoji;
 	box-sizing: border-box;
