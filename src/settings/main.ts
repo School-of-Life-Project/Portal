@@ -289,7 +289,7 @@ function buildSettingsForm(settings: Settings) {
 
 		{
 			const title = document.createElement("legend");
-			title.innerText = "🖌 Interface Theme";
+			title.innerText = " Custom Stylesheet";
 
 			fieldset3.appendChild(title);
 
@@ -301,20 +301,14 @@ function buildSettingsForm(settings: Settings) {
 			customCSSInput.placeholder =
 				'/* Learn a bit of CSS and make Portal your own! */\n\nbody {\n    font-family: "Comic Sans MS", OpenMoji;\n}\n\n/* Note: Custom themes do not apply to the Guide, Settings, or error pages.\n\nWarning: Custom CSS is not yet stable!\nYour themes may break between minor releases of the app. */';
 
-			const customCSSLabel = document.createElement("label");
-			customCSSLabel.setAttribute("for", "custom_css");
-			customCSSLabel.innerText = " Custom Stylesheet:";
-
-			fieldset3.appendChild(customCSSLabel);
-			fieldset3.appendChild(document.createElement("br"));
 			fieldset3.appendChild(customCSSInput);
 			fieldset3.addEventListener("input", handleInputUpdate);
 		}
 
 		appearance.appendChild(title);
-		appearance.appendChild(fieldset3);
 		appearance.appendChild(fieldset1);
 		appearance.appendChild(fieldset2);
+		appearance.appendChild(fieldset3);
 	}
 
 	root.appendChild(appearance);
