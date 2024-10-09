@@ -150,12 +150,15 @@ export class ePubViewer implements DocumentViewer {
 						allowScriptedContent: true,
 					});
 
-					rendition.themes.font("serif");
-					rendition.themes.fontSize("18px");
-					rendition.themes.override("line-height", "1.5");
-					/*rendition.themes.default(
-						"data:text/css;base64,Ym9keSB7IGJhY2tncm91bmQtY29sb3I6IGdyZWVuIH0=",
-					);*/
+					if (view.settings.custom_book_css) {
+						rendition.themes.default(
+							"data:text/css;base64," + btoa(view.settings.custom_book_css),
+						);
+					} else {
+						rendition.themes.font("serif");
+						rendition.themes.fontSize("18px");
+						rendition.themes.override("line-height", "1.5");
+					}
 
 					let position = initialProgress.books[this.document_index]?.position;
 

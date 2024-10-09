@@ -8,6 +8,8 @@ import {
 	openIssueTracker,
 	openRepo,
 	openWebsite,
+	placeholderBookCSS,
+	placeholderThemeCSS,
 	setActiveCourses,
 	setSettings,
 	Settings,
@@ -289,19 +291,41 @@ function buildSettingsForm(settings: Settings) {
 
 		{
 			const title = document.createElement("legend");
-			title.innerText = " Custom Stylesheet";
+			title.innerText = " Custom Stylesheets";
 
 			fieldset3.appendChild(title);
+
+			const customCSSLabel = document.createElement("label");
+			customCSSLabel.setAttribute("for", "custom_css");
+			customCSSLabel.innerText = " App Stylesheet:";
 
 			const customCSSInput = document.createElement("textarea");
 			customCSSInput.id = "custom_css";
 			if (settings.custom_css) {
 				customCSSInput.value = settings.custom_css;
 			}
-			customCSSInput.placeholder =
-				'/* Learn a bit of CSS and make Portal your own! */\n\nbody {\n    font-family: "Comic Sans MS", OpenMoji;\n}\n\n/* Note: Custom themes do not apply to the Guide, Settings, or error pages.\n\nWarning: Custom CSS is not yet stable!\nYour themes may break between minor releases of the app. */';
+			customCSSInput.placeholder = placeholderThemeCSS;
 
+			fieldset3.appendChild(customCSSLabel);
+			fieldset3.appendChild(document.createElement("br"));
 			fieldset3.appendChild(customCSSInput);
+			fieldset3.appendChild(document.createElement("br"));
+			fieldset3.addEventListener("input", handleInputUpdate);
+
+			const customBookCSSLabel = document.createElement("label");
+			customBookCSSLabel.setAttribute("for", "custom_book_css");
+			customBookCSSLabel.innerText = "📖 Course Stylesheet:";
+
+			const customBookCSSInput = document.createElement("textarea");
+			customBookCSSInput.id = "custom_book_css";
+			if (settings.custom_book_css) {
+				customBookCSSInput.value = settings.custom_book_css;
+			}
+			customBookCSSInput.placeholder = placeholderBookCSS;
+
+			fieldset3.appendChild(customBookCSSLabel);
+			fieldset3.appendChild(document.createElement("br"));
+			fieldset3.appendChild(customBookCSSInput);
 			fieldset3.addEventListener("input", handleInputUpdate);
 		}
 

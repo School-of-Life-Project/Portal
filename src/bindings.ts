@@ -9,6 +9,10 @@ const newIssueURL =
 	"https://github.com/School-of-Life-Project/Portal/issues/new";
 const discussionBoardURL =
 	"https://github.com/School-of-Life-Project/Portal/discussions?discussions_q=is%3Aopen+sort%3Atop";
+export const placeholderThemeCSS =
+	'/* Learn a bit of CSS and make Portal your own! */\n\nbody {\n    font-family: "Comic Sans MS", OpenMoji;\n}\n\n/* Note: Custom stylesheets do not apply to the Guide, Settings, or error pages. */';
+export const placeholderBookCSS =
+	'/* Learn a bit of CSS and customize your Courses! */\n\nbody {\n    font: 18px / 1.5 "Comic Sans MS";\n}';
 
 // Based on /src-tauri/src/course/mod.rs
 
@@ -96,6 +100,7 @@ export interface Settings {
 	maximum_daily_chapters: number;
 	weeks_displayed: number;
 	custom_css?: string;
+	custom_book_css?: string;
 }
 
 export async function getBackendDate(): Promise<BackendDate> {
@@ -334,6 +339,14 @@ export async function getSettings(): Promise<Settings> {
 
 				if (settings.course_time_chunks == undefined) {
 					settings.course_time_chunks = 5;
+				}
+
+				if (settings.custom_css == undefined) {
+					settings.custom_css = "";
+				}
+
+				if (settings.custom_book_css == undefined) {
+					settings.custom_book_css = "";
 				}
 
 				return settings;
