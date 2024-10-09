@@ -1,4 +1,5 @@
 import {
+	applyTheme,
 	Course,
 	CourseCompletionData,
 	displayError,
@@ -90,4 +91,6 @@ if (
 		.catch((error: Error) => {
 			displayError(error);
 		});
+
+	applyTheme(settings);
 }

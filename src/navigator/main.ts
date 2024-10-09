@@ -1,7 +1,9 @@
 import {
+	applyTheme,
 	displayError,
 	getActiveCourses,
 	getAll,
+	getSettings,
 	openDataDir,
 } from "../bindings.ts";
 import { buildCourseListing } from "./courses.ts";
@@ -76,3 +78,9 @@ if (contentListing && contentViewer) {
 		},
 	);
 }
+
+getSettings()
+	.then((settings) => applyTheme(settings))
+	.catch((error) => {
+		displayError(error);
+	});

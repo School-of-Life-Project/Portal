@@ -95,6 +95,7 @@ export interface Settings {
 	maximum_daily_time: number;
 	maximum_daily_chapters: number;
 	weeks_displayed: number;
+	custom_css?: string;
 }
 
 export async function getBackendDate(): Promise<BackendDate> {
@@ -358,5 +359,14 @@ export async function setSettings(settings?: Settings): Promise<null> {
 		});
 	} catch (error) {
 		throw convertBackendAsyncError(error);
+	}
+}
+
+export function applyTheme(settings: Settings) {
+	if (settings.custom_css) {
+		const element = document.createElement("style");
+		element.innerText = settings.custom_css;
+
+		document.head.appendChild(element);
 	}
 }

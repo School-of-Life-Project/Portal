@@ -1,4 +1,5 @@
 import {
+	applyTheme,
 	displayError,
 	getActive,
 	getBackendDate,
@@ -87,6 +88,8 @@ if (courseContainer && progressContainer && settings) {
 		progressContainer.innerHTML = "";
 		progressContainer.appendChild(fragment);
 	});
+
+	applyTheme(settings);
 
 	getBackendDate()
 		.then((lastBackendDate) => {

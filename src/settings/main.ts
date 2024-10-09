@@ -1,5 +1,6 @@
 import { getVersion } from "@tauri-apps/api/app";
 import {
+	applyTheme,
 	displayError,
 	getSettings,
 	openDataDir,
@@ -116,6 +117,8 @@ if (settingsForm && settings) {
 
 	settingsForm.innerHTML = "";
 	settingsForm.appendChild(form);
+
+	applyTheme(settings);
 }
 
 function buildSettingsForm(settings: Settings) {
