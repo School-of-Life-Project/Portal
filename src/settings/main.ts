@@ -301,7 +301,7 @@ function buildSettingsForm(settings: Settings) {
 
 			const customCSSLabel = document.createElement("label");
 			customCSSLabel.setAttribute("for", "custom_css");
-			customCSSLabel.innerText = " Custom CSS:";
+			customCSSLabel.innerText = " Custom Stylesheet:";
 
 			fieldset3.appendChild(customCSSLabel);
 			fieldset3.appendChild(document.createElement("br"));
