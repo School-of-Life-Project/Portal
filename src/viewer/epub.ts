@@ -156,7 +156,7 @@ export class ePubViewer implements DocumentViewer {
 						);
 					} else {
 						rendition.themes.font("serif");
-						rendition.themes.fontSize("18px");
+						rendition.themes.fontSize("19px");
 						rendition.themes.override("line-height", "1.5");
 					}
 
