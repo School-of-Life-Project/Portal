@@ -155,9 +155,9 @@ export class ePubViewer implements DocumentViewer {
 							"data:text/css;base64," + btoa(view.settings.custom_book_css),
 						);
 					} else {
-						rendition.themes.font("serif");
-						rendition.themes.fontSize("18px");
-						rendition.themes.override("line-height", "1.5");
+						rendition.themes.default(
+							"data:text/css;base64,Ym9keXtmb250OjE5cHgvMS41IHNlcmlmfQo=",
+						);
 					}
 
 					let position = initialProgress.books[this.document_index]?.position;
