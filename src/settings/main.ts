@@ -9,6 +9,7 @@ import {
 	openRepo,
 	openWebsite,
 	placeholderBookCSS,
+	placeholderMapCSS,
 	placeholderThemeCSS,
 	setActiveCourses,
 	setSettings,
@@ -326,6 +327,23 @@ function buildSettingsForm(settings: Settings) {
 			fieldset3.appendChild(customBookCSSLabel);
 			fieldset3.appendChild(document.createElement("br"));
 			fieldset3.appendChild(customBookCSSInput);
+			fieldset3.appendChild(document.createElement("br"));
+			fieldset3.addEventListener("input", handleInputUpdate);
+
+			const customMapCSSLabel = document.createElement("label");
+			customMapCSSLabel.setAttribute("for", "custom_map_css");
+			customMapCSSLabel.innerText = "🗺️ Course Map Stylesheet:";
+
+			const customMapCSSInput = document.createElement("textarea");
+			customMapCSSInput.id = "custom_map_css";
+			if (settings.custom_map_css) {
+				customMapCSSInput.value = settings.custom_map_css;
+			}
+			customMapCSSInput.placeholder = placeholderMapCSS;
+
+			fieldset3.appendChild(customMapCSSLabel);
+			fieldset3.appendChild(document.createElement("br"));
+			fieldset3.appendChild(customMapCSSInput);
 			fieldset3.addEventListener("input", handleInputUpdate);
 		}
 
@@ -341,6 +359,11 @@ function buildSettingsForm(settings: Settings) {
 		if (settings.custom_css || settings.custom_book_css) {
 			details.open = true;
 		}
+
+		const warning = document.createElement("p");
+		warning.innerText =
+			"⚠ These settings can cause issues with Portal when used improperly.";
+		details.appendChild(warning);
 
 		details.appendChild(fieldset3);
 

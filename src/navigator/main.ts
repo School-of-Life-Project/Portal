@@ -17,6 +17,10 @@ const activePromise = getActiveCourses().catch((error) => {
 	displayError(error);
 });
 
+const settingsPromise = getSettings().catch((error) => {
+	displayError(error);
+});
+
 const folderButton = document.getElementById("folderOpener");
 const refreshButton = document.getElementById("refreshButton");
 const contentListing = document.getElementById("listingInner");
@@ -43,9 +47,9 @@ if (refreshButton) {
 }
 
 if (contentListing && contentViewer) {
-	Promise.all([listingPromise, activePromise]).then(
-		async ([listing, activeCourses]) => {
-			if (!listing || !activeCourses) {
+	Promise.all([listingPromise, activePromise, settingsPromise]).then(
+		async ([listing, activeCourses, settings]) => {
+			if (!listing || !activeCourses || !settings) {
 				return;
 			}
 
@@ -67,6 +71,7 @@ if (contentListing && contentViewer) {
 						listing.course_maps,
 						contentViewer,
 						styleContainer,
+						settings,
 					),
 				);
 			}
@@ -75,12 +80,8 @@ if (contentListing && contentViewer) {
 
 			contentListing.innerHTML = "";
 			contentListing.appendChild(fragment);
+
+			applyTheme(settings);
 		},
 	);
 }
-
-getSettings()
-	.then((settings) => applyTheme(settings))
-	.catch((error) => {
-		displayError(error);
-	});
