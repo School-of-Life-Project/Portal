@@ -12,7 +12,7 @@ const discussionBoardURL =
 export const placeholderThemeCSS =
 	'/* Learn a bit of CSS and make Portal your own! */\n\nbody {\n    font-family: "Comic Sans MS", OpenMoji;\n}\n\n/* Note: Custom stylesheets do not apply to the Guide, Settings, or error pages. */';
 export const placeholderBookCSS =
-	'/* Learn a bit of CSS and customize your Courses! */\n\nbody {\n    font: 18px / 1.5 "Comic Sans MS";\n}';
+	'/* Learn a bit of CSS and customize your Courses! */\n\nbody {\n    font: 19px / 1.5 "Comic Sans MS";\n}';
 
 export const placeholderMapCSS =
 	'/* Learn a bit of CSS and make Portal your own! */\n\n.course-map-item {\n    font-family: "Comic Sans MS", OpenMoji;\n}\n\n/* Note: The Course Map stylesheet only applies to the Course Map graph. The rest of the Course Navigator is styled using the App Stylesheet. */';
