@@ -150,6 +150,7 @@ function buildSettingsForm(settings: Settings) {
 			fieldset1.appendChild(clockLabel);
 			fieldset1.appendChild(clockCheckbox);
 			fieldset1.appendChild(document.createElement("br"));
+			clockCheckbox.addEventListener("change", handleInputUpdate);
 
 			const listingCheckbox = document.createElement("input");
 			listingCheckbox.type = "checkbox";
@@ -163,6 +164,7 @@ function buildSettingsForm(settings: Settings) {
 			fieldset1.appendChild(listingLabel);
 			fieldset1.appendChild(listingCheckbox);
 			fieldset1.appendChild(document.createElement("br"));
+			listingCheckbox.addEventListener("change", handleInputUpdate);
 
 			const courseChunkInput = document.createElement("input");
 			courseChunkInput.type = "number";
@@ -179,6 +181,7 @@ function buildSettingsForm(settings: Settings) {
 			fieldset1.appendChild(courseChunkLabel);
 			fieldset1.appendChild(courseChunkInput);
 			fieldset1.appendChild(document.createElement("br"));
+			courseChunkInput.addEventListener("change", handleInputUpdate);
 
 			const courseTimeInput = document.createElement("input");
 			courseTimeInput.type = "number";
@@ -194,6 +197,7 @@ function buildSettingsForm(settings: Settings) {
 
 			fieldset1.appendChild(courseTimeLabel);
 			fieldset1.appendChild(courseTimeInput);
+			courseTimeInput.addEventListener("change", handleInputUpdate);
 		}
 
 		const fieldset2 = document.createElement("fieldset");
@@ -219,6 +223,7 @@ function buildSettingsForm(settings: Settings) {
 			fieldset2.appendChild(weekLabel);
 			fieldset2.appendChild(weekInput);
 			fieldset2.appendChild(document.createElement("br"));
+			weekInput.addEventListener("change", handleInputUpdate);
 
 			const timeCheckbox = document.createElement("input");
 			timeCheckbox.type = "checkbox";
@@ -232,6 +237,7 @@ function buildSettingsForm(settings: Settings) {
 			fieldset2.appendChild(timeLabel);
 			fieldset2.appendChild(timeCheckbox);
 			fieldset2.appendChild(document.createElement("br"));
+			timeCheckbox.addEventListener("change", handleInputUpdate);
 
 			const maxTotalTimeInput = document.createElement("input");
 			maxTotalTimeInput.type = "number";
@@ -248,6 +254,7 @@ function buildSettingsForm(settings: Settings) {
 			fieldset2.appendChild(maxTotalTimeLabel);
 			fieldset2.appendChild(maxTotalTimeInput);
 			fieldset2.appendChild(document.createElement("br"));
+			maxTotalTimeInput.addEventListener("change", handleInputUpdate);
 
 			const chapterCheckbox = document.createElement("input");
 			chapterCheckbox.type = "checkbox";
@@ -261,6 +268,7 @@ function buildSettingsForm(settings: Settings) {
 			fieldset2.appendChild(chapterLabel);
 			fieldset2.appendChild(chapterCheckbox);
 			fieldset2.appendChild(document.createElement("br"));
+			chapterCheckbox.addEventListener("change", handleInputUpdate);
 
 			const maxTotalChapterInput = document.createElement("input");
 			maxTotalChapterInput.type = "number";
@@ -277,6 +285,7 @@ function buildSettingsForm(settings: Settings) {
 			fieldset2.appendChild(maxTotalChapterLabel);
 			fieldset2.appendChild(maxTotalChapterInput);
 			fieldset2.appendChild(document.createElement("br"));
+			maxTotalChapterInput.addEventListener("change", handleInputUpdate);
 		}
 
 		const fieldset3 = document.createElement("fieldset");
@@ -302,6 +311,7 @@ function buildSettingsForm(settings: Settings) {
 			fieldset3.appendChild(document.createElement("br"));
 			fieldset3.appendChild(customCSSInput);
 			fieldset3.appendChild(document.createElement("br"));
+			customCSSInput.addEventListener("input", handleInputUpdate);
 
 			const customBookCSSLabel = document.createElement("label");
 			customBookCSSLabel.setAttribute("for", "custom_book_css");
@@ -318,6 +328,7 @@ function buildSettingsForm(settings: Settings) {
 			fieldset3.appendChild(document.createElement("br"));
 			fieldset3.appendChild(customBookCSSInput);
 			fieldset3.appendChild(document.createElement("br"));
+			customBookCSSInput.addEventListener("input", handleInputUpdate);
 
 			const customMapCSSLabel = document.createElement("label");
 			customMapCSSLabel.setAttribute("for", "custom_map_css");
@@ -333,6 +344,7 @@ function buildSettingsForm(settings: Settings) {
 			fieldset3.appendChild(customMapCSSLabel);
 			fieldset3.appendChild(document.createElement("br"));
 			fieldset3.appendChild(customMapCSSInput);
+			customMapCSSInput.addEventListener("input", handleInputUpdate);
 		}
 
 		appearance.appendChild(title);
@@ -359,7 +371,6 @@ function buildSettingsForm(settings: Settings) {
 	}
 
 	root.appendChild(appearance);
-	root.addEventListener("change", handleInputUpdate);
 
 	return root;
 }
