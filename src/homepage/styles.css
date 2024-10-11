@@ -68,3 +68,7 @@ nav.related a {
 	white-space: nowrap;
 	display: inline-block;
 }
+
+#progressGraphs {
+	font-size: 99%;
+}
