@@ -60,6 +60,10 @@ nav.related {
 	float: right;
 }
 
+nav.related div.related {
+	float: right;
+}
+
 nav.related a {
 	background-color: var(--button-color);
 	border: var(--primary-border);
@@ -67,6 +71,10 @@ nav.related a {
 	margin-left: 0.8lh;
 	white-space: nowrap;
 	display: inline-block;
+}
+
+nav.related div.related a {
+	margin-top: 0.8lh;
 }
 
 #progressGraphs {
