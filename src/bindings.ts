@@ -10,11 +10,9 @@ const newIssueURL =
 const discussionBoardURL =
 	"https://github.com/School-of-Life-Project/Portal/discussions?discussions_q=is%3Aopen+sort%3Atop";
 export const placeholderThemeCSS =
-	'/* Learn a bit of CSS and make Portal your own! */\n\nbody {\n    font-family: "Comic Sans MS", OpenMoji;\n}\n\n/* Note: Custom stylesheets do not apply to the Guide, Settings, or error pages. */';
+	'/* Learn a bit of CSS and make Portal your own! */\n\nbody {\n    font-family: "Comic Sans MS", OpenMoji;\n}\n\n/* Note: Custom stylesheets are only applied to the Home page and Textbook Viewer. */';
 export const placeholderBookCSS =
 	'/* Learn a bit of CSS and customize your Courses! */\n\nbody {\n    font: 19px / 1.5 "Comic Sans MS";\n}\n\n/* Note: Adding a custom textbook stylesheet will disable the default Textbook Viewer stylesheet. */';
-export const placeholderMapCSS =
-	'/* Learn a bit of CSS and make Portal your own! */\n\n.course-map-item {\n    font-family: "Comic Sans MS", OpenMoji;\n}\n\n/* Note: The Course Map stylesheet only applies to the Course Map graph. The rest of the Course Navigator is styled using the app stylesheet. */';
 
 // Based on /src-tauri/src/course/mod.rs
 
@@ -103,7 +101,6 @@ export interface Settings {
 	weeks_displayed: number;
 	custom_css?: string;
 	custom_book_css?: string;
-	custom_map_css?: string;
 }
 
 export async function getBackendDate(): Promise<BackendDate> {
@@ -350,10 +347,6 @@ export async function getSettings(): Promise<Settings> {
 
 				if (settings.custom_book_css == undefined) {
 					settings.custom_book_css = "";
-				}
-
-				if (settings.custom_map_css == undefined) {
-					settings.custom_map_css = "";
 				}
 
 				return settings;

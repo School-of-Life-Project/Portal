@@ -9,7 +9,6 @@ import {
 	openRepo,
 	openWebsite,
 	placeholderBookCSS,
-	placeholderMapCSS,
 	placeholderThemeCSS,
 	setActiveCourses,
 	setSettings,
@@ -329,22 +328,6 @@ function buildSettingsForm(settings: Settings) {
 			fieldset3.appendChild(customBookCSSInput);
 			fieldset3.appendChild(document.createElement("br"));
 			customBookCSSInput.addEventListener("input", handleInputUpdate);
-
-			const customMapCSSLabel = document.createElement("label");
-			customMapCSSLabel.setAttribute("for", "custom_map_css");
-			customMapCSSLabel.innerText = "🗺️ Course Map Stylesheet:";
-
-			const customMapCSSInput = document.createElement("textarea");
-			customMapCSSInput.id = "custom_map_css";
-			if (settings.custom_map_css) {
-				customMapCSSInput.value = settings.custom_map_css;
-			}
-			customMapCSSInput.placeholder = placeholderMapCSS;
-
-			fieldset3.appendChild(customMapCSSLabel);
-			fieldset3.appendChild(document.createElement("br"));
-			fieldset3.appendChild(customMapCSSInput);
-			customMapCSSInput.addEventListener("input", handleInputUpdate);
 		}
 
 		appearance.appendChild(title);

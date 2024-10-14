@@ -206,7 +206,7 @@ impl SVGWriter {
 
         let svg_line = format!(
             "<svg width=\"{}\" height=\"{}\" viewBox=\"0 0 {} {}\
-            \" xmlns=\"http://www.w3.org/2000/svg\">\n<style>p {{padding: 1em; margin: 0}} div.course-map-item {{width: 100%; height: 100%; background-color: var(--mini-card-color); border-radius: {}px}}</style>\n",
+            \" xmlns=\"http://www.w3.org/2000/svg\">\n<style>p{{padding:1em;margin:0}}div.course-map-item{{width:100%;height:100%;background-color: var(--mini-card-color);border-radius: {}px}}</style>\n",
             self.view_size.x, self.view_size.y, self.view_size.x, self.view_size.y, RADIUS,
         );
         result.push_str(&svg_line);

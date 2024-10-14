@@ -1,9 +1,7 @@
 import {
-	applyTheme,
 	displayError,
 	getActiveCourses,
 	getAll,
-	getSettings,
 	openDataDir,
 } from "../bindings.ts";
 import { buildCourseListing } from "./courses.ts";
@@ -14,10 +12,6 @@ const listingPromise = getAll().catch((error) => {
 });
 
 const activePromise = getActiveCourses().catch((error) => {
-	displayError(error);
-});
-
-const settingsPromise = getSettings().catch((error) => {
 	displayError(error);
 });
 
@@ -47,9 +41,9 @@ if (refreshButton) {
 }
 
 if (contentListing && contentViewer) {
-	Promise.all([listingPromise, activePromise, settingsPromise]).then(
-		async ([listing, activeCourses, settings]) => {
-			if (!listing || !activeCourses || !settings) {
+	Promise.all([listingPromise, activePromise]).then(
+		async ([listing, activeCourses]) => {
+			if (!listing || !activeCourses) {
 				return;
 			}
 
@@ -71,7 +65,6 @@ if (contentListing && contentViewer) {
 						listing.course_maps,
 						contentViewer,
 						styleContainer,
-						settings,
 					),
 				);
 			}
@@ -80,8 +73,6 @@ if (contentListing && contentViewer) {
 
 			contentListing.innerHTML = "";
 			contentListing.appendChild(fragment);
-
-			applyTheme(settings);
 		},
 	);
 }

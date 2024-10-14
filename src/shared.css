@@ -39,7 +39,13 @@
 }
 
 :root {
+	--text-color: black;
+	--reader-text-color: black;
+
 	--background-color: oklch(98% 0.02 calc(75 + (30 / 2)));
+	--reader-background-color: oklch(
+		from var(--background-color) calc(l * 3) calc(c / 3) h
+	);
 
 	--primary-card-color: oklch(95% 0.03 calc(75 + 30));
 	--secondary-card-color: oklch(95% 0.04 75);
@@ -69,6 +75,7 @@
 }
 
 body {
+	color: var(--text-color);
 	font:
 		1rem/1.2 Arial,
 		"Liberation Sans",

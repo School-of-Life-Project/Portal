@@ -1,10 +1,4 @@
-import {
-	Course,
-	CourseMap,
-	CourseProgress,
-	displayError,
-	Settings,
-} from "../bindings";
+import { Course, CourseMap, CourseProgress, displayError } from "../bindings";
 import { isCompletable, isComplete, isStarted, sortCourseMaps } from "../util";
 import { displayCourse } from "./courses";
 
@@ -13,7 +7,6 @@ export function buildCourseMapListing(
 	courseMaps: [CourseMap, string][],
 	contentViewer: HTMLElement,
 	styleContainer: HTMLStyleElement,
-	settings: Settings,
 ): DocumentFragment {
 	const fragment = document.createDocumentFragment();
 
@@ -60,7 +53,6 @@ export function buildCourseMapListing(
 						courseMapping,
 						contentViewer,
 						styleContainer,
-						settings,
 					),
 				);
 
@@ -92,7 +84,6 @@ function buildCourseMapInfo(
 	courseMapping: Map<string, [Course, CourseProgress]>,
 	contentViewer: HTMLElement,
 	styleContainer: HTMLStyleElement,
-	settings: Settings,
 ) {
 	const root = document.createDocumentFragment();
 
@@ -116,14 +107,7 @@ function buildCourseMapInfo(
 	const svgElement = image.getElementsByTagName("svg")[0];
 
 	svgElement.getElementsByTagName("style")[0].innerHTML +=
-		" .course-map-item {cursor: pointer; outline-offset: -0.5lh}";
-
-	if (settings.custom_map_css) {
-		const element = document.createElement("style");
-		element.innerText = settings.custom_map_css;
-
-		svgElement.appendChild(element);
-	}
+		".course-map-item{cursor:pointer;outline-offset: -0.5lh}";
 
 	const items: SVGForeignObjectElement[] = [];
 
