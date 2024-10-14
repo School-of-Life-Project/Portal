@@ -44,7 +44,7 @@
 
 	--background-color: oklch(98% 0.02 calc(75 + (30 / 2)));
 	--reader-background-color: oklch(
-		from var(--background-color) calc(l * 3) calc(c / 3) h
+		calc(98% * 3) calc(0.02 / 3) calc(75 + (30 / 2))
 	);
 
 	--primary-card-color: oklch(95% 0.03 calc(75 + 30));
