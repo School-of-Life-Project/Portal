@@ -64,7 +64,7 @@ nav.related a {
 	background-color: var(--button-color);
 	border: var(--primary-border);
 	padding: var(--button-padding);
-	margin-left: 0.5lh;
+	margin-left: 0.8lh;
 	white-space: nowrap;
 	display: inline-block;
 }
