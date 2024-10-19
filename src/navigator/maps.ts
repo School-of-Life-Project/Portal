@@ -51,6 +51,7 @@ export function buildCourseMapListing(
 						courseMap[0],
 						courseMap[1],
 						courseMapping,
+						courseMapMap,
 						contentViewer,
 						styleContainer,
 					),
@@ -82,6 +83,7 @@ function buildCourseMapInfo(
 	courseMap: CourseMap,
 	svg: string,
 	courseMapping: Map<string, [Course, CourseProgress]>,
+	courseMapMap: Map<string, [CourseMap, string]>,
 	contentViewer: HTMLElement,
 	styleContainer: HTMLStyleElement,
 ) {
@@ -167,10 +169,18 @@ function buildCourseMapInfo(
 							paragraph.innerText += " 📒";
 						}
 					} else {
-						displayError({
-							message: "Unable to display Course Map " + courseMap.uuid,
-							cause: "Course " + identifier + " does not exist",
-						});
+						const itemCourseMap = courseMapMap.get(identifier);
+
+						if (itemCourseMap) {
+							const paragraph = item.childNodes[0] as HTMLParagraphElement;
+
+							paragraph.innerText = "🗺️ " + paragraph.innerText.slice(2);
+						} else {
+							displayError({
+								message: "Unable to display Course Map " + courseMap.uuid,
+								cause: "Course " + identifier + " does not exist",
+							});
+						}
 					}
 				}
 			}
@@ -184,6 +194,25 @@ function buildCourseMapInfo(
 
 		if (course) {
 			displayCourse(course[0], course[1], contentViewer, styleContainer);
+		} else {
+			const itemCourseMap = courseMapMap.get(identifier);
+
+			if (itemCourseMap) {
+				contentViewer.innerHTML = "";
+				contentViewer.appendChild(
+					buildCourseMapInfo(
+						itemCourseMap[0],
+						itemCourseMap[1],
+						courseMapping,
+						courseMapMap,
+						contentViewer,
+						styleContainer,
+					),
+				);
+
+				styleContainer.innerHTML =
+					"#map-" + itemCourseMap[0].uuid + " {font-weight: bold}";
+			}
 		}
 	};
 
