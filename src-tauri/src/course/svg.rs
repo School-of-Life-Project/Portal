@@ -13,7 +13,7 @@ use layout::{
 };
 use serde_json::{from_str, to_string};
 
-use super::{CourseMap, CourseMapCourse, CourseMapRelationType};
+use super::{CourseMap, CourseMapItem, CourseMapRelationType};
 
 pub(super) const SIZE: f64 = 128.0;
 pub(super) const RATIO: f64 = 1.2;
@@ -266,7 +266,7 @@ impl RenderBackend for SVGWriter {
     }
 
     fn draw_text(&mut self, xy: Point, text: &str, look: &StyleAttr) {
-        if let Ok(course) = from_str::<CourseMapCourse>(text) {
+        if let Ok(course) = from_str::<CourseMapItem>(text) {
             let width = SIZE * RATIO;
             let height = SIZE / RATIO;
 

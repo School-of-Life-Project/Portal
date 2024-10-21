@@ -52,22 +52,22 @@ pub struct CourseMap {
     /// Optimize the CourseMap's layout for visual clarity
     #[serde(default = "default_optimize")]
     pub optimize: bool,
-    /// The Courses which are a part of this Course Map
-    pub courses: Vec<CourseMapCourse>,
+    /// The items which are a part of this Course Map
+    pub courses: Vec<CourseMapItem>,
 }
 
-/// A representation of a Course within a Course Map
+/// A representation of a linked item within a Course Map
 ///
-/// Courses can be specified in any order, and are added to the Course Map in the specified order
+/// Items can be specified in any order, and are added to the Course Map in the specified order
 #[derive(Serialize, Deserialize, JsonSchema, Debug)]
-pub struct CourseMapCourse {
-    /// The unique identifier for the Course
+pub struct CourseMapItem {
+    /// The unique identifier of a Course or Course Map
     pub uuid: Uuid,
-    /// A short title for the Course
+    /// A short title for the item
     pub label: String,
-    /// The accent color of the Course, either specified in RGB hexadecimal format or as a CSS color keyword
+    /// The accent color of the item, either specified in RGB hexadecimal format or as a CSS color keyword
     ///
-    /// This can be useful to visually differentiate courses by subject
+    /// This can be useful to visually differentiate items by subject
     #[serde(default = "default_color")]
     pub color: String,
     /// A list of unidirectional dependency relations for this course
@@ -77,14 +77,14 @@ pub struct CourseMapCourse {
     pub relations: Vec<CourseMapRelation>,
 }
 
-/// A representation of a Course's dependency relation
+/// A representation of an item's dependency relation
 ///
-/// Relations are always unidirectional: CourseMapRelation (source) -> CourseMapCourse (destination)
+/// Relations are always unidirectional: CourseMapRelation (source) -> CourseMapItem (destination)
 ///
-/// Note: It takes some trial and error to get a Course Map to display relations cleanly. Try rearranging Courses and/or Course relations, toggling layout optimization, and using Layout relations as necessary.
+/// Note: It takes some trial and error to get a Course Map to display relations cleanly. Try rearranging items and/or item relations, toggling layout optimization, and using Layout relations as necessary.
 #[derive(Serialize, Deserialize, JsonSchema, Debug)]
 pub struct CourseMapRelation {
-    /// The unique identifier of the (source) Course. Must correspond to an existing CourseMapCourse object
+    /// The unique identifier of the (source) item. Must correspond to an existing CourseMapItem object
     pub uuid: Uuid,
 
     /// The type of the relation
@@ -95,14 +95,14 @@ pub struct CourseMapRelation {
     pub optional: bool,
 }
 
-/// Types of Course dependency relations
+/// Types of item dependency relations
 #[derive(Serialize, Deserialize, JsonSchema, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum CourseMapRelationType {
-    /// Prerequisites are Courses which should be taken before the following Course
+    /// Prerequisites are items which should be completed before the following item
     Prerequisite,
-    /// Corequisites are Courses which should be taken before *or* at the same time as the following Course
+    /// Corequisites are items which should be completed before *or* at the same time as the following item
     Corequisite,
-    /// Layout relations change the Course hierarchy *without* being displayed visually
+    /// Layout relations change the item hierarchy *without* being displayed visually
     Layout,
 }
 
