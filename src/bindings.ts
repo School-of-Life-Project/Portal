@@ -317,7 +317,7 @@ export async function getSettings(): Promise<Settings> {
 					show_daily_time: true,
 					show_daily_chapters: true,
 					maximum_daily_time: 300,
-					maximum_daily_chapters: 1.25,
+					maximum_daily_chapters: 1, // 0.2 chapters / hour
 					weeks_displayed: 24,
 				} as Settings;
 			} else {
