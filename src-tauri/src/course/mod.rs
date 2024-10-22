@@ -70,9 +70,9 @@ pub struct CourseMapItem {
     /// This can be useful to visually differentiate items by subject
     #[serde(default = "default_color")]
     pub color: String,
-    /// A list of unidirectional dependency relations for this course
+    /// A list of unidirectional dependency relations for this item
     ///
-    /// Relations are added to the Course Map after all Courses are added, in the order that they are specified
+    /// Relations are added to the Course Map after all items are added, in the order that they are specified
     #[serde(default)]
     pub relations: Vec<CourseMapRelation>,
 }
