@@ -263,7 +263,7 @@
 				</p>
 				<p>
 					If the error message is "Unable to display Course Map", the course map
-					is missing one or more of the courses it is designed to accompany.
+					is missing one or more of the resources it is designed to accompany.
 					Contact the resource creator for more information.
 				</p>
 				<p>
@@ -476,14 +476,15 @@
 				<p>
 					Course Maps are TOML files, adhering to the
 					<code>$APPDATA/Resource Schema/CourseMap.json</code> schema, which
-					contain a user-facing dependency tree of Courses (referenced by UUID).
+					contain a user-facing dependency tree of resources (referenced by
+					UUID).
 				</p>
 				<p>
 					Course Maps are loaded from the path
 					<code>$APPDATA/User Resources/{UUID}.toml</code> when using the
 					&nbsp;Course&nbsp;Navigator. An invalid Course Map will result in an
 					immediate error. However, a Course Map which references a non-existent
-					Course will only produce an error once the user attempts to open the
+					resource will only produce an error once the user attempts to open the
 					Course Map.
 				</p>
 				<h3> Packaging and Sharing Resources</h3>

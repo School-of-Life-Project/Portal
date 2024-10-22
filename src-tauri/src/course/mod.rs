@@ -35,7 +35,7 @@ fn into_relative_path(path: &Path) -> PathBuf {
     new
 }
 
-/// A dependency tree of Courses. Must be a valid TOML file
+/// A dependency tree of resources. Must be a valid TOML file
 ///
 /// The Course Map's filename must be a UUID in lowercase hexadecimal form without separator characters, with the `.toml`` file extension.
 ///
@@ -52,11 +52,11 @@ pub struct CourseMap {
     /// Optimize the CourseMap's layout for visual clarity
     #[serde(default = "default_optimize")]
     pub optimize: bool,
-    /// The items which are a part of this Course Map
+    /// The resources which are a part of this Course Map
     pub courses: Vec<CourseMapItem>,
 }
 
-/// A representation of a linked item within a Course Map
+/// A representation of a linked resource within a Course Map
 ///
 /// Items can be specified in any order, and are added to the Course Map in the specified order
 #[derive(Serialize, Deserialize, JsonSchema, Debug)]

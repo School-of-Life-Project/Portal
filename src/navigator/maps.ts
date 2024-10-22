@@ -178,7 +178,7 @@ function buildCourseMapInfo(
 						} else {
 							displayError({
 								message: "Unable to display Course Map " + courseMap.uuid,
-								cause: "Course " + identifier + " does not exist",
+								cause: "Resource " + identifier + " does not exist",
 							});
 						}
 					}
