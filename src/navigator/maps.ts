@@ -159,6 +159,8 @@ function buildCourseMapInfo(
 					if (course) {
 						const paragraph = item.childNodes[0] as HTMLParagraphElement;
 
+						paragraph.innerText = "📚 " + paragraph.innerText;
+
 						if (isCompletable(course[0])) {
 							if (isComplete(course[1])) {
 								paragraph.innerText += " 🏆";
@@ -174,7 +176,7 @@ function buildCourseMapInfo(
 						if (itemCourseMap) {
 							const paragraph = item.childNodes[0] as HTMLParagraphElement;
 
-							paragraph.innerText = "🗺️ " + paragraph.innerText.slice(2);
+							paragraph.innerText = "🗺️ " + paragraph.innerText;
 						} else {
 							displayError({
 								message: "Unable to display Course Map " + courseMap.uuid,

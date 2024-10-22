@@ -272,7 +272,7 @@ impl RenderBackend for SVGWriter {
 
             #[allow(clippy::cast_precision_loss)]
             self.content.push_str(&format!(
-                "<foreignObject x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\"><div class=\"course-map-item course-map-item-{}\"><p>📚 {}</p></div></foreignObject>\n",
+                "<foreignObject x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\"><div class=\"course-map-item course-map-item-{}\"><p>{}</p></div></foreignObject>\n",
                 xy.x - (width / 2.) + (LINE_WIDTH as f64 / 2.),
                 xy.y - (height / 2.) + (LINE_WIDTH as f64 / 2.),
                 width - LINE_WIDTH as f64,
